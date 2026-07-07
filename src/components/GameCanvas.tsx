@@ -5,8 +5,7 @@ import * as THREE from "three";
 import { CONSTANTS, DEBUG_PHYSICS } from "@/game/config/constants";
 import { LEVELS } from "@/game/config/levels";
 import { THEMES } from "@/game/config/themes";
-import { generateLevel } from "@/game/engine/levelGenerator";
-import type { RingData, SectorType } from "@/game/engine/levelGenerator";
+import { generateLevel, type RingData, type SectorType } from "@/game/engine/levelGenerator";
 import { useGameStore } from "@/store/useGameStore";
 import { PlatformRing } from "@/game/entities/PlatformRing";
 import { TowerCore } from "@/game/entities/TowerCore";
@@ -306,7 +305,7 @@ function GameLogic({
       1 - Math.pow(0.001, dt),
     );
     ball.rotation.x += spinVelocity.current * spinDirection * dt;
-    ball.rotation.z += currentRotation.current * 0.015;
+    ball.rotation.y = -currentRotation.current;
 
     bounceSquash.current = Math.max(0, bounceSquash.current - dt * 6);
     const squash = bounceSquash.current * 0.35;
