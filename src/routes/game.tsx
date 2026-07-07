@@ -12,6 +12,7 @@ import { SkinShop } from "@/components/SkinShop";
 import { useGameStore } from "@/store/useGameStore";
 import { PhysicsDebugOverlay } from "@/components/PhysicsDebugOverlay";
 import { useGameSession } from "@/hooks/useGameSession";
+import { useThemePreload } from "@/hooks/useThemePreload";
 
 export const Route = createFileRoute("/game")({
   component: GamePage,
@@ -25,6 +26,7 @@ function GamePage() {
   const [hintVisible, setHintVisible] = useState(true);
   const [splash, setSplash] = useState(true);
   const { finishSession } = useGameSession();
+  useThemePreload();
   const score = useGameStore((s) => s.score);
   const currentLevel = useGameStore((s) => s.currentLevel);
   const prevStateRef = useRef(gameState);
