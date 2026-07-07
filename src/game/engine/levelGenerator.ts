@@ -44,15 +44,7 @@ export function generateLevel(
       if (rnd() < obstacleRate) sectors[s] = "danger";
     }
 
-    // Occasional bonus sector.
-    if (rnd() < 0.15) {
-      for (let s = 0; s < S; s++) {
-        if (sectors[s] === "solid") {
-          sectors[s] = "bonus";
-          break;
-        }
-      }
-    }
+    // Bonus sectors disabled (yellow/reward wedges removed).
 
     const hasCoin = rnd() < coinRate;
     rings.push({
