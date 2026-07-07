@@ -158,3 +158,41 @@
     user-select: none;
   }
 }
+
+/* ================================================================
+ * Gerente Helix — Admin panel theme
+ * Scoped to `.admin-theme` so it never touches the game (`/`).
+ * ================================================================ */
+.admin-theme {
+  --admin-bg: #07080c;
+  --admin-sidebar: #111217;
+  --admin-card: #161720;
+  --admin-input: #1b1c26;
+  --admin-border: #272936;
+  --admin-text: #ffffff;
+  --admin-text-2: #b7c7dd;
+  --admin-text-3: #7b8498;
+  --admin-green: #22c55e;
+  --admin-neon: #00e676;
+  --admin-green-hover: #16a34a;
+  --admin-blue: #3b82f6;
+  --admin-purple: #8b5cf6;
+  --admin-red: #ef4444;
+  --admin-line: rgba(255, 255, 255, 0.08);
+  --admin-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+  color: var(--admin-text);
+  background-color: var(--admin-bg);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+/* The game locks the document to overflow:hidden. Admin routes need to
+ * scroll their own main region, so we allow scroll on a scoped container. */
+.admin-scroll {
+  height: 100vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: auto;
+}
+
