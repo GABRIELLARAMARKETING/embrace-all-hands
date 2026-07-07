@@ -469,26 +469,8 @@ function GameLogic({
             />
           );
         })}
-        {generated.rings.map((ring, i) =>
-          ring.hasCoin ? (
-            <Collectible
-              key={`c-${i}`}
-              y={ring.y + CONSTANTS.PLATFORM_SPACING / 2}
-              angle={ring.coinAngle}
-              collected={collectedCoins.has(i)}
-              onCollect={() => {
-                setCollectedCoins((prev) => {
-                  if (prev.has(i)) return prev;
-                  const next = new Set(prev);
-                  next.add(i);
-                  return next;
-                });
-                collectCoin(1);
-              }}
-              ballRef={ballRef}
-            />
-          ) : null,
-        )}
+        {/* moedas removidas do jogo */}
+
       </group>
 
       <Ball ref={ballRef} ballTheme={theme.ball} fever={fever} />
