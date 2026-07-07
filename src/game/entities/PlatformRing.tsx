@@ -20,7 +20,7 @@ function sectorGeometry(): THREE.ExtrudeGeometry {
   const shape = new THREE.Shape();
   const r = CONSTANTS.TOWER_RADIUS;
   const ir = CONSTANTS.CORE_RADIUS;
-  const a = SECTOR_ANGLE * 0.98; // small gap between sectors for visual seams
+  const a = SECTOR_ANGLE; // sem gap visual entre setores — plataforma lisa
   shape.moveTo(Math.cos(0) * ir, Math.sin(0) * ir);
   shape.lineTo(Math.cos(0) * r, Math.sin(0) * r);
   const steps = 6;
