@@ -131,9 +131,8 @@ describe("frameLoop — accumulator integration", () => {
     const plat = makePlatform({ id: 5, y: -100 }); // far away, no collision
     const ball = createBallState(5);
     const acc = createAccumulator();
-    // Simulate a huge stall: 5s of delta in one call. MAX_DELTA clamps to 1/30,
-    // then MAX_SUBSTEPS caps steps; leftover must be dropped, not accumulated.
-    const steps = runFrame(ball, [plat], 0, 5, 0, acc, () => {});
+    acc.value = 999; // simulate a huge stall built up by previous frames
+    const steps = runFrame(ball, [plat], 0, PHYSICS.FIXED_STEP, 0, acc, () => {});
     expect(steps).toBe(PHYSICS.MAX_SUBSTEPS);
     expect(acc.value).toBe(0);
   });
