@@ -266,7 +266,7 @@ function GameLogic({
                 CONSTANTS.BALL_TRACK_RADIUS,
                 THEMES[themeId].accent,
               );
-              cameraShake.current = Math.max(cameraShake.current, 0.18);
+              cameraShake.current = Math.max(cameraShake.current, 0.45);
               addScore(1);
               window.setTimeout(() => {
                 breakingRingsRef.current.delete(k);
