@@ -11,7 +11,7 @@ interface Props {
   breakingSince?: number | null;
 }
 
-const BREAK_DURATION = 0.75;
+const BREAK_DURATION = 0.22;
 
 const SECTORS = CONSTANTS.SECTORS_PER_RING;
 const SECTOR_ANGLE = (Math.PI * 2) / SECTORS;
