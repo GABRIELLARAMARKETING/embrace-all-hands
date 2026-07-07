@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { GameCanvas } from "@/components/GameCanvas";
@@ -12,38 +12,15 @@ import { SkinShop } from "@/components/SkinShop";
 import { useGameStore } from "@/store/useGameStore";
 import { PhysicsDebugOverlay } from "@/components/PhysicsDebugOverlay";
 import { useGameSession } from "@/hooks/useGameSession";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/game")({
   component: GamePage,
 });
 
 function GamePage() {
-  const navigate = useNavigate();
-  const [authed, setAuthed] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (!mounted) return;
-      if (!data.session) {
-        navigate({ to: "/login", replace: true });
-      } else {
-        setAuthed(true);
-      }
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (!session) navigate({ to: "/login", replace: true });
-    });
-    return () => {
-      mounted = false;
-      sub.subscription.unsubscribe();
-    };
-  }, [navigate]);
-
   const gameState = useGameStore((s) => s.gameState);
   const loadProgress = useGameStore((s) => s.loadProgress);
-  const [themesOpen, setThemesOpen] = useState(false);
+  const [themesOpen, setThemesOpen] = useState(true);
   const [skinsOpen, setSkinsOpen] = useState(false);
   const [hintVisible, setHintVisible] = useState(true);
   const [splash, setSplash] = useState(true);
@@ -74,15 +51,8 @@ function GamePage() {
     if (gameState === "playing") setHintVisible(true);
   }, [gameState]);
 
-  if (!authed) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-gradient-to-br from-slate-900 via-indigo-950 to-fuchsia-950 text-white/70 text-sm">
-        Verificando sessão...
-      </div>
-    );
-  }
-
   const idle = gameState === "menu";
+
 
   return (
     <main className="relative h-screen w-screen overflow-hidden font-sans select-none">
