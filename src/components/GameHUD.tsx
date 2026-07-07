@@ -46,9 +46,6 @@ export function GameHUD({ showHint }: { showHint: boolean }) {
         </motion.div>
       )}
 
-      <p className="pointer-events-none absolute inset-x-0 bottom-2 z-10 text-center text-[10px] uppercase tracking-[0.25em] text-white/40">
-        Moedas virtuais — sem dinheiro real
-      </p>
     </>
   );
 }
