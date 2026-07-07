@@ -1,35 +1,43 @@
 import { forwardRef, useMemo } from "react";
 import * as THREE from "three";
 import { CONSTANTS } from "@/game/config/constants";
-import { SKINS, type SkinId } from "@/game/config/skins";
+import { FALLBACK_BALL, type ThemeBall } from "@/game/config/themes";
 
 interface Props {
-  skinId: SkinId;
+  ballTheme?: ThemeBall;
   fever: boolean;
 }
 
-// Esfera lisa, cor sólida, acabamento fosco — design minimalista.
+// Esfera lisa cuja cor vem do tema ativo. Puramente visual — não afeta física.
 export const Ball = forwardRef<THREE.Mesh, Props>(function Ball(
-  { skinId, fever },
+  { ballTheme, fever },
   ref,
 ) {
-  const skin = SKINS[skinId];
-  const material = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: skin.color,
-        emissive: fever ? "#ffcc33" : "#000000",
-        emissiveIntensity: fever ? 0.6 : 0,
-        metalness: 0,
-        roughness: 0.65,
-        flatShading: false,
-      }),
-    [fever, skin.color],
-  );
+  const bt = ballTheme ?? FALLBACK_BALL;
+  const material = useMemo(() => {
+    const emissiveColor = fever ? "#ffcc33" : bt.emissive;
+    const emissiveIntensity = fever
+      ? Math.max(0.6, bt.emissiveIntensity)
+      : bt.emissiveIntensity;
+    return new THREE.MeshStandardMaterial({
+      color: bt.color,
+      emissive: emissiveColor,
+      emissiveIntensity,
+      metalness: bt.metalness,
+      roughness: bt.roughness,
+    });
+  }, [
+    fever,
+    bt.color,
+    bt.emissive,
+    bt.emissiveIntensity,
+    bt.metalness,
+    bt.roughness,
+  ]);
 
   return (
     <mesh ref={ref} material={material} castShadow>
-      <sphereGeometry args={[CONSTANTS.BALL_RADIUS, 24, 24]} />
+      <sphereGeometry args={[CONSTANTS.BALL_RADIUS, 32, 32]} />
     </mesh>
   );
 });
