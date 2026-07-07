@@ -285,6 +285,14 @@ function GameLogic({
           bounceSquash.current = 1;
           cameraShake.current = Math.max(cameraShake.current, 0.15);
           SFX.bounce();
+          if (isFever) {
+            burstRef.current?.burst(
+              ball.position.x,
+              ringTopY,
+              ball.position.z,
+              "#ff3d7f",
+            );
+          }
           resetCombo();
           passedSincelastBounce.current = 0;
           if (sector === "bonus") collectCoin(3);
