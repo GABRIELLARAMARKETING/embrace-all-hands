@@ -60,8 +60,10 @@ function resolveContactSector(
 
 function GameLogic({
   onFirstInput,
+  cameraDistance,
 }: {
   onFirstInput: () => void;
+  cameraDistance: number;
 }) {
   const currentLevel = useGameStore((s) => s.currentLevel);
   const selectedSkin = useGameStore((s) => s.selectedSkin);
@@ -390,7 +392,7 @@ function GameLogic({
     state.camera.position.set(
       camSx,
       cameraTargetY.current + camSy,
-      CONSTANTS.CAMERA_DISTANCE,
+      cameraDistance,
     );
     state.camera.lookAt(0, ball.position.y + CONSTANTS.CAMERA_LOOK_AT_OFFSET, 0);
   });
@@ -516,13 +518,13 @@ export function GameCanvas({ onFirstInput, idle }: Props) {
         dpr={isMobile ? [1, 1.5] : [1, 2]}
         gl={{ antialias: !isMobile, powerPreference: "high-performance" }}
         camera={{
-          position: [0, CONSTANTS.CAMERA_HEIGHT_OFFSET, CONSTANTS.CAMERA_DISTANCE],
-          fov: 55,
+          position: [0, CONSTANTS.CAMERA_HEIGHT_OFFSET, CONSTANTS.CAMERA_DISTANCE * (isMobile ? 1.4 : 1)],
+          fov: isMobile ? 62 : 55,
         }}
         style={{ touchAction: "none" }}
       >
         <Suspense fallback={null}>
-          {idle ? <MenuIdleScene /> : <GameLogic onFirstInput={onFirstInput} />}
+          {idle ? <MenuIdleScene /> : <GameLogic onFirstInput={onFirstInput} cameraDistance={CONSTANTS.CAMERA_DISTANCE * (isMobile ? 1.4 : 1)} />}
         </Suspense>
       </Canvas>
       <PhysicsDebugPanel />
