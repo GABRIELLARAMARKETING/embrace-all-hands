@@ -21,7 +21,12 @@ export function ThemeSelector({ open, onClose }: { open: boolean; onClose: () =>
           const canAfford = totalCoins >= t.unlockCost;
           return (
             <div key={t.id} className="rounded-2xl border border-white/10 overflow-hidden">
-              <div className="h-16" style={{ background: t.bgGradient }} />
+              <div
+                className="h-20 bg-cover bg-center"
+                style={{
+                  backgroundImage: `url(${t.bgImage}), ${t.bgGradient}`,
+                }}
+              />
               <div className="p-2 bg-black/40">
                 <div className="text-sm font-bold">{t.name}</div>
                 {isUnlocked ? (
