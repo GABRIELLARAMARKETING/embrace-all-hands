@@ -1,92 +1,64 @@
-## Goal
+# Plano: Painel "Gerente Helix"
 
-Ajustar a jogabilidade e o visual de HUD do Helix Cash para ficar fiel ao vídeo de referência, sem quebrar temas, skins, sons, menus, modais, pontuação e moedas fictícias já existentes. Nada de dinheiro real: os campos com "R$" no vídeo viram pontuação/moedas virtuais no jogo (rótulos com o símbolo `✦` já usado).
+Vou construir um painel administrativo completo, dark, com verde neon, integrado ao projeto atual (TanStack Start + Tailwind v4), sem afetar o jogo existente na rota `/`.
 
-## O que o vídeo mostra (referência de gameplay)
+## Stack e adaptações
+- **Router**: TanStack Router (já no projeto) em vez de React Router — mesma capacidade, é o padrão da stack.
+- **Estado**: Zustand (já usado no jogo).
+- **Forms**: React Hook Form + Zod.
+- **Ícones**: lucide-react. **Animações**: framer-motion. Ambos já instalados.
+- **Persistência**: localStorage via camada de `services/` preparada para backend real.
 
-- Torre helicoidal alta e estreita, plataformas com aparência contínua em espiral e setores perigosos escuros bem visíveis.
-- Bola sempre no terço superior da tela, cai com gravidade forte e quica curto (~metade do espaçamento entre andares).
-- Câmera zoom médio, desce suave junto com a bola, sem trancos.
-- Rotação por arrasto direto — resposta imediata, com uma pitada de suavização, sem inércia longa.
-- Fundo com nuvens grandes e desfocadas, tema muito colorido/saturado.
-- HUD topo com três células: valor à esquerda, score central + barra de progresso + meta à direita.
-- Modal de vitória card escuro com valor destacado.
+## Rotas (arquivos em `src/routes/`)
+```
+/login                        → login.tsx
+/admin                        → admin.tsx (layout com Sidebar + TopHeader + <Outlet/>)
+/admin/painel                 → admin.painel.tsx
+/admin/criar-demo             → admin.criar-demo.tsx
+/admin/indicar                → admin.indicar.tsx
+/admin/indicados              → admin.indicados.tsx
+/admin/meus-saques            → admin.meus-saques.tsx
+/admin/ajustes-indicados      → admin.ajustes-indicados.tsx
+/admin/notificacoes           → admin.notificacoes.tsx
+```
+O jogo continua em `/`. Nenhuma rota do jogo é alterada.
 
-## Mudanças
+## Design tokens
+Adiciono em `src/styles.css` uma classe raiz `.admin-theme` com as cores solicitadas (#07080C, #111217, #161720, #1B1C26, #272936, #22C55E, #00E676, #3B82F6, etc.) mapeadas para variáveis (`--admin-bg`, `--admin-sidebar`, `--admin-card`, `--admin-neon`, …) e utilitários Tailwind arbitrários. Assim o jogo mantém seu próprio tema.
 
-### 1. `src/game/config/constants.ts` — tuning físico e de câmera
-- `PLATFORM_SPACING`: 1.4 → 1.25 (torre mais densa como no vídeo).
-- `TOWER_RADIUS`: 1.6 → 2.1; `CORE_RADIUS`: 0.6 → 0.65; `PLATFORM_HEIGHT`: 0.35 → 0.22.
-- `BALL_RADIUS`: 0.28 → 0.32.
-- `GRAVITY`: −18 → −22; `BOUNCE_VELOCITY`: 5.2 → 5.6 (pico ≈ 0.71 < spacing 1.25).
-- `MAX_FALL_SPEED`: −14 → −13.
-- `ROTATION_SENSITIVITY`: 0.006 → 0.009 (desktop); adicionar `TOUCH_ROTATION_SENSITIVITY` = 0.011.
-- `ROTATION_SMOOTHING`: 0.25 → 0.35 (mais snap).
-- `CAMERA_HEIGHT_OFFSET`: 2.5 → 3.2; `CAMERA_DISTANCE`: 5.5 → 6.5; adicionar `CAMERA_LOOK_AT_OFFSET` = −1.0; `CAMERA_LERP`: 0.08 (mantém).
-- `PHYSICS_MAX_STEP` e `COLLISION_COOLDOWN` mantidos.
+## Componentes (`src/components/admin/`)
+`Sidebar`, `TopHeader`, `AdminLayout`, `StatCard`, `SectionTitle`, `AdminCard`, `AdminButton`, `AdminInput`, `AdminTable`, `EmptyState`, `ToggleSwitch`, `FloatingChatButton`, `CopyButton`, `Badge`, `MoneyValue`.
 
-### 2. `src/game/engine/useTowerControls.ts`
-- Detectar `PointerEvent.pointerType === "touch"` e usar `TOUCH_ROTATION_SENSITIVITY` no delta do arrasto.
-- Ligar o listener ao elemento canvas (via prop) em vez de `window`, para poder aplicar `touch-action: none`. Alternativa: continuar em window mas cancelar `passive` false onde precisar. Manter comportamento atual de teclado.
+## Store e services
+- `src/store/useAdminStore.ts` — métricas, indicados, comissões, saques, contas demo, notificações, modo influencer. Persistência em localStorage.
+- `src/services/adminApi.ts` (+ `demoAccountsService`, `referralService`, `withdrawalService`, `notificationService`) com todas as funções listadas, async com delay curto, prontas para trocar por `fetch`.
+- `src/data/mockAdminData.ts` — estado inicial exatamente como pedido (métricas zeradas, `totalReferrals: 1`, link `?ref=YCWM29`, etc.).
+- `src/utils/`: `formatCurrency`, `formatDate`, `sanitize`, `validators`, `clipboard`.
 
-### 3. `src/components/GameCanvas.tsx`
-- Aplicar `style={{ touchAction: "none", userSelect: "none" }}` no wrapper `div` e no `<Canvas>`.
-- Câmera inicial usar novos `CAMERA_DISTANCE`/altura; `lookAt(0, ball.y + CAMERA_LOOK_AT_OFFSET, 0)`.
-- Nada muda na CCD/substeps/cooldown já corretos, apenas usar as novas constantes.
+## Páginas — funcionalidades
+- **Painel**: 6 `StatCard`s no grid solicitado.
+- **Criar Demo**: form validado (Zod: qtd 1–100, saldo ≥ 0), gera `demo 1..N`, senha `nome@N`, toast de sucesso.
+- **Indicar**: link + botão Copiar (com feedback "Copiado!"), 2 mini-cards, toggle Influencer persistido.
+- **Indicados**: 4 cards de comissão + 3 blocos (N1/N2/N3) cada com busca, badge, tabela e empty state, botão Atualizar.
+- **Meus Saques**: 2 cards (saldo + form PIX), validação (valor > 0 e ≤ saldo), histórico em tabela.
+- **Ajustes Indicados**: banner orçamento 70%, 3 cards N1/N2/N3, cálculo "Usando: X%" em tempo real, bloqueio > 70%, botões Salvar/Restaurar.
+- **Notificações**: card informativo azul, webhook (Salvar/Testar/Remover) com validação de URL, 3 toggles de eventos (ligados por padrão).
+- **Login**: tela simples preparada para autenticação (sem backend agora; salva flag em localStorage).
 
-### 4. `src/game/engine/levelGenerator.ts`
-- Reduzir `gapSize` default proporcional a 0.42π (aprox. 2 setores em 8) — hoje já usa 2 setores; garantir mínimo 2 e mudar `DANGER_ZONE_SIZE` = ~1 setor (mantém 8 setores).
-- Recomputar `totalHeight` com o novo `PLATFORM_SPACING`.
+## Layout
+- Sidebar fixa 280px desktop, colapsável no mobile via botão hambúrguer no `TopHeader`.
+- Logo "Gerente" (branco) + "Helix" (verde) no topo.
+- Item ativo: fundo verde translúcido + barra vertical verde à esquerda.
+- Item "Sair" fixado no rodapé da sidebar.
+- `TopHeader` com título/subtítulo, linha inferior, indicador online verde.
+- `FloatingChatButton` azul, canto inferior direito, presente em todas as rotas `/admin/*`.
+- Responsivo: cards 3→2→1 col, tabelas com `overflow-x-auto`.
 
-### 5. `src/game/entities/PlatformRing.tsx` / `TowerCore.tsx` / `Ball.tsx`
-- Ajustar geometria para os novos raios/espessura (só valores, sem reescrita).
-- Manter materiais/temas.
+## Segurança
+- Sanitização (`sanitize.ts` — strip de `<`, `>`, controle de tamanho), validação Zod em todos os forms, sem `dangerouslySetInnerHTML`, sem `eval`, valores monetários validados, sem log de webhook, camada de service isolada da UI.
 
-### 6. `src/components/GameHUD.tsx` — layout topo estilo referência
-- Barra superior com três blocos:
-  - Esquerda: rótulo pequeno "SALDO" + valor `✦ {totalCoins}`.
-  - Centro: rótulo "SCORE" grande + barra de progresso fina embaixo + "META" à direita da barra.
-  - Direita: rótulo "COMBO/NÍVEL" + botão pausa.
-- Botão de som flutuante já existente permanece.
-- Combo continua discreto (chip abaixo do topo). Manter cores dos temas.
-- Deixar explícito no aviso do menu principal: "Moedas virtuais — sem dinheiro real" (texto já existe).
+## Fora de escopo desta entrega
+- Autenticação real / backend (a estrutura fica pronta, `adminApi` centraliza chamadas).
+- Integração com o jogo (o painel é independente).
 
-### 7. `src/components/VictoryModal.tsx`
-- Reestilizar card escuro, título "PARABÉNS!", número grande com `✦ + {coinsGanhas}` (não `R$`). Botão primário grande "Próximo nível" (mantém funcionalidade atual).
-
-### 8. `src/routes/__root.tsx` + `src/styles.css`
-- Garantir `html, body, #root { height: 100%; margin: 0; overflow: hidden; touch-action: none; overscroll-behavior: none; }` para evitar scroll no mobile.
-
-### 9. Combo/queda longa
-- `passedSincelastBounce` já existe; ajustar `CASH_FEVER_THRESHOLD` = 4 e mostrar chip "COMBO xN" já implementado. Sem novos sistemas.
-
-### 10. Debug
-- Renomear/expor `DEBUG_PHYSICS` como `DEBUG_GAMEPLAY` (alias) e continuar usando o overlay atual, agora incluindo `combo` além dos campos existentes.
-
-## Arquivos alterados
-
-- `src/game/config/constants.ts` (tuning)
-- `src/game/engine/useTowerControls.ts` (touch sensitivity)
-- `src/components/GameCanvas.tsx` (câmera, touch-action, novas constantes)
-- `src/game/entities/PlatformRing.tsx`, `TowerCore.tsx`, `Ball.tsx` (geometria)
-- `src/game/engine/levelGenerator.ts` (spacing/gap)
-- `src/components/GameHUD.tsx` (layout topo)
-- `src/components/VictoryModal.tsx` (card fiel ao vídeo, texto/valor)
-- `src/routes/__root.tsx` / `src/styles.css` (touch-action global)
-- `src/components/PhysicsDebugOverlay.tsx` + `src/game/engine/physicsDebug.ts` (adicionar combo)
-
-## Como validar (comparando com o vídeo)
-
-1. Arrastar horizontalmente — torre gira com resposta imediata; touch no mobile sem scroll.
-2. Bola cai por gravidade forte, quica curto sem subir mais de meio andar, nunca atravessa sólido nem volta bugada.
-3. Em queda longa por gaps, chip "COMBO x2/x3/x4" aparece e Cash Fever quebra 1 danger.
-4. Câmera segue suave; bola permanece no terço superior da viewport.
-5. HUD topo idêntico em estrutura (esq/centro/dir + barra), rótulos com `✦` (nunca `R$`).
-6. Modal de vitória fiel ao vídeo (card escuro, número grande, botão primário) usando moedas virtuais.
-7. Trocar temas continua alterando só o visual; skins, sons, pontuação e persistência intactos.
-
-## Notas técnicas
-
-- Mantido CCD com `prevBottom/nextBottom` e cooldown por anel — nenhuma regressão na anti-tunneling.
-- Nenhum sistema de dinheiro real. Rótulos "R$" do vídeo são substituídos pelo símbolo `✦` para deixar explícito que é pontuação virtual.
-- Sem novas dependências.
+Depois de aprovado, implemento tudo em um único ciclo e valido o build.
