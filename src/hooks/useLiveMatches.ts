@@ -8,9 +8,8 @@ export function useLiveMatches() {
     let cancelled = false;
     async function load() {
       const { count: c, error } = await supabase
-        .from("live_matches")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "active");
+        .from("live_matches_public" as never)
+        .select("*", { count: "exact", head: true });
       if (cancelled) return;
       if (error || c == null) {
         setCount(820 + Math.floor(Math.random() * 80));
