@@ -55,7 +55,7 @@ export function VictoryModal({ open }: { open: boolean }) {
         <Button
           className="w-full"
           variant="ghost"
-          onClick={() => startGame(currentLevel - 1)}
+          onClick={() => startGame(currentLevel)}
         >
           Jogar novamente
         </Button>
