@@ -32,9 +32,13 @@ export function MainMenu({ onOpenThemes, onOpenSkins }: Props) {
     if (unlockedThemes.includes(mapped)) selectGameTheme(mapped);
   };
 
-  const handlePlayFree = () => {
+  const handlePlayFree = (mapId: string) => {
+    const map = MAP_THEMES.find((m) => m.id === mapId) ?? MAP_THEMES[index];
     // eslint-disable-next-line no-console
-    console.log("[HelixMulti] handlePlayFree", { map: MAP_THEMES[index].id });
+    console.log("[HelixMulti] handlePlayFree", { mapId: map.id, gameThemeId: map.gameThemeId });
+    if (unlockedThemes.includes(map.gameThemeId)) {
+      selectGameTheme(map.gameThemeId);
+    }
     startGame();
   };
 
