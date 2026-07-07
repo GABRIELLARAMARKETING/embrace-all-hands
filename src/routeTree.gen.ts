@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminPainelRouteImport } from './routes/admin.painel'
+import { Route as AdminCriarDemoRouteImport } from './routes/admin.criar-demo'
 
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
@@ -28,29 +29,37 @@ const AdminPainelRoute = AdminPainelRouteImport.update({
   path: '/painel',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCriarDemoRoute = AdminCriarDemoRouteImport.update({
+  id: '/criar-demo',
+  path: '/criar-demo',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin/criar-demo': typeof AdminCriarDemoRoute
   '/admin/painel': typeof AdminPainelRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin/criar-demo': typeof AdminCriarDemoRoute
   '/admin/painel': typeof AdminPainelRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin/criar-demo': typeof AdminCriarDemoRoute
   '/admin/painel': typeof AdminPainelRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/admin/painel'
+  fullPaths: '/' | '/admin' | '/admin/criar-demo' | '/admin/painel'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/admin/painel'
-  id: '__root__' | '/' | '/admin' | '/admin/painel'
+  to: '/' | '/admin' | '/admin/criar-demo' | '/admin/painel'
+  id: '__root__' | '/' | '/admin' | '/admin/criar-demo' | '/admin/painel'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -81,14 +90,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPainelRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/criar-demo': {
+      id: '/admin/criar-demo'
+      path: '/criar-demo'
+      fullPath: '/admin/criar-demo'
+      preLoaderRoute: typeof AdminCriarDemoRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminCriarDemoRoute: typeof AdminCriarDemoRoute
   AdminPainelRoute: typeof AdminPainelRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminCriarDemoRoute: AdminCriarDemoRoute,
   AdminPainelRoute: AdminPainelRoute,
 }
 
