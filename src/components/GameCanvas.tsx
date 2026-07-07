@@ -272,7 +272,7 @@ function GameLogic({
                 breakingRingsRef.current.delete(k);
                 brokenRingsRef.current.add(k);
                 setBreakingRings(new Map(breakingRingsRef.current));
-              }, 780);
+              }, 230);
             }
             setBreakingRings(new Map(breakingRingsRef.current));
           }
