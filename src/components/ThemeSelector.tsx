@@ -4,7 +4,6 @@ import { Modal } from "./Modal";
 import { Button } from "./Button";
 import { THEME_LIST, type Theme } from "@/game/config/themes";
 import { useGameStore } from "@/store/useGameStore";
-import { preloadThemeImage } from "@/hooks/useThemePreload";
 
 const FALLBACK_BG = "linear-gradient(180deg,#24104F 0%,#090014 100%)";
 
@@ -12,12 +11,6 @@ export function ThemeSelector({ open, onClose }: { open: boolean; onClose: () =>
   const selected = useGameStore((s) => s.selectedTheme);
   const selectTheme = useGameStore((s) => s.selectTheme);
   const trackRef = useRef<HTMLDivElement>(null);
-
-  // Preload the active theme's card image (fallback = gradient handled inline).
-  useEffect(() => {
-    const active = THEME_LIST.find((t) => t.id === selected);
-    if (active) void preloadThemeImage(active.cardImage);
-  }, [selected]);
 
   // Auto-center the selected card whenever it changes or the modal opens.
   useEffect(() => {
