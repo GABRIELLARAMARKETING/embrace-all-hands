@@ -82,7 +82,7 @@ function NotificacoesPage() {
         title="Notificações"
         subtitle="Configure alertas no seu iPhone via Pushcut"
       />
-      <div className="space-y-4 p-4 sm:p-6">
+      <div className="space-y-4 p-4 sm:p-5">
         <AdminCard className="border-[color:var(--admin-blue)]/30 bg-[color:var(--admin-blue)]/8">
           <div className="flex items-start gap-3">
             <Info className="mt-0.5 shrink-0 text-[color:var(--admin-blue)]" size={20} />

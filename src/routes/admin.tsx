@@ -34,8 +34,8 @@ function AdminLayout() {
     <AdminUIContext.Provider value={{ openMobileMenu: () => setMobileOpen(true) }}>
       <div className="admin-theme admin-scroll min-h-screen w-full">
         <div className="flex min-h-screen w-full">
-          <div className="hidden w-[240px] shrink-0 lg:block">
-            <div className="fixed top-0 left-0 h-screen w-[240px]">
+          <div className="hidden w-[200px] shrink-0 lg:block">
+            <div className="fixed top-0 left-0 h-screen w-[200px]">
               <Sidebar />
             </div>
           </div>
@@ -55,7 +55,7 @@ function AdminLayout() {
                   animate={{ x: 0 }}
                   exit={{ x: "-100%" }}
                   transition={{ type: "tween", duration: 0.24 }}
-                  className="fixed inset-y-0 left-0 z-50 w-[240px] lg:hidden"
+                  className="fixed inset-y-0 left-0 z-50 w-[200px] lg:hidden"
                 >
                   <Sidebar onNavigate={() => setMobileOpen(false)} />
                 </motion.div>
@@ -63,8 +63,8 @@ function AdminLayout() {
             )}
           </AnimatePresence>
 
-          <main className="flex-1 lg:pl-[240px]">
-            <div className="mx-auto flex min-h-screen max-w-5xl flex-col">
+          <main className="flex-1 lg:pl-[200px]">
+            <div className="mx-auto flex min-h-screen max-w-4xl flex-col">
               <Outlet />
             </div>
           </main>

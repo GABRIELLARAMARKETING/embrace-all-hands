@@ -61,7 +61,7 @@ function CriarDemoPage() {
         title="Criar Demo"
         subtitle="Crie contas de demonstração vinculadas à sua rede"
       />
-      <div className="p-4 sm:p-6">
+      <div className="p-4 sm:p-5">
         <AdminCard className="mx-auto max-w-3xl">
           <h2 className="text-lg font-semibold text-white">Criar Conta Demo</h2>
           <p className="mt-2 text-sm text-[color:var(--admin-text-2)]">
