@@ -104,6 +104,7 @@ function GameLogic({
   const feverUntil = useRef(0);
   const spinVelocity = useRef(0);
   const accumulator = useRef(0);
+  const debugSteps = useRef(0);
   const burstRef = useRef<BreakBurstHandle>(null);
   const trailRef = useRef<BallTrailHandle>(null);
   const [collectedCoins, setCollectedCoins] = useState<Set<number>>(new Set());
