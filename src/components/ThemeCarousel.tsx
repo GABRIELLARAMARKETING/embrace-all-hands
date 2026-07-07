@@ -12,6 +12,7 @@ interface Props {
 }
 
 export function ThemeCarousel({ themes, index, onChange }: Props) {
+  const isMobile = useIsMobile();
   const total = themes.length;
   const wrap = useCallback(
     (i: number) => (total === 0 ? 0 : ((i % total) + total) % total),
