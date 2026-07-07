@@ -27,15 +27,13 @@ function makePlatform(overrides: Partial<Platform> = {}): Platform {
   };
 }
 
-// Position a ball crossing the top of `platform` this step: previousBottom
-// sits just above the top, current bottom sits just below.
+// Place the ball just above the platform so a single fixed step crosses it.
 function makeCrossingBall(
   platformTop: number,
   velocityY = -8,
   angle = 0,
 ): BallState {
-  const b = createBallState(platformTop + PHYSICS.BALL_RADIUS - 0.005);
-  b.previousY = platformTop + PHYSICS.BALL_RADIUS + 0.005;
+  const b = createBallState(platformTop + PHYSICS.BALL_RADIUS + 0.05);
   b.velocityY = velocityY;
   b.angle = angle;
   return b;
