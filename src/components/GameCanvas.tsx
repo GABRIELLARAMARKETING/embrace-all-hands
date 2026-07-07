@@ -154,7 +154,7 @@ function GameLogic({
     if (!active || finishedRef.current) return;
     if (!ballRef.current || !towerGroup.current) return;
 
-    const dt = Math.min(deltaRaw, CONSTANTS.PHYSICS_MAX_DELTA);
+    const dt = Math.min(deltaRaw, PHYSICS.MAX_DELTA);
 
     // Smooth rotation: framerate-independent lerp toward the input target.
     const smoothT = 1 - Math.pow(1 - CONSTANTS.ROTATION_SMOOTHING, dt * 60);
@@ -170,17 +170,23 @@ function GameLogic({
 
     const ball = ballRef.current;
 
-    // ---------- Physics with fixed substeps (anti-tunneling) ----------
-    const steps = Math.max(1, Math.ceil(dt / CONSTANTS.PHYSICS_MAX_STEP));
-    const sdt = dt / steps;
+    // ---------- Physics: fixed timestep + accumulator (anti-tunneling, deterministic) ----------
+    const sdt = PHYSICS.FIXED_STEP;
+    accumulator.current += dt;
 
     let dbgCollided = false;
     let dbgSector = "-";
     let dbgRing = -1;
     let dbgPrev = ball.position.y;
+    let stepsTaken = 0;
 
-    for (let step = 0; step < steps; step++) {
-      if (finishedRef.current) break;
+    while (
+      accumulator.current >= sdt &&
+      stepsTaken < PHYSICS.MAX_SUBSTEPS &&
+      !finishedRef.current
+    ) {
+      accumulator.current -= sdt;
+      stepsTaken++;
 
       // Gravity + clamp.
       velocity.current += generated.gravity * sdt;
