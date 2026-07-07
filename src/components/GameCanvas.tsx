@@ -293,6 +293,9 @@ function GameLogic({
 
       ball.position.y = landedY !== null ? landedY : nextY;
     }
+    // Spiral-of-death guard: if we hit the substep cap, drop leftover time.
+    if (stepsTaken === PHYSICS.MAX_SUBSTEPS) accumulator.current = 0;
+
 
     if (DEBUG_PHYSICS) {
       physicsDebug.prevY = dbgPrev;
