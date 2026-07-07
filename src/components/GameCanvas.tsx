@@ -258,6 +258,7 @@ function GameLogic({
               )
                 continue;
               breakingRingsRef.current.set(k, now);
+              playSound("platform_break");
               const kRing = generated.rings[k];
               burstRef.current?.burst(
                 0,
