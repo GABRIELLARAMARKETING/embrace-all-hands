@@ -89,9 +89,9 @@ export const BreakBurst = forwardRef<BreakBurstHandle>(function BreakBurst(_, re
         p.px = x; p.py = y; p.pz = z;
         const theta = Math.random() * Math.PI * 2;
         const phi = (Math.random() - 0.5) * Math.PI * 0.9;
-        const speed = 3 + Math.random() * 4;
+        const speed = 5 + Math.random() * 5;
         p.vx = Math.cos(theta) * Math.cos(phi) * speed;
-        p.vy = Math.sin(phi) * speed + 2;
+        p.vy = Math.sin(phi) * speed + 3.5;
         p.vz = Math.sin(theta) * Math.cos(phi) * speed;
         p.rx = Math.random() * Math.PI;
         p.ry = Math.random() * Math.PI;
