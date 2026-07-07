@@ -466,9 +466,18 @@ function GameLogic({
 
       <group ref={towerGroup}>
         <TowerCore height={generated.totalHeight + 4} themeId={themeId} />
-        {generated.rings.map((ring, i) => (
-          <PlatformRing key={i} ring={ring} themeId={themeId} />
-        ))}
+        {generated.rings.map((ring, i) => {
+          if (brokenRingsRef.current.has(i)) return null;
+          const breakingSince = breakingRings.get(i) ?? null;
+          return (
+            <PlatformRing
+              key={i}
+              ring={ring}
+              themeId={themeId}
+              breakingSince={breakingSince}
+            />
+          );
+        })}
         {generated.rings.map((ring, i) =>
           ring.hasCoin ? (
             <Collectible
