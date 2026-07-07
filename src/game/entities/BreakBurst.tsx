@@ -2,11 +2,11 @@ import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-const POOL_SIZE = 64; // suporta ~4 bursts simultâneos (16 * 4)
-const PARTICLES_PER_BURST_MIN = 12;
-const PARTICLES_PER_BURST_MAX = 16;
-const LIFE_MS = 600;
-const GRAVITY = -18;
+const POOL_SIZE = 96; // ~4 bursts simultâneos (24 * 4)
+const PARTICLES_PER_BURST_MIN = 18;
+const PARTICLES_PER_BURST_MAX = 24;
+const LIFE_MS = 480;
+const GRAVITY = -22;
 
 export interface BreakBurstHandle {
   burst: (x: number, y: number, z: number, color?: THREE.ColorRepresentation) => void;
@@ -89,9 +89,9 @@ export const BreakBurst = forwardRef<BreakBurstHandle>(function BreakBurst(_, re
         p.px = x; p.py = y; p.pz = z;
         const theta = Math.random() * Math.PI * 2;
         const phi = (Math.random() - 0.5) * Math.PI * 0.9;
-        const speed = 3 + Math.random() * 4;
+        const speed = 5 + Math.random() * 5;
         p.vx = Math.cos(theta) * Math.cos(phi) * speed;
-        p.vy = Math.sin(phi) * speed + 2;
+        p.vy = Math.sin(phi) * speed + 3.5;
         p.vz = Math.sin(theta) * Math.cos(phi) * speed;
         p.rx = Math.random() * Math.PI;
         p.ry = Math.random() * Math.PI;
