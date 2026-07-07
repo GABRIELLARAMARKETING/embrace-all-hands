@@ -161,7 +161,7 @@ export function MainMenu(_props: { onOpenThemes?: () => void; onOpenSkins?: () =
               <div className="mx-auto mt-4 flex w-full max-w-[295px] items-center justify-between gap-4">
                 <button
                   type="button"
-                  onClick={() => navigate({ to: "/auth" })}
+                  onClick={() => navigate({ to: "/login" })}
                   className="h-12 sm:h-14 w-[140px] sm:w-[155px] rounded-full border border-fuchsia-400/40 bg-white/5 text-sm font-semibold text-white/90 backdrop-blur-md transition-colors hover:bg-white/10 hover:text-white"
                 >
                   Entrar
