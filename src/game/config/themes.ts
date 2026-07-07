@@ -112,7 +112,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     bgGradient: "linear-gradient(180deg,#0a2a5a 0%,#1e6b8a 100%)",
     tower: "#08324a",
     platformNormal: "#20c4d4",
-    platformDanger: "#0a0a1a",
+    platformDanger: "#ff2d55",
     platformBonus: "#a8f0ff",
     accent: "#4de8ff",
     particle: "#a8e0ff",
