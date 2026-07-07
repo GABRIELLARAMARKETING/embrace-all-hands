@@ -310,6 +310,7 @@ function GameLogic({
     }
     // Spiral-of-death guard: if we hit the substep cap, drop leftover time.
     if (stepsTaken === PHYSICS.MAX_SUBSTEPS) accumulator.current = 0;
+    debugSteps.current = stepsTaken;
 
 
     if (DEBUG_PHYSICS) {
