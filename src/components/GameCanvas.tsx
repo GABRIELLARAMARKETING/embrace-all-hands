@@ -15,6 +15,7 @@ import { Collectible } from "@/game/entities/Collectible";
 import { Clouds } from "@/game/entities/Clouds";
 import { BreakBurst, type BreakBurstHandle } from "@/game/entities/BreakBurst";
 import { BallTrail, type BallTrailHandle } from "@/game/entities/BallTrail";
+import { PhysicsDebugBridge, PhysicsDebugPanel } from "@/components/PhysicsDebugBridge";
 import { useTowerControls } from "@/game/engine/useTowerControls";
 import { SFX } from "@/utils/sound";
 import { physicsDebug } from "@/game/engine/physicsDebug";
@@ -103,6 +104,7 @@ function GameLogic({
   const feverUntil = useRef(0);
   const spinVelocity = useRef(0);
   const accumulator = useRef(0);
+  const debugSteps = useRef(0);
   const burstRef = useRef<BreakBurstHandle>(null);
   const trailRef = useRef<BallTrailHandle>(null);
   const [collectedCoins, setCollectedCoins] = useState<Set<number>>(new Set());
@@ -308,6 +310,7 @@ function GameLogic({
     }
     // Spiral-of-death guard: if we hit the substep cap, drop leftover time.
     if (stepsTaken === PHYSICS.MAX_SUBSTEPS) accumulator.current = 0;
+    debugSteps.current = stepsTaken;
 
 
     if (DEBUG_PHYSICS) {
@@ -437,6 +440,13 @@ function GameLogic({
       <Ball ref={ballRef} skinId={selectedSkin} fever={fever} />
       <BreakBurst ref={burstRef} />
       <BallTrail ref={trailRef} />
+      <PhysicsDebugBridge
+        ballRef={ballRef}
+        velocityRef={velocity}
+        accumulatorRef={accumulator}
+        stepsRef={debugSteps}
+        towerRotationRef={currentRotation}
+      />
     </>
   );
 }
@@ -506,6 +516,7 @@ export function GameCanvas({ onFirstInput, idle }: Props) {
           {idle ? <MenuIdleScene /> : <GameLogic onFirstInput={onFirstInput} />}
         </Suspense>
       </Canvas>
+      <PhysicsDebugPanel />
     </div>
   );
 }
