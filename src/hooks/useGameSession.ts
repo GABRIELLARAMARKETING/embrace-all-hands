@@ -1,12 +1,13 @@
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export function useGameSession() {
-  const sessionIdRef = useRef<string | null>(null);
-  const startedAtRef = useRef<number>(0);
+// Module-scoped state so start/finish can happen from different components.
+let currentSessionId: string | null = null;
+let startedAt = 0;
 
+export function useGameSession() {
   const startSession = useCallback(async (themeId: string | null) => {
-    startedAtRef.current = Date.now();
+    startedAt = Date.now();
     try {
       const { data: userRes } = await supabase.auth.getUser();
       const uid = userRes.user?.id;
@@ -17,7 +18,7 @@ export function useGameSession() {
         .select("id")
         .single();
       if (error) return null;
-      sessionIdRef.current = data.id;
+      currentSessionId = data.id;
       return data.id;
     } catch {
       return null;
@@ -26,9 +27,9 @@ export function useGameSession() {
 
   const finishSession = useCallback(
     async (data: { score: number; level_reached: number; status?: "finished" | "gameover" }) => {
-      const id = sessionIdRef.current;
+      const id = currentSessionId;
       if (!id) return;
-      const duration = Math.max(0, Math.floor((Date.now() - startedAtRef.current) / 1000));
+      const duration = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
       try {
         await supabase
           .from("game_sessions")
@@ -43,7 +44,7 @@ export function useGameSession() {
       } catch {
         /* swallow */
       }
-      sessionIdRef.current = null;
+      currentSessionId = null;
     },
     [],
   );

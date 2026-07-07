@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { GameCanvas } from "@/components/GameCanvas";
 import { MainMenu } from "@/components/MainMenu";
@@ -11,6 +11,7 @@ import { ThemeSelector } from "@/components/ThemeSelector";
 import { SkinShop } from "@/components/SkinShop";
 import { useGameStore } from "@/store/useGameStore";
 import { PhysicsDebugOverlay } from "@/components/PhysicsDebugOverlay";
+import { useGameSession } from "@/hooks/useGameSession";
 
 export const Route = createFileRoute("/")({
   component: Index,
