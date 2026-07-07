@@ -263,7 +263,7 @@ function GameLogic({
                 0,
                 kRing.y + CONSTANTS.PLATFORM_HEIGHT / 2,
                 CONSTANTS.BALL_TRACK_RADIUS,
-                theme.accent,
+                THEMES[themeId].accent,
               );
               cameraShake.current = Math.max(cameraShake.current, 0.18);
               addScore(1);
