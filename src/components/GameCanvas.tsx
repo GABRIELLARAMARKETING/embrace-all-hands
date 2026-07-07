@@ -3,6 +3,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useIsMobile } from "@/hooks/use-mobile";
 import * as THREE from "three";
 import { CONSTANTS, DEBUG_PHYSICS } from "@/game/config/constants";
+import { PHYSICS } from "@/game/physicsConstants";
 import { LEVELS } from "@/game/config/levels";
 import { THEMES } from "@/game/config/themes";
 import { generateLevel, type RingData, type SectorType } from "@/game/engine/levelGenerator";
@@ -99,6 +100,7 @@ function GameLogic({
   const passedSincelastBounce = useRef(0);
   const feverUntil = useRef(0);
   const spinVelocity = useRef(0);
+  const accumulator = useRef(0);
   const [collectedCoins, setCollectedCoins] = useState<Set<number>>(new Set());
   const [fever, setFever] = useState(false);
   const finishedRef = useRef(false);
@@ -122,6 +124,7 @@ function GameLogic({
     currentRotation.current = 0;
     bounceSquash.current = 0;
     spinVelocity.current = 0;
+    accumulator.current = 0;
     if (ballRef.current) {
       ballRef.current.position.set(0, 0.5, CONSTANTS.BALL_TRACK_RADIUS);
       ballRef.current.rotation.set(0, 0, 0);
@@ -151,7 +154,7 @@ function GameLogic({
     if (!active || finishedRef.current) return;
     if (!ballRef.current || !towerGroup.current) return;
 
-    const dt = Math.min(deltaRaw, CONSTANTS.PHYSICS_MAX_DELTA);
+    const dt = Math.min(deltaRaw, PHYSICS.MAX_DELTA);
 
     // Smooth rotation: framerate-independent lerp toward the input target.
     const smoothT = 1 - Math.pow(1 - CONSTANTS.ROTATION_SMOOTHING, dt * 60);
@@ -167,17 +170,23 @@ function GameLogic({
 
     const ball = ballRef.current;
 
-    // ---------- Physics with fixed substeps (anti-tunneling) ----------
-    const steps = Math.max(1, Math.ceil(dt / CONSTANTS.PHYSICS_MAX_STEP));
-    const sdt = dt / steps;
+    // ---------- Physics: fixed timestep + accumulator (anti-tunneling, deterministic) ----------
+    const sdt = PHYSICS.FIXED_STEP;
+    accumulator.current += dt;
 
     let dbgCollided = false;
     let dbgSector = "-";
     let dbgRing = -1;
     let dbgPrev = ball.position.y;
+    let stepsTaken = 0;
 
-    for (let step = 0; step < steps; step++) {
-      if (finishedRef.current) break;
+    while (
+      accumulator.current >= sdt &&
+      stepsTaken < PHYSICS.MAX_SUBSTEPS &&
+      !finishedRef.current
+    ) {
+      accumulator.current -= sdt;
+      stepsTaken++;
 
       // Gravity + clamp.
       velocity.current += generated.gravity * sdt;
@@ -188,7 +197,7 @@ function GameLogic({
 
       const prevY = ball.position.y;
       const nextY = prevY + velocity.current * sdt;
-      if (step === 0) dbgPrev = prevY;
+      if (stepsTaken === 1) dbgPrev = prevY;
 
       let landedY: number | null = null;
 
@@ -284,6 +293,9 @@ function GameLogic({
 
       ball.position.y = landedY !== null ? landedY : nextY;
     }
+    // Spiral-of-death guard: if we hit the substep cap, drop leftover time.
+    if (stepsTaken === PHYSICS.MAX_SUBSTEPS) accumulator.current = 0;
+
 
     if (DEBUG_PHYSICS) {
       physicsDebug.prevY = dbgPrev;
