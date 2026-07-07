@@ -40,23 +40,27 @@ function resolveContactSector(
   ring: RingData,
   normalizedBallAngle: number,
 ): SectorType {
-  const offsets = [0, -BALL_ANGLE_RADIUS * 0.85, BALL_ANGLE_RADIUS * 0.85];
-  let hasSolid = false;
-  let hasBonus = false;
-  let hasDanger = false;
+  // Center sample decides bounce / danger / bonus — the ball's angular center
+  // is the authoritative contact point. Colour is only cosmetic; the sector
+  // TYPE from the ring model is what determines game over.
+  const centerSector = sectorAt(ring, normalizedBallAngle, 0);
+  if (centerSector === "danger") return "danger";
+  if (centerSector === "bonus") return "bonus";
+  if (centerSector === "solid") return "solid";
 
-  for (const offset of offsets) {
-    const sector = sectorAt(ring, normalizedBallAngle, offset);
-    if (sector === "danger") hasDanger = true;
-    if (sector === "bonus") hasBonus = true;
-    if (sector === "solid") hasSolid = true;
-  }
-
-  if (hasDanger) return "danger";
-  if (hasBonus) return "bonus";
-  if (hasSolid) return "solid";
+  // Only when the ball sits over a gap do we sample the edges — this is a
+  // small forgiveness so the player can slip through gaps that align with the
+  // ball's angular extents, without ever turning a safe hit into "danger".
+  const edgeOffset = BALL_ANGLE_RADIUS * 0.85;
+  const left = sectorAt(ring, normalizedBallAngle, -edgeOffset);
+  const right = sectorAt(ring, normalizedBallAngle, edgeOffset);
+  if (left === "empty" && right === "empty") return "empty";
+  // Adjacent solid/bonus keeps the ball on the platform (bounce), never danger.
+  if (left === "solid" || right === "solid") return "solid";
+  if (left === "bonus" || right === "bonus") return "bonus";
   return "empty";
 }
+
 
 function GameLogic({
   onFirstInput,
