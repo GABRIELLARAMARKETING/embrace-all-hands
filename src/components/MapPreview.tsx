@@ -10,6 +10,22 @@ interface Props {
  * the backend preview_config so new themes require no code changes.
  */
 export function MapPreview({ preview, intensity = 1 }: Props) {
+  if (preview.previewImage) {
+    return (
+      <div
+        className="relative h-full w-full overflow-hidden rounded-[18px]"
+        style={{ background: preview.background }}
+      >
+        <img
+          src={preview.previewImage}
+          alt=""
+          className="h-full w-full object-cover"
+          style={{ opacity: 0.4 + intensity * 0.6 }}
+          draggable={false}
+        />
+      </div>
+    );
+  }
   const platforms = (preview.platformColors ?? []).slice(0, 3);
   const [p0, p1, p2] = [platforms[0] ?? "#ccc", platforms[1] ?? "#999", platforms[2] ?? "#fff"];
 
