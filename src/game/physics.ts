@@ -31,6 +31,7 @@ export function angleBetween(
   start: number,
   size: number,
 ): boolean {
+  if (size <= 0) return false;
   const a = normalizeAngle(angle);
   const s = normalizeAngle(start);
   const end = s + size;
