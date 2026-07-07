@@ -13,6 +13,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminPainelRouteImport } from './routes/admin.painel'
 import { Route as AdminIndicarRouteImport } from './routes/admin.indicar'
+import { Route as AdminIndicadosRouteImport } from './routes/admin.indicados'
 import { Route as AdminCriarDemoRouteImport } from './routes/admin.criar-demo'
 
 const AdminRoute = AdminRouteImport.update({
@@ -35,6 +36,11 @@ const AdminIndicarRoute = AdminIndicarRouteImport.update({
   path: '/indicar',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminIndicadosRoute = AdminIndicadosRouteImport.update({
+  id: '/indicados',
+  path: '/indicados',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCriarDemoRoute = AdminCriarDemoRouteImport.update({
   id: '/criar-demo',
   path: '/criar-demo',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/admin/criar-demo': typeof AdminCriarDemoRoute
+  '/admin/indicados': typeof AdminIndicadosRoute
   '/admin/indicar': typeof AdminIndicarRoute
   '/admin/painel': typeof AdminPainelRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/admin/criar-demo': typeof AdminCriarDemoRoute
+  '/admin/indicados': typeof AdminIndicadosRoute
   '/admin/indicar': typeof AdminIndicarRoute
   '/admin/painel': typeof AdminPainelRoute
 }
@@ -60,6 +68,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/admin/criar-demo': typeof AdminCriarDemoRoute
+  '/admin/indicados': typeof AdminIndicadosRoute
   '/admin/indicar': typeof AdminIndicarRoute
   '/admin/painel': typeof AdminPainelRoute
 }
@@ -69,15 +78,23 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin/criar-demo'
+    | '/admin/indicados'
     | '/admin/indicar'
     | '/admin/painel'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/admin/criar-demo' | '/admin/indicar' | '/admin/painel'
+  to:
+    | '/'
+    | '/admin'
+    | '/admin/criar-demo'
+    | '/admin/indicados'
+    | '/admin/indicar'
+    | '/admin/painel'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/admin/criar-demo'
+    | '/admin/indicados'
     | '/admin/indicar'
     | '/admin/painel'
   fileRoutesById: FileRoutesById
@@ -117,6 +134,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndicarRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/indicados': {
+      id: '/admin/indicados'
+      path: '/indicados'
+      fullPath: '/admin/indicados'
+      preLoaderRoute: typeof AdminIndicadosRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/criar-demo': {
       id: '/admin/criar-demo'
       path: '/criar-demo'
@@ -129,12 +153,14 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminCriarDemoRoute: typeof AdminCriarDemoRoute
+  AdminIndicadosRoute: typeof AdminIndicadosRoute
   AdminIndicarRoute: typeof AdminIndicarRoute
   AdminPainelRoute: typeof AdminPainelRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCriarDemoRoute: AdminCriarDemoRoute,
+  AdminIndicadosRoute: AdminIndicadosRoute,
   AdminIndicarRoute: AdminIndicarRoute,
   AdminPainelRoute: AdminPainelRoute,
 }
