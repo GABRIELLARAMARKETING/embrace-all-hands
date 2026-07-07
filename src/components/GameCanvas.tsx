@@ -451,6 +451,11 @@ function GameLogic({
         stepsRef={debugSteps}
         towerRotationRef={currentRotation}
       />
+      <SectorDebugBridge
+        rings={generated.rings}
+        ballRef={ballRef}
+        towerRotationRef={currentRotation}
+      />
     </>
   );
 }
