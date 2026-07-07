@@ -20,7 +20,7 @@ export const Route = createFileRoute("/game")({
 function GamePage() {
   const gameState = useGameStore((s) => s.gameState);
   const loadProgress = useGameStore((s) => s.loadProgress);
-  const [themesOpen, setThemesOpen] = useState(true);
+  const [themesOpen, setThemesOpen] = useState(false);
   const [skinsOpen, setSkinsOpen] = useState(false);
   const [hintVisible, setHintVisible] = useState(true);
   const [splash, setSplash] = useState(true);
