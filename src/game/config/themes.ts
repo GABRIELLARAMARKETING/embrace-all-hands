@@ -1,3 +1,12 @@
+import cottonBg from "@/assets/themes/cotton-bg.jpg.asset.json";
+import neonBg from "@/assets/themes/neon-bg.jpg.asset.json";
+import goldBg from "@/assets/themes/gold-bg.jpg.asset.json";
+import oceanBg from "@/assets/themes/ocean-bg.jpg.asset.json";
+import candyBg from "@/assets/themes/candy-bg.jpg.asset.json";
+import cyberBg from "@/assets/themes/cyber-bg.jpg.asset.json";
+import lavaBg from "@/assets/themes/lava-bg.jpg.asset.json";
+import luxuryBg from "@/assets/themes/luxury-bg.jpg.asset.json";
+
 export type ThemeId =
   | "cotton"
   | "neon"
@@ -22,6 +31,7 @@ export interface Theme {
   id: ThemeId;
   name: string;
   bgGradient: string;
+  bgImage: string;
   tower: string;
   platformNormal: string;
   platformDanger: string;
@@ -47,6 +57,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     id: "cotton",
     name: "Cotton Sky",
     bgGradient: "linear-gradient(180deg,#ffd1e5 0%,#ffe7d1 100%)",
+    bgImage: cottonBg.url,
     tower: "#c0326e",
     platformNormal: "#e57ba8",
     platformDanger: "#3a0a1a",
@@ -68,6 +79,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     id: "neon",
     name: "Neon Night",
     bgGradient: "linear-gradient(180deg,#0a0a1f 0%,#1a0a3a 100%)",
+    bgImage: neonBg.url,
     tower: "#3a1a6b",
     platformNormal: "#7b2ff7",
     platformDanger: "#ff2a6d",
@@ -89,6 +101,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     id: "gold",
     name: "Gold Rush",
     bgGradient: "linear-gradient(180deg,#3a2a0a 0%,#8a6a1a 100%)",
+    bgImage: goldBg.url,
     tower: "#8a5a1a",
     platformNormal: "#f1c40f",
     platformDanger: "#e63946",
@@ -110,6 +123,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     id: "ocean",
     name: "Ocean Drop",
     bgGradient: "linear-gradient(180deg,#0a2a5a 0%,#1e6b8a 100%)",
+    bgImage: oceanBg.url,
     tower: "#08324a",
     platformNormal: "#20c4d4",
     platformDanger: "#ff2d55",
@@ -131,6 +145,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     id: "candy",
     name: "Candy Helix",
     bgGradient: "linear-gradient(180deg,#ffb3f7 0%,#b3e5ff 100%)",
+    bgImage: candyBg.url,
     tower: "#ff5cb3",
     platformNormal: "#a066ff",
     platformDanger: "#3a0a3a",
@@ -152,6 +167,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     id: "cyber",
     name: "Cyber Cash",
     bgGradient: "linear-gradient(180deg,#001510 0%,#003a2a 100%)",
+    bgImage: cyberBg.url,
     tower: "#0a3a2a",
     platformNormal: "#00ff9d",
     platformDanger: "#ff003a",
@@ -173,6 +189,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     id: "lava",
     name: "Lava Core",
     bgGradient: "linear-gradient(180deg,#1a0505 0%,#5a1a0a 100%)",
+    bgImage: lavaBg.url,
     tower: "#2a0a0a",
     platformNormal: "#3a1a1a",
     platformDanger: "#ff3a1a",
@@ -195,6 +212,7 @@ export const THEMES: Record<ThemeId, Theme> = {
     id: "luxury",
     name: "Luxury White",
     bgGradient: "linear-gradient(180deg,#f5f5f5 0%,#e0d8c8 100%)",
+    bgImage: luxuryBg.url,
     tower: "#c0a868",
     platformNormal: "#f0eadf",
     platformDanger: "#2a2018",

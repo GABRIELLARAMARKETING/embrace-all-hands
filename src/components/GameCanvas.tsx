@@ -553,9 +553,9 @@ export function GameCanvas({ onFirstInput, idle }: Props) {
 
   return (
     <div
-      className="absolute inset-0"
+      className="absolute inset-0 bg-cover bg-center"
       style={{
-        background: theme.bgGradient,
+        backgroundImage: `url(${theme.bgImage}), ${theme.bgGradient}`,
         touchAction: "none",
         userSelect: "none",
         WebkitUserSelect: "none",
