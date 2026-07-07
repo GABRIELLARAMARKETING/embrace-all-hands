@@ -74,7 +74,7 @@ function AjustesIndicadosPage() {
         title="Ajustes indicados"
         subtitle="Configure quanto do seu orçamento cada nível da rede recebe"
       />
-      <div className="space-y-6 p-4 sm:p-6">
+      <div className="space-y-6 p-4 sm:p-5">
         <h2 className="text-lg font-semibold text-white">Ajustes de comissão</h2>
         <p className="-mt-4 text-sm text-[color:var(--admin-text-2)]">
           Configure qual % do depósito cada nível da sua rede receberá. O restante após pagar os

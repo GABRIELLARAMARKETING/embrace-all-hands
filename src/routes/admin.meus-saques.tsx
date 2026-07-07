@@ -61,7 +61,7 @@ function MeusSaquesPage() {
         title="Meus Saques"
         subtitle="Solicite o saque das suas comissões acumuladas"
       />
-      <div className="space-y-6 p-4 sm:p-6">
+      <div className="space-y-6 p-4 sm:p-5">
         <h2 className="text-lg font-semibold text-white">Meus Saques de Comissão</h2>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
