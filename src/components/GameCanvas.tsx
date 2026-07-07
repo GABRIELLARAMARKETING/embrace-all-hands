@@ -390,32 +390,18 @@ function GameLogic({
 
     // ---------- Post-physics visuals ----------
 
-    // Squash on impact, stretch on fast falling.
-    const spinDirection = velocity.current < 0 ? 1 : -0.45;
-    const spinFriction = Math.pow(CONSTANTS.SPIN_FRICTION, dt * 60);
-    spinVelocity.current = THREE.MathUtils.lerp(
-      spinVelocity.current * spinFriction,
-      Math.abs(velocity.current) / CONSTANTS.BALL_RADIUS,
-      1 - Math.pow(0.001, dt),
-    );
-    ball.rotation.x += spinVelocity.current * spinDirection * dt;
-    ball.rotation.y = -currentRotation.current;
+    // Rotação visual desativada (esfera lisa não precisa) — ref mantida p/ reset.
+    void spinVelocity;
 
-    bounceSquash.current = Math.max(0, bounceSquash.current - dt * 6);
-    const squash = bounceSquash.current * 0.35;
-    const fallStretch = Math.max(0, Math.min(0.2, -velocity.current * 0.012));
+    // Deformação bem sutil: quique quase rígido, esticada leve na queda.
+    bounceSquash.current = Math.max(0, bounceSquash.current - dt * 9);
+    const squash = bounceSquash.current * 0.14;
+    const fallStretch = Math.max(0, Math.min(0.07, -velocity.current * 0.005));
     const sx = 1 + squash - fallStretch * 0.5;
     const sy = 1 - squash + fallStretch;
     ball.scale.set(sx, sy, sx);
 
-    // Trail: apenas em quedas longas (|velY| > 12), pool fixo — sem alocação no frame.
-    trailRef.current?.update(
-      ball.position.x,
-      ball.position.y,
-      ball.position.z,
-      Math.abs(velocity.current),
-      dt * 1000,
-    );
+    // Trail desativado — visual minimalista. (Componente mantido para reativação futura.)
 
     // Progress bar (based on descent depth).
     const p = Math.min(1, Math.abs(ball.position.y) / generated.totalHeight);
