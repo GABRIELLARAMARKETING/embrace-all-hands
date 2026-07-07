@@ -1,8 +1,12 @@
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useGameStore } from "@/store/useGameStore";
-import { Button } from "./Button";
-import { COIN_SYMBOL } from "@/game/config/constants";
-import { formatScore } from "@/utils/formatScore";
+import { MAP_THEMES } from "@/data/themes";
+import { LogoHelix } from "./LogoHelix";
+import { LiveCounter } from "./LiveCounter";
+import { ThemeCarousel } from "./ThemeCarousel";
+import { PrimaryButton } from "./PrimaryButton";
+import { AuthActions } from "./AuthActions";
 
 interface Props {
   onOpenThemes: () => void;
@@ -11,57 +15,79 @@ interface Props {
 
 export function MainMenu({ onOpenThemes, onOpenSkins }: Props) {
   const startGame = useGameStore((s) => s.startGame);
-  const bestScore = useGameStore((s) => s.bestScore);
-  const totalCoins = useGameStore((s) => s.totalCoins);
-  const currentLevel = useGameStore((s) => s.currentLevel);
+  const selectedGameTheme = useGameStore((s) => s.selectedTheme);
+  const unlockedThemes = useGameStore((s) => s.unlockedThemes);
+  const selectGameTheme = useGameStore((s) => s.selectTheme);
+
+  // Initial carousel index tries to reflect the currently selected in-game theme.
+  const initialIndex = useMemo(() => {
+    const idx = MAP_THEMES.findIndex((m) => m.gameThemeId === selectedGameTheme);
+    return idx >= 0 ? idx : 0;
+  }, [selectedGameTheme]);
+  const [index, setIndex] = useState(initialIndex);
+
+  const handleChange = (i: number) => {
+    setIndex(i);
+    const mapped = MAP_THEMES[i].gameThemeId;
+    if (unlockedThemes.includes(mapped)) selectGameTheme(mapped);
+  };
+
+  const handlePlayFree = () => {
+    // eslint-disable-next-line no-console
+    console.log("[HelixMulti] handlePlayFree", { map: MAP_THEMES[index].id });
+    startGame();
+  };
 
   return (
-    <div className="absolute inset-0 z-10 flex flex-col items-center justify-between p-6 pointer-events-none">
-      <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
-        className="pointer-events-auto mt-6 text-center"
-      >
-        <h1 className="text-5xl sm:text-6xl font-black tracking-tighter text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
-          HELIX <span className="bg-gradient-to-br from-amber-300 to-fuchsia-400 bg-clip-text text-transparent">CASH</span>
-        </h1>
-        <p className="mt-2 text-sm text-white/80 max-w-sm mx-auto">
-          Gire a torre, atravesse os espaços e colete moedas virtuais.
-        </p>
-      </motion.div>
+    <div
+      className="pointer-events-auto absolute inset-0 z-10 h-full w-full overflow-y-auto"
+      style={{
+        fontFamily:
+          "'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+        background:
+          "radial-gradient(120% 80% at 50% 40%, #3a0f52 0%, #310840 30%, #21002f 65%, #180026 100%)",
+      }}
+    >
+      {/* Central soft glow behind the carousel */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-0 h-[520px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{
+          background:
+            "radial-gradient(closest-side, rgba(168,85,247,0.35), rgba(168,85,247,0.08) 60%, transparent 80%)",
+          filter: "blur(4px)",
+        }}
+      />
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.4 }}
-        className="pointer-events-auto w-full max-w-xs space-y-3"
-      >
-        <Button className="w-full" onClick={() => startGame()}>
-          ▶ Jogar Agora
-        </Button>
-        <div className="grid grid-cols-2 gap-3">
-          <Button variant="ghost" onClick={onOpenThemes}>Temas</Button>
-          <Button variant="ghost" onClick={onOpenSkins}>Skins</Button>
+      <div className="relative z-10 mx-auto flex min-h-full max-w-[900px] flex-col items-center justify-between gap-4 px-4 py-5 sm:py-6">
+        <div className="flex w-full flex-col items-center gap-3">
+          <LogoHelix />
+          <LiveCounter />
+
+          <motion.p
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.4 }}
+            className="mt-1 text-center text-[13px] sm:text-[15px] font-bold uppercase tracking-[0.35em] text-fuchsia-200/80"
+          >
+            Escolha seu mapa
+          </motion.p>
         </div>
-        <div className="mt-6 rounded-2xl bg-black/30 backdrop-blur-md border border-white/10 px-4 py-3 text-white grid grid-cols-3 text-center">
-          <div>
-            <div className="text-[10px] uppercase tracking-widest text-white/60">Melhor</div>
-            <div className="font-bold">{formatScore(bestScore)}</div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-widest text-white/60">Nível</div>
-            <div className="font-bold">{currentLevel}</div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-widest text-white/60">{COIN_SYMBOL} Total</div>
-            <div className="font-bold text-amber-300">{totalCoins}</div>
-          </div>
+
+        <div className="w-full">
+          <ThemeCarousel index={index} onChange={handleChange} />
         </div>
-        <p className="text-center text-[10px] text-white/50 mt-3">
-          Jogo de habilidade com moedas virtuais. Sem dinheiro real.
-        </p>
-      </motion.div>
+
+        <div className="flex w-full flex-col items-center gap-3 pb-3">
+          <PrimaryButton onClick={handlePlayFree} aria-label="Jogar grátis">
+            JOGAR GRATIS
+          </PrimaryButton>
+          <AuthActions
+            onLogin={onOpenSkins}
+            onSignup={onOpenThemes}
+          />
+        </div>
+      </div>
     </div>
   );
 }
