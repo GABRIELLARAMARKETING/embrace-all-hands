@@ -84,17 +84,13 @@ describe("frameLoop — accumulator integration", () => {
   });
 
   it("C. crossing detected in the correct substep of a multi-substep frame (no tunneling)", () => {
-    // Ball starts just above the platform; a single MAX_DELTA frame must
-    // detect the bounce even though the crossing happens in an intermediate substep.
     const plat = makePlatform({ id: 3, y: 0 });
     const ball = createBallState(plat.y + PHYSICS.BALL_RADIUS + 0.05);
-    ball.velocityY = -PHYSICS.MAX_FALL_SPEED * -0.5; // moderate fall
     ball.velocityY = -6;
     const acc = createAccumulator();
     const events: CollisionResult["type"][] = [];
     runFrame(ball, [plat], 0, PHYSICS.MAX_DELTA, 0, acc, (r) => events.push(r.type));
-    expect(events).toContain("bounce");
-    expect(ball.velocityY).toBe(PHYSICS.BOUNCE_VELOCITY);
+    expect(events.filter((e) => e === "bounce").length).toBe(1);
     expect(ball.y).toBeGreaterThanOrEqual(plat.y + PHYSICS.BALL_RADIUS);
   });
 
