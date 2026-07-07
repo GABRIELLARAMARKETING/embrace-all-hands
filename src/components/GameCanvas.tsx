@@ -146,7 +146,10 @@ function GameLogic({
       ballRef.current.scale.set(1, 1, 1);
     }
     cameraTargetY.current = 0;
-  }, [gameState, currentLevel]);
+    brokenRingsRef.current = new Set();
+    breakingRingsRef.current = new Map();
+    deepestRingRef.current = -1;
+    setBreakingRings(new Map());
 
   // Space to pause, R to restart.
   useEffect(() => {
