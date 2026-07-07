@@ -13,6 +13,7 @@ import { TowerCore } from "@/game/entities/TowerCore";
 import { Ball } from "@/game/entities/Ball";
 import { Collectible } from "@/game/entities/Collectible";
 import { Clouds } from "@/game/entities/Clouds";
+import { BreakBurst, type BreakBurstHandle } from "@/game/entities/BreakBurst";
 import { useTowerControls } from "@/game/engine/useTowerControls";
 import { SFX } from "@/utils/sound";
 import { physicsDebug } from "@/game/engine/physicsDebug";
@@ -101,6 +102,7 @@ function GameLogic({
   const feverUntil = useRef(0);
   const spinVelocity = useRef(0);
   const accumulator = useRef(0);
+  const burstRef = useRef<BreakBurstHandle>(null);
   const [collectedCoins, setCollectedCoins] = useState<Set<number>>(new Set());
   const [fever, setFever] = useState(false);
   const finishedRef = useRef(false);
@@ -283,6 +285,14 @@ function GameLogic({
           bounceSquash.current = 1;
           cameraShake.current = Math.max(cameraShake.current, 0.15);
           SFX.bounce();
+          if (isFever) {
+            burstRef.current?.burst(
+              ball.position.x,
+              ringTopY,
+              ball.position.z,
+              "#ff3d7f",
+            );
+          }
           resetCombo();
           passedSincelastBounce.current = 0;
           if (sector === "bonus") collectCoin(3);
@@ -413,6 +423,7 @@ function GameLogic({
       </group>
 
       <Ball ref={ballRef} skinId={selectedSkin} fever={fever} />
+      <BreakBurst ref={burstRef} />
     </>
   );
 }
