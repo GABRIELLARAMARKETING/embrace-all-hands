@@ -20,6 +20,7 @@ export interface PreviewConfig {
   decorations: ThemeDecoration[];
   cardGlow: string;
   thumbnailStyle: string;
+  previewImage?: string;
 }
 
 export interface GameplayConfig {
