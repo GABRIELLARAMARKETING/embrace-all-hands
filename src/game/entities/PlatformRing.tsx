@@ -8,7 +8,10 @@ import { THEMES, type ThemeId } from "@/game/config/themes";
 interface Props {
   ring: RingData;
   themeId: ThemeId;
+  breakingSince?: number | null;
 }
+
+const BREAK_DURATION = 0.75;
 
 const SECTORS = CONSTANTS.SECTORS_PER_RING;
 const SECTOR_ANGLE = (Math.PI * 2) / SECTORS;
