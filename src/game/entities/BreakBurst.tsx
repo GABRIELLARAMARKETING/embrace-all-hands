@@ -2,11 +2,11 @@ import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-const POOL_SIZE = 64; // suporta ~4 bursts simultâneos (16 * 4)
-const PARTICLES_PER_BURST_MIN = 12;
-const PARTICLES_PER_BURST_MAX = 16;
-const LIFE_MS = 600;
-const GRAVITY = -18;
+const POOL_SIZE = 96; // ~4 bursts simultâneos (24 * 4)
+const PARTICLES_PER_BURST_MIN = 18;
+const PARTICLES_PER_BURST_MAX = 24;
+const LIFE_MS = 480;
+const GRAVITY = -22;
 
 export interface BreakBurstHandle {
   burst: (x: number, y: number, z: number, color?: THREE.ColorRepresentation) => void;
