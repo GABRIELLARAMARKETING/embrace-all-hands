@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { GameTheme } from "@/types/theme";
 import { MapCard } from "./MapCard";
 
