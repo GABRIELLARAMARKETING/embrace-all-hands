@@ -46,6 +46,7 @@ export function MainMenu({ onOpenThemes, onOpenSkins }: Props) {
           "'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
         background:
           "radial-gradient(120% 80% at 50% 40%, #3a0f52 0%, #310840 30%, #21002f 65%, #180026 100%)",
+        touchAction: "pan-y",
       }}
     >
       {/* Central soft glow behind the carousel */}
