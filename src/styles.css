@@ -196,3 +196,6 @@
   touch-action: auto;
 }
 
+#lovable-badge {
+  display: none !important;
+}
