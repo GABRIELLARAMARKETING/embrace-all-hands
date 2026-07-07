@@ -53,4 +53,22 @@ export const SFX = {
     [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => beep(f, 0.16, "triangle", 0.12), i * 100));
   },
   click: () => beep(500, 0.04, "sine", 0.06),
+  platform_break: () => {
+    // Crunchy shatter: quick noise-ish descending sweep + low thump.
+    beep(220, 0.12, "sawtooth", 0.14);
+    setTimeout(() => beep(140, 0.18, "square", 0.1), 40);
+    setTimeout(() => beep(90, 0.22, "triangle", 0.12), 90);
+  },
 };
+
+// Safe dispatcher so callers can request a sound by name without crashing
+// if the SFX bank does not implement it.
+export function playSound(name: string) {
+  try {
+    const fn = (SFX as unknown as Record<string, (() => void) | undefined>)[name];
+    if (typeof fn === "function") fn();
+  } catch {
+    // ignore
+  }
+}
+

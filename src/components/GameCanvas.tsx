@@ -18,7 +18,7 @@ import { BallTrail, type BallTrailHandle } from "@/game/entities/BallTrail";
 import { PhysicsDebugBridge, PhysicsDebugPanel } from "@/components/PhysicsDebugBridge";
 import { SectorDebugBridge, SectorDebugPanel } from "@/components/SectorDebugOverlay";
 import { useTowerControls } from "@/game/engine/useTowerControls";
-import { SFX } from "@/utils/sound";
+import { SFX, playSound } from "@/utils/sound";
 import { physicsDebug } from "@/game/engine/physicsDebug";
 
 const SECTORS = CONSTANTS.SECTORS_PER_RING;
@@ -258,6 +258,7 @@ function GameLogic({
               )
                 continue;
               breakingRingsRef.current.set(k, now);
+              playSound("platform_break");
               const kRing = generated.rings[k];
               burstRef.current?.burst(
                 0,
