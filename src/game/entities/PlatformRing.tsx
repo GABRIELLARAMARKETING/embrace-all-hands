@@ -86,7 +86,10 @@ export function PlatformRing({ ring, themeId }: Props) {
             geometry={getGeo()}
             material={materials[mat as keyof typeof materials]}
             rotation={[-Math.PI / 2, 0, i * SECTOR_ANGLE]}
-            position={[0, CONSTANTS.PLATFORM_HEIGHT / 2, 0]}
+            // Extrusão vai de y=0 a y=+H após Rx(-PI/2); deslocando -H/2 o slab
+            // fica centrado em ring.y e o topo visual coincide com o topo físico
+            // usado na colisão (ring.y + H/2).
+            position={[0, -CONSTANTS.PLATFORM_HEIGHT / 2, 0]}
             castShadow
             receiveShadow
           />

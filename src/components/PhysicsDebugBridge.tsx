@@ -44,7 +44,8 @@ export function PhysicsDebugPanel() {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "d") setOpen((v) => !v);
+      // "P" para o painel de física — "D" é usada para girar a torre (WASD).
+      if (e.key.toLowerCase() === "p") setOpen((v) => !v);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);

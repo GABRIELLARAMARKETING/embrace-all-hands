@@ -11,6 +11,9 @@ interface Props {
   ballRef: React.RefObject<THREE.Mesh | null>;
 }
 
+// Vetor reutilizável — evita alocação dentro do useFrame.
+const COIN_WORLD = new THREE.Vector3();
+
 export function Collectible({ y, angle, collected, onCollect, ballRef }: Props) {
   const ref = useRef<THREE.Mesh>(null);
   const r = (CONSTANTS.TOWER_RADIUS + CONSTANTS.CORE_RADIUS) / 2;
@@ -20,11 +23,13 @@ export function Collectible({ y, angle, collected, onCollect, ballRef }: Props) 
     ref.current.rotation.y += dt * 3;
     ref.current.position.y = y + Math.sin(state.clock.elapsedTime * 2) * 0.08;
 
-    // Collision with ball.
+    // Collision with ball — comparar em espaço de MUNDO: a moeda vive dentro
+    // do grupo da torre (coords locais) e a bola vive fora dele (coords de mundo).
     if (ballRef.current) {
-      const dx = ref.current.position.x - ballRef.current.position.x;
-      const dy = ref.current.position.y - ballRef.current.position.y;
-      const dz = ref.current.position.z - ballRef.current.position.z;
+      ref.current.getWorldPosition(COIN_WORLD);
+      const dx = COIN_WORLD.x - ballRef.current.position.x;
+      const dy = COIN_WORLD.y - ballRef.current.position.y;
+      const dz = COIN_WORLD.z - ballRef.current.position.z;
       if (dx * dx + dy * dy + dz * dz < 0.3 * 0.3) onCollect();
     }
   });
