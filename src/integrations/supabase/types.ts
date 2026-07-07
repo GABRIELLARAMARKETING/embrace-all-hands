@@ -249,7 +249,38 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      live_matches_public: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string | null
+          status: string | null
+          theme_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string | null
+          status?: string | null
+          theme_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string | null
+          status?: string | null
+          theme_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_matches_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "game_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
