@@ -14,6 +14,7 @@ import { Ball } from "@/game/entities/Ball";
 import { Collectible } from "@/game/entities/Collectible";
 import { Clouds } from "@/game/entities/Clouds";
 import { BreakBurst, type BreakBurstHandle } from "@/game/entities/BreakBurst";
+import { BallTrail, type BallTrailHandle } from "@/game/entities/BallTrail";
 import { useTowerControls } from "@/game/engine/useTowerControls";
 import { SFX } from "@/utils/sound";
 import { physicsDebug } from "@/game/engine/physicsDebug";
@@ -103,6 +104,7 @@ function GameLogic({
   const spinVelocity = useRef(0);
   const accumulator = useRef(0);
   const burstRef = useRef<BreakBurstHandle>(null);
+  const trailRef = useRef<BallTrailHandle>(null);
   const [collectedCoins, setCollectedCoins] = useState<Set<number>>(new Set());
   const [fever, setFever] = useState(false);
   const finishedRef = useRef(false);
@@ -127,6 +129,7 @@ function GameLogic({
     bounceSquash.current = 0;
     spinVelocity.current = 0;
     accumulator.current = 0;
+    trailRef.current?.reset();
     if (ballRef.current) {
       ballRef.current.position.set(0, 0.5, CONSTANTS.BALL_TRACK_RADIUS);
       ballRef.current.rotation.set(0, 0, 0);
@@ -343,6 +346,15 @@ function GameLogic({
     const sy = 1 - squash + fallStretch;
     ball.scale.set(sx, sy, sx);
 
+    // Trail: apenas em quedas longas (|velY| > 12), pool fixo — sem alocação no frame.
+    trailRef.current?.update(
+      ball.position.x,
+      ball.position.y,
+      ball.position.z,
+      Math.abs(velocity.current),
+      dt * 1000,
+    );
+
     // Progress bar (based on descent depth).
     const p = Math.min(1, Math.abs(ball.position.y) / generated.totalHeight);
     setProgress(p);
@@ -424,6 +436,7 @@ function GameLogic({
 
       <Ball ref={ballRef} skinId={selectedSkin} fever={fever} />
       <BreakBurst ref={burstRef} />
+      <BallTrail ref={trailRef} />
     </>
   );
 }
