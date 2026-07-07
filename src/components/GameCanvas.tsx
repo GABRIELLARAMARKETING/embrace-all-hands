@@ -346,6 +346,15 @@ function GameLogic({
     const sy = 1 - squash + fallStretch;
     ball.scale.set(sx, sy, sx);
 
+    // Trail: apenas em quedas longas (|velY| > 12), pool fixo — sem alocação no frame.
+    trailRef.current?.update(
+      ball.position.x,
+      ball.position.y,
+      ball.position.z,
+      Math.abs(velocity.current),
+      dt * 1000,
+    );
+
     // Progress bar (based on descent depth).
     const p = Math.min(1, Math.abs(ball.position.y) / generated.totalHeight);
     setProgress(p);
