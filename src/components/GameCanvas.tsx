@@ -518,13 +518,13 @@ export function GameCanvas({ onFirstInput, idle }: Props) {
         dpr={isMobile ? [1, 1.5] : [1, 2]}
         gl={{ antialias: !isMobile, powerPreference: "high-performance" }}
         camera={{
-          position: [0, CONSTANTS.CAMERA_HEIGHT_OFFSET, CONSTANTS.CAMERA_DISTANCE],
-          fov: 55,
+          position: [0, CONSTANTS.CAMERA_HEIGHT_OFFSET, CONSTANTS.CAMERA_DISTANCE * (isMobile ? 1.4 : 1)],
+          fov: isMobile ? 62 : 55,
         }}
         style={{ touchAction: "none" }}
       >
         <Suspense fallback={null}>
-          {idle ? <MenuIdleScene /> : <GameLogic onFirstInput={onFirstInput} />}
+          {idle ? <MenuIdleScene /> : <GameLogic onFirstInput={onFirstInput} cameraDistance={CONSTANTS.CAMERA_DISTANCE * (isMobile ? 1.4 : 1)} />}
         </Suspense>
       </Canvas>
       <PhysicsDebugPanel />
