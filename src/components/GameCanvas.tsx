@@ -210,7 +210,10 @@ function GameLogic({
 
       // Only test platform collisions while descending.
       if (velocity.current < 0) {
-        const ballAngle = -currentRotation.current + Math.PI / 2;
+        // A shape do setor é construída no plano XY e rotacionada com Rx(-PI/2),
+        // o que espelha o ângulo (XZ = -planar). A bola está no ângulo de mundo +PI/2,
+        // logo em espaço planar do anel: -(PI/2) - rotação da torre.
+        const ballAngle = -currentRotation.current - Math.PI / 2;
         const normalizedAngle =
           ((ballAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
 
