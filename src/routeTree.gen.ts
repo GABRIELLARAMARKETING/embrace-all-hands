@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminPainelRouteImport } from './routes/admin.painel'
+import { Route as AdminNotificacoesRouteImport } from './routes/admin.notificacoes'
 import { Route as AdminMeusSaquesRouteImport } from './routes/admin.meus-saques'
 import { Route as AdminIndicarRouteImport } from './routes/admin.indicar'
 import { Route as AdminIndicadosRouteImport } from './routes/admin.indicados'
@@ -31,6 +32,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminPainelRoute = AdminPainelRouteImport.update({
   id: '/painel',
   path: '/painel',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNotificacoesRoute = AdminNotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminMeusSaquesRoute = AdminMeusSaquesRouteImport.update({
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/admin/indicados': typeof AdminIndicadosRoute
   '/admin/indicar': typeof AdminIndicarRoute
   '/admin/meus-saques': typeof AdminMeusSaquesRoute
+  '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/painel': typeof AdminPainelRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +84,7 @@ export interface FileRoutesByTo {
   '/admin/indicados': typeof AdminIndicadosRoute
   '/admin/indicar': typeof AdminIndicarRoute
   '/admin/meus-saques': typeof AdminMeusSaquesRoute
+  '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/painel': typeof AdminPainelRoute
 }
 export interface FileRoutesById {
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   '/admin/indicados': typeof AdminIndicadosRoute
   '/admin/indicar': typeof AdminIndicarRoute
   '/admin/meus-saques': typeof AdminMeusSaquesRoute
+  '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/painel': typeof AdminPainelRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/admin/indicados'
     | '/admin/indicar'
     | '/admin/meus-saques'
+    | '/admin/notificacoes'
     | '/admin/painel'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/admin/indicados'
     | '/admin/indicar'
     | '/admin/meus-saques'
+    | '/admin/notificacoes'
     | '/admin/painel'
   id:
     | '__root__'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/admin/indicados'
     | '/admin/indicar'
     | '/admin/meus-saques'
+    | '/admin/notificacoes'
     | '/admin/painel'
   fileRoutesById: FileRoutesById
 }
@@ -149,6 +161,13 @@ declare module '@tanstack/react-router' {
       path: '/painel'
       fullPath: '/admin/painel'
       preLoaderRoute: typeof AdminPainelRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/notificacoes': {
+      id: '/admin/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/admin/notificacoes'
+      preLoaderRoute: typeof AdminNotificacoesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/meus-saques': {
@@ -195,6 +214,7 @@ interface AdminRouteChildren {
   AdminIndicadosRoute: typeof AdminIndicadosRoute
   AdminIndicarRoute: typeof AdminIndicarRoute
   AdminMeusSaquesRoute: typeof AdminMeusSaquesRoute
+  AdminNotificacoesRoute: typeof AdminNotificacoesRoute
   AdminPainelRoute: typeof AdminPainelRoute
 }
 
@@ -204,6 +224,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminIndicadosRoute: AdminIndicadosRoute,
   AdminIndicarRoute: AdminIndicarRoute,
   AdminMeusSaquesRoute: AdminMeusSaquesRoute,
+  AdminNotificacoesRoute: AdminNotificacoesRoute,
   AdminPainelRoute: AdminPainelRoute,
 }
 
