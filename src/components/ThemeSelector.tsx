@@ -94,7 +94,7 @@ function ThemeCard({
           ? "h-64 w-44 scale-100 border-white/70 shadow-[0_0_35px_rgba(168,85,247,0.55)]"
           : "h-56 w-36 scale-90 border-white/10 opacity-70 hover:opacity-90",
       ].join(" ")}
-      style={{ background: FALLBACK_BG }}
+      style={{ background: theme.bgGradient || FALLBACK_BG }}
       aria-pressed={active}
       aria-label={theme.name}
     >
