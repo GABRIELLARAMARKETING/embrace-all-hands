@@ -92,7 +92,7 @@ export function Sidebar({ onNavigate }: Props) {
 
       <div className="border-t border-[color:var(--admin-line)] p-3">
         <Link
-          to="/login"
+          to="/admin/login"
           onClick={() => {
             if (typeof window !== "undefined") {
               window.localStorage.removeItem("gerente-helix:auth");
