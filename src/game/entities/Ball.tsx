@@ -15,29 +15,21 @@ export const Ball = forwardRef<THREE.Mesh, Props>(function Ball(
 ) {
   const bt = ballTheme ?? FALLBACK_BALL;
   const material = useMemo(() => {
-    const emissiveColor = fever ? "#ffcc33" : bt.emissive;
-    const emissiveIntensity = fever
-      ? Math.max(0.6, bt.emissiveIntensity)
-      : bt.emissiveIntensity;
+    // Estilo simples: cor sólida fosca, sem brilho metálico nem emissivo.
+    // Só ganha um leve glow durante o fever.
     return new THREE.MeshStandardMaterial({
       color: bt.color,
-      emissive: emissiveColor,
-      emissiveIntensity,
-      metalness: bt.metalness,
-      roughness: bt.roughness,
+      emissive: fever ? new THREE.Color("#ffcc33") : new THREE.Color("#000000"),
+      emissiveIntensity: fever ? 0.5 : 0,
+      metalness: 0,
+      roughness: 1,
     });
-  }, [
-    fever,
-    bt.color,
-    bt.emissive,
-    bt.emissiveIntensity,
-    bt.metalness,
-    bt.roughness,
-  ]);
+  }, [fever, bt.color]);
 
+  // Escala apenas visual — a física continua usando CONSTANTS.BALL_RADIUS.
   return (
-    <mesh ref={ref} material={material} castShadow>
-      <sphereGeometry args={[CONSTANTS.BALL_RADIUS, 32, 32]} />
+    <mesh ref={ref} material={material} scale={0.7} castShadow>
+      <sphereGeometry args={[CONSTANTS.BALL_RADIUS, 24, 24]} />
     </mesh>
   );
 });
