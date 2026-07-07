@@ -392,7 +392,7 @@ function GameLogic({
     state.camera.position.set(
       camSx,
       cameraTargetY.current + camSy,
-      CONSTANTS.CAMERA_DISTANCE,
+      cameraDistance,
     );
     state.camera.lookAt(0, ball.position.y + CONSTANTS.CAMERA_LOOK_AT_OFFSET, 0);
   });
