@@ -346,11 +346,14 @@ function GameLogic({
 
     // Camera follow + subtle shake (camera is purely visual — never touches physics).
     const cameraT = 1 - Math.pow(1 - CONSTANTS.CAMERA_LERP, dt * 60);
-    cameraTargetY.current = THREE.MathUtils.lerp(
+    // Camera segue apenas descendo — nunca sobe quando a bola quica (padrão do gênero).
+    const desiredCamY = ball.position.y + CONSTANTS.CAMERA_HEIGHT_OFFSET;
+    const nextCamY = THREE.MathUtils.lerp(
       cameraTargetY.current,
-      ball.position.y + CONSTANTS.CAMERA_HEIGHT_OFFSET,
+      desiredCamY,
       cameraT,
     );
+    cameraTargetY.current = Math.min(cameraTargetY.current, nextCamY);
     cameraShake.current = Math.max(0, cameraShake.current - dt * 2.5);
     const shake = cameraShake.current;
     const camSx = shake ? (Math.random() - 0.5) * shake * 0.4 : 0;
