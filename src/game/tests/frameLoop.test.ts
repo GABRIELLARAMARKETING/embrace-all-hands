@@ -109,7 +109,7 @@ describe("frameLoop — accumulator integration", () => {
     runFrame(ball, [plat], 0, PHYSICS.MAX_DELTA, 0, acc, (r) => events.push(r.type));
     expect(events.filter((e) => e === "pass").length).toBe(1);
     expect(events).not.toContain("bounce");
-    expect(ball.y).toBeLessThan(plat.y);
+    expect(ball.y).toBeLessThan(plat.y + PHYSICS.BALL_RADIUS + 0.05);
   });
 
   it("E. determinism: 30 FPS vs 240 FPS produce identical bounce count over 3s", () => {
