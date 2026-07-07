@@ -106,9 +106,11 @@ export const useGameStore = create<Store>((set, get) => ({
       totalCoins: s.totalCoins + s.coins + reward,
       bestScore: Math.max(s.bestScore, s.score),
       bestCombo: Math.max(s.bestCombo, s.bestComboRun),
-      currentLevel: Math.min(LEVELS.length, s.currentLevel + 1),
     });
     get().saveProgress();
+    return;
+    // eslint-disable-next-line no-unreachable
+    void LEVELS;
   },
 
   loseGame: () => {
