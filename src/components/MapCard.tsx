@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import type { MapTheme } from "@/data/themes";
+import type { GameTheme } from "@/types/theme";
 import { MapPreview } from "./MapPreview";
 
 interface Props {
-  theme: MapTheme;
+  theme: GameTheme;
   role: "center" | "near" | "far";
-  offset: number; // -2..2
+  offset: number;
   onClick?: () => void;
 }
 
@@ -18,7 +18,8 @@ const SIZE = {
 export function MapCard({ theme, role, offset, onClick }: Props) {
   const s = SIZE[role];
   const isCenter = role === "center";
-  const xPx = offset * 130; // horizontal spread
+  const xPx = offset * 130;
+  const glow = theme.preview_config.cardGlow ?? "#a855f7";
 
   return (
     <motion.button
@@ -38,11 +39,7 @@ export function MapCard({ theme, role, offset, onClick }: Props) {
       transition={{ type: "spring", stiffness: 260, damping: 30 }}
     >
       <motion.div
-        animate={
-          isCenter
-            ? { y: [0, -6, 0] }
-            : { y: 0 }
-        }
+        animate={isCenter ? { y: [0, -6, 0] } : { y: 0 }}
         transition={
           isCenter
             ? { duration: 3.6, repeat: Infinity, ease: "easeInOut" }
@@ -52,13 +49,13 @@ export function MapCard({ theme, role, offset, onClick }: Props) {
         style={{
           width: s.w,
           height: s.h,
-          border: `2px solid ${isCenter ? "#a855f7" : "rgba(168,85,247,0.35)"}`,
+          border: `2px solid ${isCenter ? glow : "rgba(168,85,247,0.35)"}`,
           boxShadow: isCenter
-            ? "0 20px 60px -10px rgba(168,85,247,0.65), 0 0 0 1px rgba(255,255,255,0.06) inset, 0 0 40px rgba(168,85,247,0.35)"
+            ? `0 20px 60px -10px ${glow}, 0 0 0 1px rgba(255,255,255,0.06) inset, 0 0 40px ${glow}55`
             : "0 10px 30px -12px rgba(0,0,0,0.6)",
         }}
       >
-        <MapPreview theme={theme} intensity={isCenter ? 1 : 0.7} />
+        <MapPreview preview={theme.preview_config} intensity={isCenter ? 1 : 0.7} />
         {!isCenter && <div className="absolute inset-0 bg-black/25" />}
       </motion.div>
     </motion.button>

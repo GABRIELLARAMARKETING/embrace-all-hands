@@ -1,48 +1,53 @@
-import type { MapTheme } from "@/data/themes";
+import type { PreviewConfig, ThemeDecoration } from "@/types/theme";
 
 interface Props {
-  theme: MapTheme;
-  intensity?: number; // 0..1 — dims decor on side cards
+  preview: PreviewConfig;
+  intensity?: number;
 }
 
 /**
- * Pure CSS/SVG preview of a Helix tower for a given theme. No canvas.
- * Renders a vertical pole, a stack of helicoidal platform slices with gaps,
- * a ball sitting on top and a few themed background decorations.
+ * Pure CSS/SVG preview of a Helix tower for a given theme, driven entirely by
+ * the backend preview_config so new themes require no code changes.
  */
-export function MapPreview({ theme, intensity = 1 }: Props) {
+export function MapPreview({ preview, intensity = 1 }: Props) {
+  const platforms = (preview.platformColors ?? []).slice(0, 3);
+  const [p0, p1, p2] = [platforms[0] ?? "#ccc", platforms[1] ?? "#999", platforms[2] ?? "#fff"];
+
   return (
     <div
       className="relative h-full w-full overflow-hidden rounded-[18px]"
-      style={{ background: theme.background }}
+      style={{ background: preview.background }}
     >
-      <Decor kind={theme.decorations} intensity={intensity} accent={theme.accent} />
+      {(preview.decorations ?? []).map((d) => (
+        <Decor key={d} kind={d} intensity={intensity} accent={preview.cardGlow} />
+      ))}
 
       {/* Pole */}
       <div
         className="absolute left-1/2 top-[10%] h-[80%] w-[6%] -translate-x-1/2 rounded-full"
         style={{
-          background: `linear-gradient(180deg, ${theme.pole}, ${shade(theme.pole, -20)})`,
+          background: `linear-gradient(180deg, ${preview.poleColor}, ${shade(preview.poleColor, -20)})`,
           boxShadow: "inset 0 0 6px rgba(0,0,0,0.35)",
         }}
       />
 
       {/* Platforms */}
-      {Array.from({ length: 7 }).map((_, i) => (
-        <Platform
-          key={i}
-          top={`${18 + i * 10}%`}
-          rotate={(i * 47) % 360}
-          colors={theme.platforms}
-        />
-      ))}
+      {Array.from({ length: 7 }).map((_, i) => {
+        const isDanger = i === 2 || i === 5;
+        const colors: [string, string, string] = isDanger
+          ? [preview.dangerColor, p1, preview.dangerColor]
+          : [p0, p1, p2];
+        return (
+          <Platform key={i} top={`${18 + i * 10}%`} rotate={(i * 47) % 360} colors={colors} />
+        );
+      })}
 
       {/* Ball */}
       <div
         className="absolute left-1/2 top-[14%] h-4 w-4 -translate-x-1/2 rounded-full"
         style={{
-          background: `radial-gradient(circle at 30% 30%, #fff, ${theme.ball})`,
-          boxShadow: `0 0 12px 2px ${withAlpha(theme.accent, 0.7)}`,
+          background: `radial-gradient(circle at 30% 30%, #fff, ${preview.ballColor})`,
+          boxShadow: `0 0 12px 2px ${withAlpha(preview.cardGlow, 0.7)}`,
         }}
       />
     </div>
@@ -58,7 +63,6 @@ function Platform({
   rotate: number;
   colors: [string, string, string];
 }) {
-  // A semicircular slice suggesting a helix ring, tinted per theme.
   return (
     <div
       className="absolute left-1/2 h-3 w-[78%] -translate-x-1/2"
@@ -84,12 +88,12 @@ function Decor({
   intensity,
   accent,
 }: {
-  kind: MapTheme["decorations"];
+  kind: ThemeDecoration;
   intensity: number;
   accent: string;
 }) {
   const style = { opacity: intensity };
-  if (kind === "clouds") {
+  if (kind === "clouds")
     return (
       <div className="absolute inset-0" style={style}>
         <div className="absolute left-2 top-3 h-3 w-8 rounded-full bg-white/80" />
@@ -97,16 +101,14 @@ function Decor({
         <div className="absolute left-4 bottom-4 h-3 w-6 rounded-full bg-white/60" />
       </div>
     );
-  }
-  if (kind === "lava") {
+  if (kind === "lava")
     return (
       <div className="absolute inset-0" style={style}>
         <div className="absolute bottom-0 left-0 h-8 w-full bg-gradient-to-t from-orange-500/70 to-transparent" />
         <div className="absolute right-4 top-8 h-1.5 w-1.5 rounded-full bg-orange-300 shadow-[0_0_8px_2px_rgba(255,120,40,0.9)]" />
       </div>
     );
-  }
-  if (kind === "bubbles") {
+  if (kind === "bubbles")
     return (
       <div className="absolute inset-0" style={style}>
         {[10, 30, 55, 75].map((p, i) => (
@@ -118,24 +120,21 @@ function Decor({
         ))}
       </div>
     );
-  }
-  if (kind === "stadium") {
+  if (kind === "stadium")
     return (
       <div className="absolute inset-0" style={style}>
         <div className="absolute inset-x-2 bottom-3 h-6 rounded-md bg-black/40 ring-1 ring-white/10" />
         <div className="absolute inset-x-4 bottom-5 h-2 rounded-sm bg-white/20" />
       </div>
     );
-  }
-  if (kind === "candy") {
+  if (kind === "candy")
     return (
       <div className="absolute inset-0" style={style}>
         <div className="absolute left-3 top-5 h-4 w-4 rounded-full bg-pink-300" />
         <div className="absolute right-4 top-10 h-3 w-3 rotate-45 bg-yellow-200" />
       </div>
     );
-  }
-  if (kind === "grid") {
+  if (kind === "grid")
     return (
       <div
         className="absolute inset-0"
@@ -147,8 +146,7 @@ function Decor({
         }}
       />
     );
-  }
-  if (kind === "snow") {
+  if (kind === "snow")
     return (
       <div className="absolute inset-0" style={style}>
         {[15, 40, 65, 85].map((p, i) => (
@@ -160,16 +158,14 @@ function Decor({
         ))}
       </div>
     );
-  }
-  if (kind === "desert") {
+  if (kind === "desert")
     return (
       <div className="absolute inset-0" style={style}>
         <div className="absolute bottom-2 left-2 h-6 w-1.5 rounded bg-emerald-700" />
         <div className="absolute right-4 top-4 h-4 w-4 rounded-full bg-yellow-200/80 shadow-[0_0_16px_4px_rgba(255,220,120,0.7)]" />
       </div>
     );
-  }
-  if (kind === "stars") {
+  if (kind === "stars")
     return (
       <div className="absolute inset-0" style={style}>
         {[8, 22, 44, 63, 78, 90].map((p, i) => (
@@ -181,8 +177,6 @@ function Decor({
         ))}
       </div>
     );
-  }
-  // jungle
   return (
     <div className="absolute inset-0" style={style}>
       <div className="absolute bottom-0 left-0 h-6 w-full bg-gradient-to-t from-emerald-900/70 to-transparent" />
@@ -192,7 +186,6 @@ function Decor({
 }
 
 function shade(hex: string, amt: number) {
-  // Very small utility, forgiving on invalid input.
   const c = hex.replace("#", "");
   const num = parseInt(c.length === 3 ? c.split("").map((x) => x + x).join("") : c, 16);
   const r = Math.max(0, Math.min(255, (num >> 16) + amt));
