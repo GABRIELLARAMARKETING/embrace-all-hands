@@ -7,8 +7,14 @@ import { TopHeader } from "@/components/admin/TopHeader";
 import { AdminCard } from "@/components/admin/AdminCard";
 import { AdminInput } from "@/components/admin/AdminInput";
 import { AdminButton } from "@/components/admin/AdminButton";
+import { AdminTable } from "@/components/admin/AdminTable";
+import { EmptyState } from "@/components/admin/EmptyState";
+import { MoneyValue } from "@/components/admin/MoneyValue";
 import { demoAccountSchema, type DemoAccountFormValues } from "@/utils/validators";
 import { demoAccountsService } from "@/services/demoAccountsService";
+import { useAdminStore } from "@/store/useAdminStore";
+import { formatDate } from "@/utils/formatDate";
+
 
 export const Route = createFileRoute("/admin/criar-demo")({
   head: () => ({
@@ -21,7 +27,10 @@ export const Route = createFileRoute("/admin/criar-demo")({
 });
 
 function CriarDemoPage() {
+  const accounts = useAdminStore((s) => s.demoAccounts);
+
   const form = useForm<DemoAccountFormValues>({
+
     resolver: zodResolver(demoAccountSchema),
     defaultValues: {
       namePattern: "demo",
@@ -112,7 +121,46 @@ function CriarDemoPage() {
             </div>
           </form>
         </AdminCard>
+
+        <AdminCard className="mx-auto mt-6 max-w-3xl">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-base font-semibold text-white">Contas criadas</h3>
+            <span className="text-xs text-[color:var(--admin-text-3)]">
+              {accounts.length} conta(s)
+            </span>
+          </div>
+          <AdminTable
+            emptyState={<EmptyState message="Nenhuma conta demo criada ainda" />}
+            rows={accounts}
+            getRowKey={(r) => r.id}
+            columns={[
+              { key: "n", header: "#", render: (_r, i) => i + 1, width: "48px" },
+              {
+                key: "name",
+                header: "Nome",
+                render: (r) => <span className="text-white">{r.name}</span>,
+              },
+              { key: "phone", header: "Telefone", render: (r) => r.phone },
+              {
+                key: "password",
+                header: "Senha",
+                render: (r) => <span className="font-mono text-xs">{r.password}</span>,
+              },
+              {
+                key: "balance",
+                header: "Saldo Inicial",
+                render: (r) => <MoneyValue value={r.initialBalance} />,
+              },
+              {
+                key: "created",
+                header: "Criada em",
+                render: (r) => formatDate(r.createdAt),
+              },
+            ]}
+          />
+        </AdminCard>
       </div>
+
     </>
   );
 }
