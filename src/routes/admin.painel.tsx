@@ -38,7 +38,7 @@ function PainelPage() {
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.25 }}
-        className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-8 lg:grid-cols-3"
+        className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-6 lg:grid-cols-3"
       >
         {cards.map((c) => (
           <StatCard key={c.label} {...c} />
