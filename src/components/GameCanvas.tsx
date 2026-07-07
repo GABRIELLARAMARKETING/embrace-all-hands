@@ -491,7 +491,7 @@ function GameLogic({
         )}
       </group>
 
-      <Ball ref={ballRef} skinId={selectedSkin} fever={fever} />
+      <Ball ref={ballRef} ballTheme={theme.ball} fever={fever} />
       <BreakBurst ref={burstRef} />
       <BallTrail ref={trailRef} />
       <PhysicsDebugBridge
