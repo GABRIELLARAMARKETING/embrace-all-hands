@@ -121,7 +121,46 @@ function CriarDemoPage() {
             </div>
           </form>
         </AdminCard>
+
+        <AdminCard className="mx-auto mt-6 max-w-3xl">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-base font-semibold text-white">Contas criadas</h3>
+            <span className="text-xs text-[color:var(--admin-text-3)]">
+              {accounts.length} conta(s)
+            </span>
+          </div>
+          <AdminTable
+            emptyState={<EmptyState message="Nenhuma conta demo criada ainda" />}
+            rows={accounts}
+            getRowKey={(r) => r.id}
+            columns={[
+              { key: "n", header: "#", render: (_r, i) => i + 1, width: "48px" },
+              {
+                key: "name",
+                header: "Nome",
+                render: (r) => <span className="text-white">{r.name}</span>,
+              },
+              { key: "phone", header: "Telefone", render: (r) => r.phone },
+              {
+                key: "password",
+                header: "Senha",
+                render: (r) => <span className="font-mono text-xs">{r.password}</span>,
+              },
+              {
+                key: "balance",
+                header: "Saldo Inicial",
+                render: (r) => <MoneyValue value={r.initialBalance} />,
+              },
+              {
+                key: "created",
+                header: "Criada em",
+                render: (r) => formatDate(r.createdAt),
+              },
+            ]}
+          />
+        </AdminCard>
       </div>
+
     </>
   );
 }
