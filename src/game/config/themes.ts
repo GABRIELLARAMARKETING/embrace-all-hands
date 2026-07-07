@@ -1,3 +1,12 @@
+import cottonBg from "@/assets/themes/cotton-bg.jpg.asset.json";
+import neonBg from "@/assets/themes/neon-bg.jpg.asset.json";
+import goldBg from "@/assets/themes/gold-bg.jpg.asset.json";
+import oceanBg from "@/assets/themes/ocean-bg.jpg.asset.json";
+import candyBg from "@/assets/themes/candy-bg.jpg.asset.json";
+import cyberBg from "@/assets/themes/cyber-bg.jpg.asset.json";
+import lavaBg from "@/assets/themes/lava-bg.jpg.asset.json";
+import luxuryBg from "@/assets/themes/luxury-bg.jpg.asset.json";
+
 export type ThemeId =
   | "cotton"
   | "neon"
@@ -22,6 +31,7 @@ export interface Theme {
   id: ThemeId;
   name: string;
   bgGradient: string;
+  bgImage: string;
   tower: string;
   platformNormal: string;
   platformDanger: string;
