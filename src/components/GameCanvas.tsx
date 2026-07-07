@@ -150,6 +150,9 @@ function GameLogic({
     breakingRingsRef.current = new Map();
     deepestRingRef.current = -1;
     setBreakingRings(new Map());
+  }, [gameState, currentLevel]);
+
+
 
   // Space to pause, R to restart.
   useEffect(() => {
