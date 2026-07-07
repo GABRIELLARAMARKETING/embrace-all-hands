@@ -118,12 +118,18 @@ export const useAdminStore = create<AdminStore>()(
         typeof window !== "undefined" ? window.localStorage : (undefined as unknown as Storage),
       ),
       partialize: (state) => ({
+        metrics: state.metrics,
+        availableBalance: state.availableBalance,
+        referrals: state.referrals,
         influencerMode: state.influencerMode,
         commissionSettings: state.commissionSettings,
         withdrawals: state.withdrawals,
         demoAccounts: state.demoAccounts,
         notifications: state.notifications,
       }),
+      // Avoid SSR/CSR hydration mismatch: only read from localStorage on the client.
+      skipHydration: typeof window === "undefined",
+
     },
   ),
 );
