@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { GameCanvas } from "@/components/GameCanvas";
@@ -12,7 +12,6 @@ import { SkinShop } from "@/components/SkinShop";
 import { useGameStore } from "@/store/useGameStore";
 import { PhysicsDebugOverlay } from "@/components/PhysicsDebugOverlay";
 import { useGameSession } from "@/hooks/useGameSession";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/game")({
   component: GamePage,
@@ -30,7 +29,30 @@ function GamePage() {
   const currentLevel = useGameStore((s) => s.currentLevel);
   const prevStateRef = useRef(gameState);
 
+  useEffect(() => {
+    const prev = prevStateRef.current;
+    if (prev === "playing" && (gameState === "gameOver" || gameState === "victory")) {
+      finishSession({
+        score,
+        level_reached: currentLevel,
+        status: gameState === "victory" ? "finished" : "gameover",
+      });
+    }
+    prevStateRef.current = gameState;
+  }, [gameState, finishSession, score, currentLevel]);
+
+  useEffect(() => {
+    loadProgress();
+    const t = setTimeout(() => setSplash(false), 900);
+    return () => clearTimeout(t);
+  }, [loadProgress]);
+
+  useEffect(() => {
+    if (gameState === "playing") setHintVisible(true);
+  }, [gameState]);
+
   const idle = gameState === "menu";
+
 
   return (
     <main className="relative h-screen w-screen overflow-hidden font-sans select-none">
