@@ -7,8 +7,14 @@ import { TopHeader } from "@/components/admin/TopHeader";
 import { AdminCard } from "@/components/admin/AdminCard";
 import { AdminInput } from "@/components/admin/AdminInput";
 import { AdminButton } from "@/components/admin/AdminButton";
+import { AdminTable } from "@/components/admin/AdminTable";
+import { EmptyState } from "@/components/admin/EmptyState";
+import { MoneyValue } from "@/components/admin/MoneyValue";
 import { demoAccountSchema, type DemoAccountFormValues } from "@/utils/validators";
 import { demoAccountsService } from "@/services/demoAccountsService";
+import { useAdminStore } from "@/store/useAdminStore";
+import { formatDate } from "@/utils/formatDate";
+
 
 export const Route = createFileRoute("/admin/criar-demo")({
   head: () => ({
