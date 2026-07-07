@@ -81,10 +81,10 @@ export function checkPlatformCollision(
   const prevBottom = ball.previousY - PHYSICS.BALL_RADIUS;
   const currBottom = ball.y - PHYSICS.BALL_RADIUS;
 
-  // swept: base of the ball must have crossed the platform top this step
+  // swept: ball was above (or at) the top last step and is now below.
+  // Asymmetric to prevent re-detection on subsequent substeps once crossed.
   const crossed =
-    prevBottom >= top - PHYSICS.COLLISION_EPSILON &&
-    currBottom <= top + PHYSICS.COLLISION_EPSILON;
+    prevBottom >= top - PHYSICS.COLLISION_EPSILON && currBottom < top;
   if (!crossed) return { type: "none" };
 
   // per-platform cooldown (prevents double bounce)
