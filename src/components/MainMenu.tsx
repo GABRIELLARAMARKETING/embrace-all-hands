@@ -84,7 +84,7 @@ export function MainMenu({ onOpenThemes, onOpenSkins }: Props) {
         </div>
 
         <div className="flex w-full flex-col items-center gap-3 pb-3">
-          <PrimaryButton onClick={handlePlayFree} aria-label="Jogar grátis">
+          <PrimaryButton onClick={() => handlePlayFree(MAP_THEMES[index].id)} aria-label="Jogar grátis">
             JOGAR GRATIS
           </PrimaryButton>
           <AuthActions
