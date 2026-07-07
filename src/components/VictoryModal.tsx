@@ -13,7 +13,7 @@ export function VictoryModal({ open }: { open: boolean }) {
   const toMenu = useGameStore((s) => s.toMenu);
   const reward = 25 + (currentLevel - 1) * 5;
   const totalReward = coins + reward;
-  const hasNext = currentLevel <= LEVELS.length;
+  const hasNext = false;
 
   return (
     <Modal open={open} title="Parabéns!">
