@@ -60,8 +60,10 @@ function resolveContactSector(
 
 function GameLogic({
   onFirstInput,
+  cameraDistance,
 }: {
   onFirstInput: () => void;
+  cameraDistance: number;
 }) {
   const currentLevel = useGameStore((s) => s.currentLevel);
   const selectedSkin = useGameStore((s) => s.selectedSkin);
