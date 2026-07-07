@@ -100,6 +100,7 @@ function GameLogic({
   const passedSincelastBounce = useRef(0);
   const feverUntil = useRef(0);
   const spinVelocity = useRef(0);
+  const accumulator = useRef(0);
   const [collectedCoins, setCollectedCoins] = useState<Set<number>>(new Set());
   const [fever, setFever] = useState(false);
   const finishedRef = useRef(false);
