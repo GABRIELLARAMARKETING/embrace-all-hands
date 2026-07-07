@@ -12,7 +12,7 @@ export function TopHeader({ title, subtitle, context }: Props) {
   const { openMobileMenu } = useAdminUI();
 
   return (
-    <header className="border-b border-[color:var(--admin-line)] bg-[color:var(--admin-bg)]/60 px-4 pb-5 pt-5 backdrop-blur sm:px-8">
+    <header className="border-b border-[color:var(--admin-line)] bg-[color:var(--admin-bg)]/60 px-4 pb-4 pt-4 backdrop-blur sm:px-6">
       <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
         <button
           type="button"

@@ -25,7 +25,7 @@ function IndicarPage() {
   return (
     <>
       <TopHeader title="Indicar" subtitle="Seu link de indicação para compartilhar" />
-      <div className="space-y-4 p-4 sm:p-8">
+      <div className="space-y-4 p-4 sm:p-6">
         <AdminCard>
           <h2 className="text-lg font-semibold text-white">Indicar Amigos</h2>
 
