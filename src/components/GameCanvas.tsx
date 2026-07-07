@@ -6,6 +6,7 @@ import { CONSTANTS, DEBUG_PHYSICS } from "@/game/config/constants";
 import { LEVELS } from "@/game/config/levels";
 import { THEMES } from "@/game/config/themes";
 import { generateLevel } from "@/game/engine/levelGenerator";
+import type { RingData, SectorType } from "@/game/engine/levelGenerator";
 import { useGameStore } from "@/store/useGameStore";
 import { PlatformRing } from "@/game/entities/PlatformRing";
 import { TowerCore } from "@/game/entities/TowerCore";
@@ -18,6 +19,40 @@ import { physicsDebug } from "@/game/engine/physicsDebug";
 
 const SECTORS = CONSTANTS.SECTORS_PER_RING;
 const SECTOR_ANGLE = (Math.PI * 2) / SECTORS;
+const BALL_ANGLE_RADIUS = Math.asin(
+  Math.min(0.95, CONSTANTS.BALL_RADIUS / CONSTANTS.BALL_TRACK_RADIUS),
+);
+
+function sectorAt(ring: RingData, normalizedBallAngle: number, offset = 0): SectorType {
+  const relAngle =
+    (((normalizedBallAngle - ring.rotation + offset) % (Math.PI * 2)) +
+      Math.PI * 2) %
+    (Math.PI * 2);
+  const sectorIndex = Math.floor(relAngle / SECTOR_ANGLE) % SECTORS;
+  return ring.sectors[sectorIndex];
+}
+
+function resolveContactSector(
+  ring: RingData,
+  normalizedBallAngle: number,
+): SectorType {
+  const offsets = [0, -BALL_ANGLE_RADIUS * 0.85, BALL_ANGLE_RADIUS * 0.85];
+  let hasSolid = false;
+  let hasBonus = false;
+  let hasDanger = false;
+
+  for (const offset of offsets) {
+    const sector = sectorAt(ring, normalizedBallAngle, offset);
+    if (sector === "danger") hasDanger = true;
+    if (sector === "bonus") hasBonus = true;
+    if (sector === "solid") hasSolid = true;
+  }
+
+  if (hasDanger) return "danger";
+  if (hasBonus) return "bonus";
+  if (hasSolid) return "solid";
+  return "empty";
+}
 
 function GameLogic({
   onFirstInput,
@@ -64,6 +99,7 @@ function GameLogic({
   const collisionCooldownUntil = useRef(0);
   const passedSincelastBounce = useRef(0);
   const feverUntil = useRef(0);
+  const spinVelocity = useRef(0);
   const [collectedCoins, setCollectedCoins] = useState<Set<number>>(new Set());
   const [fever, setFever] = useState(false);
   const finishedRef = useRef(false);
@@ -86,8 +122,10 @@ function GameLogic({
     towerRotation.current = 0;
     currentRotation.current = 0;
     bounceSquash.current = 0;
+    spinVelocity.current = 0;
     if (ballRef.current) {
-      ballRef.current.position.set(0, 0.5, (CONSTANTS.TOWER_RADIUS + CONSTANTS.CORE_RADIUS) / 2);
+      ballRef.current.position.set(0, 0.5, CONSTANTS.BALL_TRACK_RADIUS);
+      ballRef.current.rotation.set(0, 0, 0);
       ballRef.current.scale.set(1, 1, 1);
     }
     cameraTargetY.current = 0;
@@ -177,13 +215,7 @@ function GameLogic({
             continue;
           }
 
-          const relAngle =
-            (((normalizedAngle - ring.rotation) % (Math.PI * 2)) +
-              Math.PI * 2) %
-            (Math.PI * 2);
-          const sectorIndex =
-            Math.floor(relAngle / SECTOR_ANGLE) % SECTORS;
-          const sector = ring.sectors[sectorIndex];
+          const sector = resolveContactSector(ring, normalizedAngle);
 
           dbgSector = sector;
           dbgRing = i;
@@ -193,7 +225,7 @@ function GameLogic({
               prevY,
               nextY,
               velY: velocity.current,
-              relAngle,
+              normalizedAngle,
             });
           }
 
@@ -221,11 +253,19 @@ function GameLogic({
             return;
           }
 
+          const impactSpeed = Math.abs(velocity.current);
           landedY = ringTopY + CONSTANTS.BALL_RADIUS + CONSTANTS.COLLISION_EPSILON;
           lastBounceRing.current = i;
           collisionCooldownUntil.current =
             state.clock.elapsedTime + CONSTANTS.COLLISION_COOLDOWN;
-          velocity.current = CONSTANTS.BOUNCE_VELOCITY;
+          velocity.current = Math.min(
+            CONSTANTS.MAX_BOUNCE_VELOCITY,
+            Math.max(
+              CONSTANTS.BOUNCE_VELOCITY,
+              impactSpeed * CONSTANTS.BOUNCE_RESTITUTION,
+            ),
+          );
+          spinVelocity.current = Math.min(32, impactSpeed / CONSTANTS.BALL_RADIUS);
           bounceSquash.current = 1;
           cameraShake.current = Math.max(cameraShake.current, 0.15);
           SFX.bounce();
@@ -259,6 +299,15 @@ function GameLogic({
     // ---------- Post-physics visuals ----------
 
     // Squash on impact, stretch on fast falling.
+    const spinDirection = velocity.current < 0 ? 1 : -0.45;
+    spinVelocity.current = THREE.MathUtils.lerp(
+      spinVelocity.current,
+      Math.abs(velocity.current) / CONSTANTS.BALL_RADIUS,
+      1 - Math.pow(0.001, dt),
+    );
+    ball.rotation.x += spinVelocity.current * spinDirection * dt;
+    ball.rotation.z += currentRotation.current * 0.015;
+
     bounceSquash.current = Math.max(0, bounceSquash.current - dt * 6);
     const squash = bounceSquash.current * 0.35;
     const fallStretch = Math.max(0, Math.min(0.2, -velocity.current * 0.012));
@@ -278,10 +327,11 @@ function GameLogic({
     }
 
     // Camera follow + subtle shake (camera is purely visual — never touches physics).
+    const cameraT = 1 - Math.pow(1 - CONSTANTS.CAMERA_LERP, dt * 60);
     cameraTargetY.current = THREE.MathUtils.lerp(
       cameraTargetY.current,
       ball.position.y + CONSTANTS.CAMERA_HEIGHT_OFFSET,
-      CONSTANTS.CAMERA_LERP,
+      cameraT,
     );
     cameraShake.current = Math.max(0, cameraShake.current - dt * 2.5);
     const shake = cameraShake.current;
