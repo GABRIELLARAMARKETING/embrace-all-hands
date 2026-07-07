@@ -1,50 +1,28 @@
 import { useGameStore } from "@/store/useGameStore";
-import { LEVELS } from "@/game/config/levels";
-import { formatScore } from "@/utils/formatScore";
 import { Volume2, VolumeX } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function GameHUD({ showHint }: { showHint: boolean }) {
-  const score = useGameStore((s) => s.score);
   const combo = useGameStore((s) => s.combo);
-  const currentLevel = useGameStore((s) => s.currentLevel);
   const soundEnabled = useGameStore((s) => s.soundEnabled);
   const toggleSound = useGameStore((s) => s.toggleSound);
 
-  const level = LEVELS[currentLevel - 1];
-
   return (
     <>
-      {/* Top bar — score only */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 p-3 sm:p-4">
-        <div className="pointer-events-auto mx-auto flex max-w-3xl items-stretch gap-2 sm:gap-3">
-          <div className="flex flex-1 flex-col justify-center rounded-2xl border border-white/10 bg-black/35 px-3 py-2 text-white backdrop-blur-md">
-            <div className="flex items-baseline justify-between">
-              <span className="text-[9px] uppercase tracking-[0.18em] text-white/60">
-                Score
-              </span>
-              <span className="text-[10px] text-white/60">
-                {level?.name ?? `Nível ${currentLevel}`}
-              </span>
-            </div>
-            <span className="text-xl font-black tabular-nums leading-none">
-              {formatScore(score)}
-            </span>
-          </div>
-        </div>
-
-        {/* Combo chip */}
-        {combo > 1 && (
+      {/* Combo chip */}
+      {combo > 1 && (
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-20 p-3 sm:p-4">
           <motion.div
             key={combo}
             initial={{ scale: 0.7, opacity: 0, y: -6 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            className="mx-auto mt-3 w-fit rounded-full bg-fuchsia-500/85 px-4 py-1 text-xs font-black tracking-[0.2em] text-white shadow-lg backdrop-blur"
+            className="mx-auto w-fit rounded-full bg-fuchsia-500/85 px-4 py-1 text-xs font-black tracking-[0.2em] text-white shadow-lg backdrop-blur"
           >
             COMBO x{combo}
           </motion.div>
-        )}
-      </div>
+        </div>
+      )}
+
 
 
       {/* Floating sound toggle */}
