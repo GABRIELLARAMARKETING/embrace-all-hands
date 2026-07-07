@@ -61,12 +61,25 @@ export const BreakBurst = forwardRef<BreakBurstHandle>(function BreakBurst(_, re
   const hiddenScale = useMemo(() => new THREE.Vector3(0, 0, 0), []);
   const defaultColor = useMemo(() => new THREE.Color("#ff3d7f"), []);
 
+  // Contadores para evitar varrer todo o pool sem necessidade.
+  const activeCount = useRef(0);
+  const maxUsedIdx = useRef(-1); // último índice já tocado (para "esconder" só uma vez)
+  const matrixDirty = useRef(false);
+  const colorDirty = useRef(false);
+
+  const hideSlot = (mesh: THREE.InstancedMesh, i: number) => {
+    tmpMatrix.compose(tmpPos.set(0, 0, 0), tmpQuat.identity(), hiddenScale);
+    mesh.setMatrixAt(i, tmpMatrix);
+    matrixDirty.current = true;
+  };
+
   useImperativeHandle(ref, () => ({
     burst: (x, y, z, color) => {
+      const mesh = meshRef.current;
       const count =
         PARTICLES_PER_BURST_MIN +
         Math.floor(Math.random() * (PARTICLES_PER_BURST_MAX - PARTICLES_PER_BURST_MIN + 1));
-      const col = color !== undefined ? new THREE.Color(color) : defaultColor;
+      const col = color !== undefined ? defaultColor.clone().set(color) : defaultColor;
       let spawned = 0;
       for (let i = 0; i < pool.length && spawned < count; i++) {
         const p = pool[i];
@@ -87,6 +100,13 @@ export const BreakBurst = forwardRef<BreakBurstHandle>(function BreakBurst(_, re
         p.wy = (Math.random() - 0.5) * 12;
         p.wz = (Math.random() - 0.5) * 12;
         p.color.copy(col);
+        activeCount.current++;
+        if (i > maxUsedIdx.current) maxUsedIdx.current = i;
+        // Cor só muda no spawn — escreve uma vez, marca buffer dirty.
+        if (mesh) {
+          mesh.setColorAt(i, p.color);
+          colorDirty.current = true;
+        }
         spawned++;
       }
     },
@@ -95,23 +115,25 @@ export const BreakBurst = forwardRef<BreakBurstHandle>(function BreakBurst(_, re
   useFrame((_, dt) => {
     const mesh = meshRef.current;
     if (!mesh) return;
+
+    // Fast-path: nada ativo, não escreve nada nem toca buffers.
+    if (activeCount.current === 0) {
+      if (mesh.visible) mesh.visible = false;
+      return;
+    }
+
     const ms = dt * 1000;
-    let anyActive = false;
-    for (let i = 0; i < pool.length; i++) {
+    const limit = maxUsedIdx.current + 1; // itera só até o slot mais alto já usado
+    for (let i = 0; i < limit; i++) {
       const p = pool[i];
-      if (!p.active) {
-        tmpMatrix.compose(tmpPos.set(0, 0, 0), tmpQuat.identity(), hiddenScale);
-        mesh.setMatrixAt(i, tmpMatrix);
-        continue;
-      }
+      if (!p.active) continue;
       p.age += ms;
       if (p.age >= LIFE_MS) {
         p.active = false;
-        tmpMatrix.compose(tmpPos.set(0, 0, 0), tmpQuat.identity(), hiddenScale);
-        mesh.setMatrixAt(i, tmpMatrix);
+        activeCount.current--;
+        hideSlot(mesh, i);
         continue;
       }
-      anyActive = true;
       p.vy += GRAVITY * dt;
       p.px += p.vx * dt;
       p.py += p.vy * dt;
@@ -120,19 +142,30 @@ export const BreakBurst = forwardRef<BreakBurstHandle>(function BreakBurst(_, re
       p.ry += p.wy * dt;
       p.rz += p.wz * dt;
       const t = 1 - p.age / LIFE_MS;
-      const s = Math.max(0.001, t);
+      const s = t > 0.001 ? t : 0.001;
       tmpPos.set(p.px, p.py, p.pz);
       tmpEuler.set(p.rx, p.ry, p.rz);
       tmpQuat.setFromEuler(tmpEuler);
       tmpScale.set(s, s, s);
       tmpMatrix.compose(tmpPos, tmpQuat, tmpScale);
       mesh.setMatrixAt(i, tmpMatrix);
-      mesh.setColorAt(i, p.color);
+      matrixDirty.current = true;
     }
-    mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    mesh.visible = anyActive;
+
+    // Todo o pool zerou — reseta o cursor para o fast-path da próxima frame.
+    if (activeCount.current === 0) maxUsedIdx.current = -1;
+
+    if (matrixDirty.current) {
+      mesh.instanceMatrix.needsUpdate = true;
+      matrixDirty.current = false;
+    }
+    if (colorDirty.current && mesh.instanceColor) {
+      mesh.instanceColor.needsUpdate = true;
+      colorDirty.current = false;
+    }
+    mesh.visible = true;
   });
+
 
   // instanceColor precisa ser inicializado — passando null cria buffer no primeiro setColorAt.
   return (
