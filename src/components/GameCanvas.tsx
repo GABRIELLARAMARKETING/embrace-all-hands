@@ -16,6 +16,7 @@ import { Clouds } from "@/game/entities/Clouds";
 import { BreakBurst, type BreakBurstHandle } from "@/game/entities/BreakBurst";
 import { BallTrail, type BallTrailHandle } from "@/game/entities/BallTrail";
 import { PhysicsDebugBridge, PhysicsDebugPanel } from "@/components/PhysicsDebugBridge";
+import { SectorDebugBridge, SectorDebugPanel } from "@/components/SectorDebugOverlay";
 import { useTowerControls } from "@/game/engine/useTowerControls";
 import { SFX } from "@/utils/sound";
 import { physicsDebug } from "@/game/engine/physicsDebug";
@@ -450,6 +451,11 @@ function GameLogic({
         stepsRef={debugSteps}
         towerRotationRef={currentRotation}
       />
+      <SectorDebugBridge
+        rings={generated.rings}
+        ballRef={ballRef}
+        towerRotationRef={currentRotation}
+      />
     </>
   );
 }
@@ -520,6 +526,7 @@ export function GameCanvas({ onFirstInput, idle }: Props) {
         </Suspense>
       </Canvas>
       <PhysicsDebugPanel />
+      <SectorDebugPanel />
     </div>
   );
 }
