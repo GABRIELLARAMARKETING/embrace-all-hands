@@ -526,6 +526,7 @@ export function GameCanvas({ onFirstInput, idle }: Props) {
         </Suspense>
       </Canvas>
       <PhysicsDebugPanel />
+      <SectorDebugPanel />
     </div>
   );
 }
