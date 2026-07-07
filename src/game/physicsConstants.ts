@@ -1,0 +1,16 @@
+// Physics tunables — exact values per spec. Do not scatter magic numbers.
+export const PHYSICS = {
+  GRAVITY: -32,
+  BOUNCE_VELOCITY: 11.5,
+  MAX_FALL_SPEED: -28,
+  BALL_RADIUS: 0.42,
+  PLATFORM_SPACING: 3.2,
+  PLATFORM_THICKNESS: 0.55,
+  COLLISION_EPSILON: 0.02,
+  MAX_DELTA: 1 / 30,
+  FIXED_STEP: 1 / 120,
+  MAX_SUBSTEPS: 6,
+  COLLISION_COOLDOWN_MS: 120,
+  TOWER_ROTATION_SENSITIVITY: 0.0072,
+  ROTATION_DAMPING: 0.88,
+} as const;
