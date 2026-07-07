@@ -77,7 +77,7 @@ function LoginPage() {
 
   if (checkingSession) {
     return (
-      <div className="grid min-h-screen place-items-center bg-[#0a1a10] text-emerald-300/60">
+      <div className="grid min-h-screen place-items-center bg-[#0c0326] text-violet-300/60">
         <Loader2 className="animate-spin" size={22} />
       </div>
     );
@@ -89,7 +89,7 @@ function LoginPage() {
       style={{
         fontFamily: "'Poppins', ui-sans-serif, system-ui, sans-serif",
         background:
-          "radial-gradient(120% 80% at 50% 10%, #0f3d24 0%, #0a2716 40%, #05130b 80%, #020806 100%)",
+          "radial-gradient(120% 80% at 50% 10%, #2a0f5c 0%, #180740 40%, #0c0326 80%, #050110 100%)",
       }}
     >
       <GreenFX />
@@ -101,10 +101,10 @@ function LoginPage() {
         className="relative z-10 w-full max-w-md"
       >
         <div
-          className="relative rounded-[28px] border border-emerald-400/25 bg-gradient-to-b from-emerald-950/60 to-black/70 p-6 sm:p-8 backdrop-blur-xl"
+          className="relative rounded-[28px] border border-violet-400/25 bg-gradient-to-b from-violet-950/60 to-black/70 p-6 sm:p-8 backdrop-blur-xl"
           style={{
             boxShadow:
-              "0 30px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(16,185,129,0.15), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 60px -10px rgba(16,185,129,0.35)",
+              "0 30px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(139,92,246,0.15), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 60px -10px rgba(139,92,246,0.35)",
           }}
         >
           <div
@@ -112,7 +112,7 @@ function LoginPage() {
             className="pointer-events-none absolute inset-x-10 -top-px h-px"
             style={{
               background:
-                "linear-gradient(90deg, transparent, #34d399, #10b981, transparent)",
+                "linear-gradient(90deg, transparent, #c084fc, #8b5cf6, transparent)",
             }}
           />
 
@@ -121,19 +121,19 @@ function LoginPage() {
             <motion.div
               animate={{ y: [0, -4, 0] }}
               transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-              className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-[0_10px_30px_-6px_rgba(16,185,129,0.7)]"
+              className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-violet-400 to-violet-600 shadow-[0_10px_30px_-6px_rgba(139,92,246,0.7)]"
             >
               <Zap className="text-white" size={26} strokeWidth={2.6} />
             </motion.div>
-            <p className="mt-2 text-[11px] font-black tracking-[0.28em] text-emerald-300">
+            <p className="mt-2 text-[11px] font-black tracking-[0.28em] text-violet-300">
               HELIX MULTI
             </p>
           </div>
 
           {/* Pill */}
-          <div className="mx-auto mt-4 flex w-fit items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1.5">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-200">
+          <div className="mx-auto mt-4 flex w-fit items-center gap-2 rounded-full border border-violet-400/40 bg-violet-500/10 px-4 py-1.5">
+            <span className="h-2 w-2 rounded-full bg-violet-400 shadow-[0_0_10px_#c084fc]" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-violet-200">
               Acesse sua conta
             </span>
           </div>
@@ -141,7 +141,7 @@ function LoginPage() {
           <h1 className="mt-5 text-center text-3xl sm:text-4xl font-extrabold text-white">
             Bem-vindo de volta
           </h1>
-          <p className="mt-1.5 text-center text-sm text-emerald-100/60">
+          <p className="mt-1.5 text-center text-sm text-violet-100/60">
             Entre para continuar jogando
           </p>
 
@@ -175,7 +175,7 @@ function LoginPage() {
                   type="button"
                   onClick={() => setShowPass((s) => !s)}
                   aria-label={showPass ? "Ocultar senha" : "Mostrar senha"}
-                  className="text-emerald-300/60 transition hover:text-emerald-200"
+                  className="text-violet-300/60 transition hover:text-violet-200"
                 >
                   {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -186,7 +186,7 @@ function LoginPage() {
               <button
                 type="button"
                 onClick={() => toast.info("Recuperação de senha em breve")}
-                className="text-sm font-bold text-emerald-400 hover:text-emerald-300"
+                className="text-sm font-bold text-violet-400 hover:text-violet-300"
               >
                 Esqueci minha senha
               </button>
@@ -200,9 +200,9 @@ function LoginPage() {
               className="relative flex h-14 w-full items-center justify-center gap-3 overflow-hidden rounded-full text-base font-extrabold uppercase tracking-wider text-white transition disabled:opacity-80"
               style={{
                 background:
-                  "linear-gradient(180deg, #22e08a 0%, #10b981 55%, #059669 100%)",
+                  "linear-gradient(180deg, #a855f7 0%, #8b5cf6 55%, #6d28d9 100%)",
                 boxShadow:
-                  "0 14px 34px -6px rgba(16,185,129,0.65), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -2px 0 rgba(0,0,0,0.15)",
+                  "0 14px 34px -6px rgba(139,92,246,0.65), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -2px 0 rgba(0,0,0,0.15)",
               }}
             >
               <AnimatePresence mode="wait">
@@ -224,16 +224,16 @@ function LoginPage() {
           </form>
 
           <div className="my-5 flex items-center gap-3">
-            <div className="h-px flex-1 bg-emerald-400/15" />
-            <span className="text-xs text-emerald-200/50">ou</span>
-            <div className="h-px flex-1 bg-emerald-400/15" />
+            <div className="h-px flex-1 bg-violet-400/15" />
+            <span className="text-xs text-violet-200/50">ou</span>
+            <div className="h-px flex-1 bg-violet-400/15" />
           </div>
 
-          <p className="text-center text-sm text-emerald-100/70">
+          <p className="text-center text-sm text-violet-100/70">
             Não tem conta?{" "}
             <Link
               to="/auth"
-              className="font-extrabold text-emerald-400 hover:text-emerald-300"
+              className="font-extrabold text-violet-400 hover:text-violet-300"
             >
               Cadastre-se grátis
             </Link>
@@ -242,7 +242,7 @@ function LoginPage() {
           <button
             type="button"
             onClick={() => navigate({ to: "/game" })}
-            className="mt-4 flex w-full items-center justify-center gap-1 text-sm text-emerald-100/50 hover:text-emerald-200"
+            className="mt-4 flex w-full items-center justify-center gap-1 text-sm text-violet-100/50 hover:text-violet-200"
           >
             <ChevronLeft size={16} /> Voltar ao início
           </button>
@@ -268,21 +268,21 @@ function Field({
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value">) {
   return (
     <div>
-      <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-emerald-100/80">
+      <label className="mb-2 block text-[11px] font-black uppercase tracking-[0.14em] text-violet-100/80">
         {label}
       </label>
       <div
-        className={`flex items-center gap-3 rounded-full border bg-emerald-950/40 px-5 transition focus-within:bg-emerald-950/60 ${
+        className={`flex items-center gap-3 rounded-full border bg-violet-950/40 px-5 transition focus-within:bg-violet-950/60 ${
           error
             ? "border-rose-400/70 focus-within:border-rose-400"
-            : "border-emerald-400/25 focus-within:border-emerald-400"
+            : "border-violet-400/25 focus-within:border-violet-400"
         }`}
       >
         <input
           {...rest}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="h-12 w-full bg-transparent text-[15px] text-white placeholder-emerald-100/30 outline-none"
+          className="h-12 w-full bg-transparent text-[15px] text-white placeholder-violet-100/30 outline-none"
         />
         {trailing}
       </div>
@@ -297,19 +297,19 @@ function GreenFX() {
       <div
         aria-hidden
         className="pointer-events-none absolute -left-24 top-1/4 h-72 w-72 rounded-full opacity-40 blur-3xl"
-        style={{ background: "radial-gradient(circle, #10b981 0%, transparent 65%)" }}
+        style={{ background: "radial-gradient(circle, #8b5cf6 0%, transparent 65%)" }}
       />
       <div
         aria-hidden
         className="pointer-events-none absolute -right-16 bottom-1/4 h-80 w-80 rounded-full opacity-30 blur-3xl"
-        style={{ background: "radial-gradient(circle, #34d399 0%, transparent 65%)" }}
+        style={{ background: "radial-gradient(circle, #c084fc 0%, transparent 65%)" }}
       />
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {Array.from({ length: 14 }).map((_, i) => (
           <motion.span
             key={i}
             aria-hidden
-            className="absolute block h-1 w-1 rounded-full bg-emerald-300"
+            className="absolute block h-1 w-1 rounded-full bg-violet-300"
             style={{
               left: `${(i * 53) % 100}%`,
               top: `${(i * 37) % 100}%`,
