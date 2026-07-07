@@ -113,6 +113,11 @@ function GameLogic({
   const [collectedCoins, setCollectedCoins] = useState<Set<number>>(new Set());
   const [fever, setFever] = useState(false);
   const finishedRef = useRef(false);
+  // Floor-break mechanic.
+  const [breakingRings, setBreakingRings] = useState<Map<number, number>>(new Map());
+  const brokenRingsRef = useRef<Set<number>>(new Set());
+  const breakingRingsRef = useRef<Map<number, number>>(new Map());
+  const deepestRingRef = useRef<number>(-1);
 
   const active = gameState === "playing";
 
@@ -141,7 +146,13 @@ function GameLogic({
       ballRef.current.scale.set(1, 1, 1);
     }
     cameraTargetY.current = 0;
+    brokenRingsRef.current = new Set();
+    breakingRingsRef.current = new Map();
+    deepestRingRef.current = -1;
+    setBreakingRings(new Map());
   }, [gameState, currentLevel]);
+
+
 
   // Space to pause, R to restart.
   useEffect(() => {
@@ -229,6 +240,43 @@ function GameLogic({
 
           if (prevBottom < ringTopY) continue;
           if (nextBottom > ringTopY) continue;
+
+          // Broken/breaking rings have no collision — but still count as descent.
+          const isGone =
+            brokenRingsRef.current.has(i) || breakingRingsRef.current.has(i);
+
+          // Descent tracker: whenever the ball crosses a new deeper ring,
+          // break every ring above it that is still active.
+          if (i > deepestRingRef.current) {
+            const prevDeepest = deepestRingRef.current;
+            deepestRingRef.current = i;
+            const now = state.clock.elapsedTime;
+            for (let k = Math.max(0, prevDeepest); k < i; k++) {
+              if (
+                brokenRingsRef.current.has(k) ||
+                breakingRingsRef.current.has(k)
+              )
+                continue;
+              breakingRingsRef.current.set(k, now);
+              const kRing = generated.rings[k];
+              burstRef.current?.burst(
+                0,
+                kRing.y + CONSTANTS.PLATFORM_HEIGHT / 2,
+                CONSTANTS.BALL_TRACK_RADIUS,
+                THEMES[themeId].accent,
+              );
+              cameraShake.current = Math.max(cameraShake.current, 0.18);
+              addScore(1);
+              window.setTimeout(() => {
+                breakingRingsRef.current.delete(k);
+                brokenRingsRef.current.add(k);
+                setBreakingRings(new Map(breakingRingsRef.current));
+              }, 780);
+            }
+            setBreakingRings(new Map(breakingRingsRef.current));
+          }
+
+          if (isGone) continue;
 
           if (
             i === lastBounceRing.current &&
@@ -418,9 +466,18 @@ function GameLogic({
 
       <group ref={towerGroup}>
         <TowerCore height={generated.totalHeight + 4} themeId={themeId} />
-        {generated.rings.map((ring, i) => (
-          <PlatformRing key={i} ring={ring} themeId={themeId} />
-        ))}
+        {generated.rings.map((ring, i) => {
+          if (brokenRingsRef.current.has(i)) return null;
+          const breakingSince = breakingRings.get(i) ?? null;
+          return (
+            <PlatformRing
+              key={i}
+              ring={ring}
+              themeId={themeId}
+              breakingSince={breakingSince}
+            />
+          );
+        })}
         {generated.rings.map((ring, i) =>
           ring.hasCoin ? (
             <Collectible

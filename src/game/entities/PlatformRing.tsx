@@ -8,7 +8,10 @@ import { THEMES, type ThemeId } from "@/game/config/themes";
 interface Props {
   ring: RingData;
   themeId: ThemeId;
+  breakingSince?: number | null;
 }
+
+const BREAK_DURATION = 0.75;
 
 const SECTORS = CONSTANTS.SECTORS_PER_RING;
 const SECTOR_ANGLE = (Math.PI * 2) / SECTORS;
@@ -42,7 +45,7 @@ function getGeo() {
   return SHARED_GEO;
 }
 
-export function PlatformRing({ ring, themeId }: Props) {
+export function PlatformRing({ ring, themeId, breakingSince = null }: Props) {
   const groupRef = useRef<THREE.Group>(null);
   const theme = THEMES[themeId];
 
@@ -68,11 +71,24 @@ export function PlatformRing({ ring, themeId }: Props) {
     [themeId, theme.platformBonus, theme.platformDanger, theme.platformNormal],
   );
 
-  // Pulse danger sectors subtly.
+  // Pulse danger sectors + break animation.
   useFrame((state) => {
     if (!groupRef.current) return;
     const t = state.clock.elapsedTime;
     materials.danger.emissiveIntensity = 0.6 + Math.sin(t * 4) * 0.3;
+
+    if (breakingSince != null) {
+      const elapsed = Math.max(0, t - breakingSince);
+      const k = Math.min(1, elapsed / BREAK_DURATION);
+      const s = 1 - k;
+      groupRef.current.scale.set(1, Math.max(0.001, s * 0.6), 1);
+      groupRef.current.rotation.y = ring.rotation + k * 2.4;
+      groupRef.current.position.y = ring.y - k * 1.6;
+    } else {
+      groupRef.current.scale.set(1, 1, 1);
+      groupRef.current.position.y = ring.y;
+      groupRef.current.rotation.y = ring.rotation;
+    }
   });
 
   return (
