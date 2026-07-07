@@ -181,6 +181,7 @@ function GameLogic({
 
       // Gravity + clamp.
       velocity.current += generated.gravity * sdt;
+      velocity.current *= Math.exp(-CONSTANTS.AIR_FRICTION * sdt);
       if (velocity.current < CONSTANTS.MAX_FALL_SPEED) {
         velocity.current = CONSTANTS.MAX_FALL_SPEED;
       }
@@ -261,10 +262,15 @@ function GameLogic({
             CONSTANTS.MAX_BOUNCE_VELOCITY,
             Math.max(
               CONSTANTS.BOUNCE_VELOCITY,
-              impactSpeed * CONSTANTS.BOUNCE_RESTITUTION,
+              impactSpeed * CONSTANTS.BOUNCE_RESTITUTION *
+                (1 - CONSTANTS.IMPACT_FRICTION),
             ),
           );
-          spinVelocity.current = Math.min(32, impactSpeed / CONSTANTS.BALL_RADIUS);
+          spinVelocity.current = Math.min(
+            28,
+            (impactSpeed / CONSTANTS.BALL_RADIUS) *
+              (1 - CONSTANTS.IMPACT_FRICTION),
+          );
           bounceSquash.current = 1;
           cameraShake.current = Math.max(cameraShake.current, 0.15);
           SFX.bounce();
@@ -299,8 +305,9 @@ function GameLogic({
 
     // Squash on impact, stretch on fast falling.
     const spinDirection = velocity.current < 0 ? 1 : -0.45;
+    const spinFriction = Math.pow(CONSTANTS.SPIN_FRICTION, dt * 60);
     spinVelocity.current = THREE.MathUtils.lerp(
-      spinVelocity.current,
+      spinVelocity.current * spinFriction,
       Math.abs(velocity.current) / CONSTANTS.BALL_RADIUS,
       1 - Math.pow(0.001, dt),
     );
