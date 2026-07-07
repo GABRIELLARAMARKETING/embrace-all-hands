@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { GameTheme } from "@/types/theme";
 import { MapPreview } from "./MapPreview";
 
@@ -9,16 +10,24 @@ interface Props {
   onClick?: () => void;
 }
 
-const SIZE = {
-  center: { w: 175, h: 305, scale: 1, opacity: 1, blur: 0 },
-  near: { w: 140, h: 240, scale: 0.92, opacity: 0.75, blur: 0.5 },
-  far: { w: 110, h: 190, scale: 0.82, opacity: 0.45, blur: 1.5 },
+const SIZE_DESKTOP = {
+  center: { w: 175, h: 305, scale: 1, opacity: 1, blur: 0, spacing: 130 },
+  near: { w: 140, h: 240, scale: 0.92, opacity: 0.75, blur: 0.5, spacing: 130 },
+  far: { w: 110, h: 190, scale: 0.82, opacity: 0.45, blur: 1.5, spacing: 130 },
+} as const;
+
+const SIZE_MOBILE = {
+  center: { w: 128, h: 220, scale: 1, opacity: 1, blur: 0, spacing: 92 },
+  near: { w: 104, h: 178, scale: 0.9, opacity: 0.7, blur: 0.5, spacing: 92 },
+  far: { w: 82, h: 140, scale: 0.78, opacity: 0.35, blur: 1.5, spacing: 92 },
 } as const;
 
 export function MapCard({ theme, role, offset, onClick }: Props) {
+  const isMobile = useIsMobile();
+  const SIZE = isMobile ? SIZE_MOBILE : SIZE_DESKTOP;
   const s = SIZE[role];
   const isCenter = role === "center";
-  const xPx = offset * 130;
+  const xPx = offset * s.spacing;
   const glow = theme.preview_config.cardGlow ?? "#a855f7";
 
   return (
