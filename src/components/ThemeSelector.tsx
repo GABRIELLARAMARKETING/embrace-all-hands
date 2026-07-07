@@ -4,7 +4,6 @@ import { Modal } from "./Modal";
 import { Button } from "./Button";
 import { THEME_LIST, type Theme } from "@/game/config/themes";
 import { useGameStore } from "@/store/useGameStore";
-import { preloadThemeImage } from "@/hooks/useThemePreload";
 
 const FALLBACK_BG = "linear-gradient(180deg,#24104F 0%,#090014 100%)";
 
@@ -12,12 +11,6 @@ export function ThemeSelector({ open, onClose }: { open: boolean; onClose: () =>
   const selected = useGameStore((s) => s.selectedTheme);
   const selectTheme = useGameStore((s) => s.selectTheme);
   const trackRef = useRef<HTMLDivElement>(null);
-
-  // Preload the active theme's card image (fallback = gradient handled inline).
-  useEffect(() => {
-    const active = THEME_LIST.find((t) => t.id === selected);
-    if (active) void preloadThemeImage(active.cardImage);
-  }, [selected]);
 
   // Auto-center the selected card whenever it changes or the modal opens.
   useEffect(() => {
@@ -101,19 +94,10 @@ function ThemeCard({
           ? "h-64 w-44 scale-100 border-white/70 shadow-[0_0_35px_rgba(168,85,247,0.55)]"
           : "h-56 w-36 scale-90 border-white/10 opacity-70 hover:opacity-90",
       ].join(" ")}
-      style={{ background: FALLBACK_BG }}
+      style={{ background: theme.bgGradient || FALLBACK_BG }}
       aria-pressed={active}
       aria-label={theme.name}
     >
-      <img
-        src={theme.cardImage}
-        alt=""
-        loading={active ? "eager" : "lazy"}
-        decoding="async"
-        width={512}
-        height={768}
-        className="absolute inset-0 h-full w-full object-cover"
-      />
 
       {/* Bottom gradient for label legibility */}
       <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
