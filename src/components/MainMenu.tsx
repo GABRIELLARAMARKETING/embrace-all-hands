@@ -1,98 +1,183 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { useGameStore } from "@/store/useGameStore";
-import { MAP_THEMES } from "@/data/themes";
+import { useThemes } from "@/hooks/useThemes";
+import { useSelectedTheme } from "@/hooks/useSelectedTheme";
+import { useLiveMatches } from "@/hooks/useLiveMatches";
+import { useGameSession } from "@/hooks/useGameSession";
+import { slugToGameTheme } from "@/lib/themeSlugMap";
+import { supabase } from "@/integrations/supabase/client";
+import type { GameTheme } from "@/types/theme";
 import { LogoHelix } from "./LogoHelix";
-import { LiveCounter } from "./LiveCounter";
 import { ThemeCarousel } from "./ThemeCarousel";
 import { PrimaryButton } from "./PrimaryButton";
-import { AuthActions } from "./AuthActions";
+import { ThemeProvider } from "./ThemeProvider";
 
-interface Props {
-  onOpenThemes: () => void;
-  onOpenSkins: () => void;
-}
-
-export function MainMenu({ onOpenThemes, onOpenSkins }: Props) {
+export function MainMenu(_props: { onOpenThemes?: () => void; onOpenSkins?: () => void }) {
+  const navigate = useNavigate();
   const startGame = useGameStore((s) => s.startGame);
-  const selectedGameTheme = useGameStore((s) => s.selectedTheme);
-  const unlockedThemes = useGameStore((s) => s.unlockedThemes);
   const selectGameTheme = useGameStore((s) => s.selectTheme);
+  const unlockedThemes = useGameStore((s) => s.unlockedThemes);
 
-  // Initial carousel index tries to reflect the currently selected in-game theme.
-  const initialIndex = useMemo(() => {
-    const idx = MAP_THEMES.findIndex((m) => m.gameThemeId === selectedGameTheme);
-    return idx >= 0 ? idx : 0;
-  }, [selectedGameTheme]);
-  const [index, setIndex] = useState(initialIndex);
+  const { data: themes, isLoading, error } = useThemes();
+  const { selectedId, selectTheme } = useSelectedTheme();
+  const liveCount = useLiveMatches();
+  const { startSession } = useGameSession();
+
+  const [index, setIndex] = useState(0);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserEmail(data.user?.email ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUserEmail(session?.user?.email ?? null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  // Sync carousel index to persisted selection once themes arrive.
+  useEffect(() => {
+    if (!themes || themes.length === 0) return;
+    const target = selectedId ?? themes.find((t) => t.is_default)?.id ?? themes[0].id;
+    const idx = themes.findIndex((t) => t.id === target);
+    if (idx >= 0) setIndex(idx);
+  }, [themes, selectedId]);
+
+  const current: GameTheme | undefined = useMemo(
+    () => (themes && themes.length > 0 ? themes[index] : undefined),
+    [themes, index],
+  );
 
   const handleChange = (i: number) => {
     setIndex(i);
-    const mapped = MAP_THEMES[i].gameThemeId;
-    if (unlockedThemes.includes(mapped)) selectGameTheme(mapped);
+    const t = themes?.[i];
+    if (t) selectTheme(t.id);
   };
 
-  const handlePlayFree = (mapId: string) => {
-    const map = MAP_THEMES.find((m) => m.id === mapId) ?? MAP_THEMES[index];
-    // eslint-disable-next-line no-console
-    console.log("[HelixMulti] handlePlayFree", { mapId: map.id, gameThemeId: map.gameThemeId });
-    if (unlockedThemes.includes(map.gameThemeId)) {
-      selectGameTheme(map.gameThemeId);
-    }
+  const handlePlay = async () => {
+    if (!current) return;
+    const gameId = slugToGameTheme(current.slug);
+    if (unlockedThemes.includes(gameId)) selectGameTheme(gameId);
+    await startSession(current.id);
     startGame();
   };
 
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    toast.success("Sessão encerrada");
+  }
+
   return (
-    <div
-      className="pointer-events-auto absolute inset-0 z-10 h-full w-full overflow-y-auto"
-      style={{
-        fontFamily:
-          "'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
-        background:
-          "radial-gradient(120% 80% at 50% 40%, #3a0f52 0%, #310840 30%, #21002f 65%, #180026 100%)",
-        touchAction: "pan-y",
-      }}
-    >
-      {/* Central soft glow behind the carousel */}
+    <>
+      <ThemeProvider theme={current} />
       <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 -z-0 h-[520px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        className="pointer-events-auto absolute inset-0 z-10 h-full w-full overflow-y-auto"
         style={{
+          fontFamily: "'Poppins', ui-sans-serif, system-ui, sans-serif",
           background:
-            "radial-gradient(closest-side, rgba(168,85,247,0.35), rgba(168,85,247,0.08) 60%, transparent 80%)",
-          filter: "blur(4px)",
+            current?.ui_config.backgroundGradient ??
+            "radial-gradient(120% 80% at 50% 40%, #3a0f52 0%, #310840 30%, #21002f 65%, #180026 100%)",
+          touchAction: "pan-y",
+          transition: "background 0.4s ease",
         }}
-      />
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-1/2 -z-0 h-[520px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{
+            background: `radial-gradient(closest-side, ${current?.preview_config.cardGlow ?? "#a855f7"}55, transparent 70%)`,
+            filter: "blur(4px)",
+          }}
+        />
 
-      <div className="relative z-10 mx-auto flex min-h-full max-w-[900px] flex-col items-center justify-between gap-4 px-4 py-5 sm:py-6">
-        <div className="flex w-full flex-col items-center gap-3">
-          <LogoHelix />
-          <LiveCounter />
+        <div className="relative z-10 mx-auto flex min-h-full max-w-[900px] flex-col items-center justify-between gap-4 px-4 py-5 sm:py-6">
+          <div className="flex w-full flex-col items-center gap-3">
+            <LogoHelix />
 
-          <motion.p
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.4 }}
-            className="mt-1 text-center text-[13px] sm:text-[15px] font-bold uppercase tracking-[0.35em] text-fuchsia-200/80"
-          >
-            Escolha seu mapa
-          </motion.p>
-        </div>
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.5 }}
+              className="mx-auto flex h-11 w-[90%] max-w-[575px] items-center justify-center gap-3 rounded-full border border-white/15 bg-white/10 px-5 text-white backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_10px_30px_-10px_rgba(0,0,0,0.5)]"
+              role="status"
+              aria-live="polite"
+            >
+              <span className="relative flex h-2.5 w-2.5">
+                <motion.span
+                  className="absolute inset-0 rounded-full bg-emerald-400"
+                  animate={{ scale: [1, 1.6, 1], opacity: [0.7, 0, 0.7] }}
+                  transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
+                />
+                <span className="relative m-auto h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_2px_rgba(52,211,153,0.9)]" />
+              </span>
+              <span className="text-sm font-medium tracking-tight">
+                <span className="font-bold tabular-nums">{liveCount}</span> partidas ao vivo agora
+              </span>
+            </motion.div>
 
-        <div className="w-full">
-          <ThemeCarousel index={index} onChange={handleChange} />
-        </div>
+            <motion.p
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25, duration: 0.4 }}
+              className="mt-1 text-center text-[13px] sm:text-[15px] font-bold uppercase tracking-[0.35em] text-fuchsia-200/80"
+            >
+              Escolha seu mapa
+            </motion.p>
+          </div>
 
-        <div className="flex w-full flex-col items-center gap-3 pb-3">
-          <PrimaryButton onClick={() => handlePlayFree(MAP_THEMES[index].id)} aria-label="Jogar grátis">
-            JOGAR GRATIS
-          </PrimaryButton>
-          <AuthActions
-            onLogin={onOpenSkins}
-            onSignup={onOpenThemes}
-          />
+          <div className="w-full">
+            {isLoading && (
+              <div className="grid h-[340px] place-items-center text-white/60">Carregando temas…</div>
+            )}
+            {error && (
+              <div className="grid h-[340px] place-items-center text-red-300">
+                Erro ao carregar temas
+              </div>
+            )}
+            {themes && themes.length > 0 && (
+              <ThemeCarousel themes={themes} index={index} onChange={handleChange} />
+            )}
+          </div>
+
+          <div className="flex w-full flex-col items-center gap-3 pb-3">
+            <PrimaryButton onClick={handlePlay} aria-label="Jogar grátis" disabled={!current}>
+              JOGAR GRATIS
+            </PrimaryButton>
+
+            {userEmail ? (
+              <div className="mx-auto mt-2 flex w-full max-w-[295px] items-center justify-between gap-3">
+                <span className="truncate text-xs text-white/60">{userEmail}</span>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="text-sm font-medium text-white/70 underline underline-offset-4 hover:text-fuchsia-200"
+                >
+                  Sair
+                </button>
+              </div>
+            ) : (
+              <div className="mx-auto mt-4 flex w-full max-w-[295px] items-center justify-between gap-4">
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: "/auth" })}
+                  className="h-12 sm:h-14 w-[140px] sm:w-[155px] rounded-full border border-fuchsia-400/40 bg-white/5 text-sm font-semibold text-white/90 backdrop-blur-md transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  Entrar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: "/auth" })}
+                  className="text-sm font-medium text-white/70 underline underline-offset-4 transition-colors hover:text-fuchsia-200"
+                >
+                  Cadastrar-se
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

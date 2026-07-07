@@ -1,25 +1,25 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
-import { MAP_THEMES } from "@/data/themes";
+import type { GameTheme } from "@/types/theme";
 import { MapCard } from "./MapCard";
 
 interface Props {
+  themes: GameTheme[];
   index: number;
   onChange: (index: number) => void;
 }
 
-export function ThemeCarousel({ index, onChange }: Props) {
-  const total = MAP_THEMES.length;
+export function ThemeCarousel({ themes, index, onChange }: Props) {
+  const total = themes.length;
   const wrap = useCallback(
-    (i: number) => ((i % total) + total) % total,
+    (i: number) => (total === 0 ? 0 : ((i % total) + total) % total),
     [total],
   );
 
   const next = useCallback(() => onChange(wrap(index + 1)), [index, onChange, wrap]);
   const prev = useCallback(() => onChange(wrap(index - 1)), [index, onChange, wrap]);
 
-  // Keyboard nav
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") prev();
@@ -29,7 +29,6 @@ export function ThemeCarousel({ index, onChange }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [next, prev]);
 
-  // Touch swipe
   const startX = useRef<number | null>(null);
   const onTouchStart = (e: React.TouchEvent) => {
     startX.current = e.touches[0]?.clientX ?? null;
@@ -42,9 +41,10 @@ export function ThemeCarousel({ index, onChange }: Props) {
     startX.current = null;
   };
 
-  const current = MAP_THEMES[index];
-
+  if (total === 0) return null;
+  const current = themes[index];
   const visibleRange = [-2, -1, 0, 1, 2] as const;
+  const glow = current.ui_config.textGlow ?? current.preview_config.cardGlow;
 
   return (
     <div className="w-full">
@@ -55,9 +55,8 @@ export function ThemeCarousel({ index, onChange }: Props) {
       >
         {visibleRange.map((offset) => {
           const i = wrap(index + offset);
-          const role =
-            offset === 0 ? "center" : Math.abs(offset) === 1 ? "near" : "far";
-          const theme = MAP_THEMES[i];
+          const role = offset === 0 ? "center" : Math.abs(offset) === 1 ? "near" : "far";
+          const theme = themes[i];
           return (
             <MapCard
               key={`${theme.id}-${offset}`}
@@ -97,8 +96,8 @@ export function ThemeCarousel({ index, onChange }: Props) {
             transition={{ duration: 0.25 }}
             className="text-2xl sm:text-[28px] font-extrabold tracking-[0.18em]"
             style={{
-              color: "#c084fc",
-              textShadow: "0 0 18px rgba(168,85,247,0.55)",
+              color: glow,
+              textShadow: `0 0 18px ${glow}88`,
             }}
           >
             {current.label}
