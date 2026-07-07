@@ -241,6 +241,43 @@ function GameLogic({
           if (prevBottom < ringTopY) continue;
           if (nextBottom > ringTopY) continue;
 
+          // Broken/breaking rings have no collision — but still count as descent.
+          const isGone =
+            brokenRingsRef.current.has(i) || breakingRingsRef.current.has(i);
+
+          // Descent tracker: whenever the ball crosses a new deeper ring,
+          // break every ring above it that is still active.
+          if (i > deepestRingRef.current) {
+            const prevDeepest = deepestRingRef.current;
+            deepestRingRef.current = i;
+            const now = state.clock.elapsedTime;
+            for (let k = Math.max(0, prevDeepest); k < i; k++) {
+              if (
+                brokenRingsRef.current.has(k) ||
+                breakingRingsRef.current.has(k)
+              )
+                continue;
+              breakingRingsRef.current.set(k, now);
+              const kRing = generated.rings[k];
+              burstRef.current?.burst(
+                0,
+                kRing.y + CONSTANTS.PLATFORM_HEIGHT / 2,
+                CONSTANTS.BALL_TRACK_RADIUS,
+                theme.accent,
+              );
+              cameraShake.current = Math.max(cameraShake.current, 0.18);
+              addScore(1);
+              window.setTimeout(() => {
+                breakingRingsRef.current.delete(k);
+                brokenRingsRef.current.add(k);
+                setBreakingRings(new Map(breakingRingsRef.current));
+              }, 780);
+            }
+            setBreakingRings(new Map(breakingRingsRef.current));
+          }
+
+          if (isGone) continue;
+
           if (
             i === lastBounceRing.current &&
             state.clock.elapsedTime < collisionCooldownUntil.current
