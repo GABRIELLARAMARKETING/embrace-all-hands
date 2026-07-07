@@ -105,15 +105,6 @@ function ThemeCard({
       aria-pressed={active}
       aria-label={theme.name}
     >
-      <img
-        src={theme.cardImage}
-        alt=""
-        loading={active ? "eager" : "lazy"}
-        decoding="async"
-        width={512}
-        height={768}
-        className="absolute inset-0 h-full w-full object-cover"
-      />
 
       {/* Bottom gradient for label legibility */}
       <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
