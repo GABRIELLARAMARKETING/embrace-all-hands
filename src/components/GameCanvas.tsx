@@ -70,7 +70,7 @@ function GameLogic({
   cameraDistance: number;
 }) {
   const currentLevel = useGameStore((s) => s.currentLevel);
-  const selectedSkin = useGameStore((s) => s.selectedSkin);
+  void useGameStore((s) => s.selectedSkin);
   const selectedTheme = useGameStore((s) => s.selectedTheme);
   const gameState = useGameStore((s) => s.gameState);
   const setProgress = useGameStore((s) => s.setProgress);
