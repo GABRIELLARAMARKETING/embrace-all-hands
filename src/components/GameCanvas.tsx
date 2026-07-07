@@ -15,6 +15,7 @@ import { Collectible } from "@/game/entities/Collectible";
 import { Clouds } from "@/game/entities/Clouds";
 import { BreakBurst, type BreakBurstHandle } from "@/game/entities/BreakBurst";
 import { BallTrail, type BallTrailHandle } from "@/game/entities/BallTrail";
+import { PhysicsDebugBridge, PhysicsDebugPanel } from "@/components/PhysicsDebugBridge";
 import { useTowerControls } from "@/game/engine/useTowerControls";
 import { SFX } from "@/utils/sound";
 import { physicsDebug } from "@/game/engine/physicsDebug";
