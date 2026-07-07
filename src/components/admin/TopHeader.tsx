@@ -16,7 +16,7 @@ export function TopHeader({ title, subtitle, context }: Props) {
       <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
         <button
           type="button"
-          onClick={onOpenMenu}
+          onClick={openMobileMenu}
           className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] border border-[color:var(--admin-border)] bg-[color:var(--admin-card)] text-[color:var(--admin-text-2)] lg:hidden"
           aria-label="Abrir menu"
         >
