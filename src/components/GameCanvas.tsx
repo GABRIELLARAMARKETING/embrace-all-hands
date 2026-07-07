@@ -423,6 +423,7 @@ function GameLogic({
       </group>
 
       <Ball ref={ballRef} skinId={selectedSkin} fever={fever} />
+      <BreakBurst ref={burstRef} />
     </>
   );
 }
