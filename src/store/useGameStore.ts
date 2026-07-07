@@ -108,9 +108,6 @@ export const useGameStore = create<Store>((set, get) => ({
       bestCombo: Math.max(s.bestCombo, s.bestComboRun),
     });
     get().saveProgress();
-    return;
-    // eslint-disable-next-line no-unreachable
-    void LEVELS;
   },
 
   loseGame: () => {
