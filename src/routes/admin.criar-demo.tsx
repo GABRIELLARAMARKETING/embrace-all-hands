@@ -27,7 +27,10 @@ export const Route = createFileRoute("/admin/criar-demo")({
 });
 
 function CriarDemoPage() {
+  const accounts = useAdminStore((s) => s.demoAccounts);
+
   const form = useForm<DemoAccountFormValues>({
+
     resolver: zodResolver(demoAccountSchema),
     defaultValues: {
       namePattern: "demo",
