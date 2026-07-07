@@ -516,6 +516,7 @@ export function GameCanvas({ onFirstInput, idle }: Props) {
           {idle ? <MenuIdleScene /> : <GameLogic onFirstInput={onFirstInput} />}
         </Suspense>
       </Canvas>
+      <PhysicsDebugPanel />
     </div>
   );
 }
