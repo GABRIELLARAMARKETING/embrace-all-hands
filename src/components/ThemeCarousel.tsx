@@ -51,7 +51,7 @@ export function ThemeCarousel({ themes, index, onChange }: Props) {
   return (
     <div className="w-full">
       <div
-        className="relative mx-auto h-[240px] w-full max-w-[720px] overflow-hidden sm:h-[340px]"
+        className={`relative mx-auto w-full max-w-[720px] overflow-hidden ${isMobile ? "h-[260px]" : "h-[340px]"}`}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
