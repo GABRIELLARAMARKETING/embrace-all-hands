@@ -13,6 +13,7 @@ import { TowerCore } from "@/game/entities/TowerCore";
 import { Ball } from "@/game/entities/Ball";
 import { Collectible } from "@/game/entities/Collectible";
 import { Clouds } from "@/game/entities/Clouds";
+import { BreakBurst, type BreakBurstHandle } from "@/game/entities/BreakBurst";
 import { useTowerControls } from "@/game/engine/useTowerControls";
 import { SFX } from "@/utils/sound";
 import { physicsDebug } from "@/game/engine/physicsDebug";
