@@ -17,32 +17,12 @@ export function VictoryModal({ open }: { open: boolean }) {
 
   return (
     <Modal open={open} title="Parabéns!">
-      <p className="mb-1 text-center text-xs uppercase tracking-[0.25em] text-white/60">
-        Você ganhou
-      </p>
-      <div className="mb-5 text-center">
-        <div className="bg-gradient-to-br from-amber-300 to-fuchsia-400 bg-clip-text text-5xl font-black tracking-tight text-transparent">
-          + {COIN_SYMBOL} {totalReward}
-        </div>
-        <div className="mt-1 text-[10px] uppercase tracking-[0.25em] text-white/40">
-          Moedas virtuais
-        </div>
-      </div>
-
-      <div className="mb-5 grid grid-cols-2 gap-3 text-center">
-        <div className="rounded-xl border border-white/10 bg-white/5 py-2">
+      <div className="mb-5 grid grid-cols-1 gap-3 text-center">
+        <div className="rounded-xl border border-white/10 bg-white/5 py-3">
           <div className="text-[10px] uppercase tracking-widest text-white/50">
             Score
           </div>
-          <div className="font-bold">{formatScore(score)}</div>
-        </div>
-        <div className="rounded-xl border border-white/10 bg-white/5 py-2">
-          <div className="text-[10px] uppercase tracking-widest text-white/50">
-            Recompensa
-          </div>
-          <div className="font-bold text-amber-300">
-            {COIN_SYMBOL} {reward}
-          </div>
+          <div className="text-2xl font-bold">{formatScore(score)}</div>
         </div>
       </div>
 
