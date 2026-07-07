@@ -436,6 +436,7 @@ function GameLogic({
 
       <Ball ref={ballRef} skinId={selectedSkin} fever={fever} />
       <BreakBurst ref={burstRef} />
+      <BallTrail ref={trailRef} />
     </>
   );
 }
