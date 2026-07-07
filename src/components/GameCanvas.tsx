@@ -3,6 +3,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useIsMobile } from "@/hooks/use-mobile";
 import * as THREE from "three";
 import { CONSTANTS, DEBUG_PHYSICS } from "@/game/config/constants";
+import { PHYSICS } from "@/game/physicsConstants";
 import { LEVELS } from "@/game/config/levels";
 import { THEMES } from "@/game/config/themes";
 import { generateLevel, type RingData, type SectorType } from "@/game/engine/levelGenerator";
