@@ -113,6 +113,11 @@ function GameLogic({
   const [collectedCoins, setCollectedCoins] = useState<Set<number>>(new Set());
   const [fever, setFever] = useState(false);
   const finishedRef = useRef(false);
+  // Floor-break mechanic.
+  const [breakingRings, setBreakingRings] = useState<Map<number, number>>(new Map());
+  const brokenRingsRef = useRef<Set<number>>(new Set());
+  const breakingRingsRef = useRef<Map<number, number>>(new Map());
+  const deepestRingRef = useRef<number>(-1);
 
   const active = gameState === "playing";
 
