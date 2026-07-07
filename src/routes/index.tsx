@@ -24,6 +24,22 @@ function Index() {
   const [skinsOpen, setSkinsOpen] = useState(false);
   const [hintVisible, setHintVisible] = useState(true);
   const [splash, setSplash] = useState(true);
+  const { finishSession } = useGameSession();
+  const score = useGameStore((s) => s.score);
+  const currentLevel = useGameStore((s) => s.currentLevel);
+  const prevStateRef = useRef(gameState);
+
+  useEffect(() => {
+    const prev = prevStateRef.current;
+    if (prev === "playing" && (gameState === "gameOver" || gameState === "victory")) {
+      finishSession({
+        score,
+        level_reached: currentLevel,
+        status: gameState === "victory" ? "finished" : "gameover",
+      });
+    }
+    prevStateRef.current = gameState;
+  }, [gameState, finishSession, score, currentLevel]);
 
   useEffect(() => {
     loadProgress();
