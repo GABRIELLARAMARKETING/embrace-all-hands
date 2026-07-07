@@ -70,7 +70,7 @@ function GameLogic({
   cameraDistance: number;
 }) {
   const currentLevel = useGameStore((s) => s.currentLevel);
-  const selectedSkin = useGameStore((s) => s.selectedSkin);
+  
   const selectedTheme = useGameStore((s) => s.selectedTheme);
   const gameState = useGameStore((s) => s.gameState);
   const setProgress = useGameStore((s) => s.setProgress);
@@ -491,7 +491,7 @@ function GameLogic({
         )}
       </group>
 
-      <Ball ref={ballRef} skinId={selectedSkin} fever={fever} />
+      <Ball ref={ballRef} ballTheme={theme.ball} fever={fever} />
       <BreakBurst ref={burstRef} />
       <BallTrail ref={trailRef} />
       <PhysicsDebugBridge
