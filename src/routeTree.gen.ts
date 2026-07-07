@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminPainelRouteImport } from './routes/admin.painel'
 import { Route as AdminNotificacoesRouteImport } from './routes/admin.notificacoes'
 import { Route as AdminMeusSaquesRouteImport } from './routes/admin.meus-saques'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminIndicarRouteImport } from './routes/admin.indicar'
 import { Route as AdminIndicadosRouteImport } from './routes/admin.indicados'
 import { Route as AdminCriarDemoRouteImport } from './routes/admin.criar-demo'
@@ -56,6 +57,11 @@ const AdminMeusSaquesRoute = AdminMeusSaquesRouteImport.update({
   path: '/meus-saques',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminIndicarRoute = AdminIndicarRouteImport.update({
   id: '/indicar',
   path: '/indicar',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/admin/criar-demo': typeof AdminCriarDemoRoute
   '/admin/indicados': typeof AdminIndicadosRoute
   '/admin/indicar': typeof AdminIndicarRoute
+  '/admin/login': typeof AdminLoginRoute
   '/admin/meus-saques': typeof AdminMeusSaquesRoute
   '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/painel': typeof AdminPainelRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/admin/criar-demo': typeof AdminCriarDemoRoute
   '/admin/indicados': typeof AdminIndicadosRoute
   '/admin/indicar': typeof AdminIndicarRoute
+  '/admin/login': typeof AdminLoginRoute
   '/admin/meus-saques': typeof AdminMeusSaquesRoute
   '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/painel': typeof AdminPainelRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/admin/criar-demo': typeof AdminCriarDemoRoute
   '/admin/indicados': typeof AdminIndicadosRoute
   '/admin/indicar': typeof AdminIndicarRoute
+  '/admin/login': typeof AdminLoginRoute
   '/admin/meus-saques': typeof AdminMeusSaquesRoute
   '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/painel': typeof AdminPainelRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/admin/criar-demo'
     | '/admin/indicados'
     | '/admin/indicar'
+    | '/admin/login'
     | '/admin/meus-saques'
     | '/admin/notificacoes'
     | '/admin/painel'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/admin/criar-demo'
     | '/admin/indicados'
     | '/admin/indicar'
+    | '/admin/login'
     | '/admin/meus-saques'
     | '/admin/notificacoes'
     | '/admin/painel'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/admin/criar-demo'
     | '/admin/indicados'
     | '/admin/indicar'
+    | '/admin/login'
     | '/admin/meus-saques'
     | '/admin/notificacoes'
     | '/admin/painel'
@@ -217,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMeusSaquesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/indicar': {
       id: '/admin/indicar'
       path: '/indicar'
@@ -253,6 +272,7 @@ interface AdminRouteChildren {
   AdminCriarDemoRoute: typeof AdminCriarDemoRoute
   AdminIndicadosRoute: typeof AdminIndicadosRoute
   AdminIndicarRoute: typeof AdminIndicarRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   AdminMeusSaquesRoute: typeof AdminMeusSaquesRoute
   AdminNotificacoesRoute: typeof AdminNotificacoesRoute
   AdminPainelRoute: typeof AdminPainelRoute
@@ -263,6 +283,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCriarDemoRoute: AdminCriarDemoRoute,
   AdminIndicadosRoute: AdminIndicadosRoute,
   AdminIndicarRoute: AdminIndicarRoute,
+  AdminLoginRoute: AdminLoginRoute,
   AdminMeusSaquesRoute: AdminMeusSaquesRoute,
   AdminNotificacoesRoute: AdminNotificacoesRoute,
   AdminPainelRoute: AdminPainelRoute,
