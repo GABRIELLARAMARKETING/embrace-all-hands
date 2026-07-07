@@ -14,7 +14,239 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      game_sessions: {
+        Row: {
+          created_at: string
+          duration_seconds: number
+          finished_at: string | null
+          id: string
+          level_reached: number
+          score: number
+          status: string
+          theme_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number
+          finished_at?: string | null
+          id?: string
+          level_reached?: number
+          score?: number
+          status?: string
+          theme_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number
+          finished_at?: string | null
+          id?: string
+          level_reached?: number
+          score?: number
+          status?: string
+          theme_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_sessions_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "game_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_themes: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          gameplay_config: Json
+          id: string
+          is_active: boolean
+          is_default: boolean
+          label: string
+          min_level: number
+          name: string
+          preview_config: Json
+          rarity: string
+          slug: string
+          sort_order: number
+          ui_config: Json
+          unlock_price: number
+          unlock_type: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          gameplay_config: Json
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          label: string
+          min_level?: number
+          name: string
+          preview_config: Json
+          rarity?: string
+          slug: string
+          sort_order?: number
+          ui_config: Json
+          unlock_price?: number
+          unlock_type?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          gameplay_config?: Json
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          label?: string
+          min_level?: number
+          name?: string
+          preview_config?: Json
+          rarity?: string
+          slug?: string
+          sort_order?: number
+          ui_config?: Json
+          unlock_price?: number
+          unlock_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      live_matches: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          fake_or_real: string
+          id: string
+          status: string
+          theme_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          fake_or_real?: string
+          id?: string
+          status?: string
+          theme_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          fake_or_real?: string
+          id?: string
+          status?: string
+          theme_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_matches_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "game_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          coins: number
+          created_at: string
+          display_name: string | null
+          id: string
+          level: number
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          coins?: number
+          created_at?: string
+          display_name?: string | null
+          id: string
+          level?: number
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          coins?: number
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          level?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_theme_inventory: {
+        Row: {
+          id: string
+          source: string
+          theme_id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          source?: string
+          theme_id: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          source?: string
+          theme_id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_theme_inventory_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "game_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_theme_preferences: {
+        Row: {
+          id: string
+          selected_theme_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          selected_theme_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          selected_theme_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_theme_preferences_selected_theme_id_fkey"
+            columns: ["selected_theme_id"]
+            isOneToOne: false
+            referencedRelation: "game_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
