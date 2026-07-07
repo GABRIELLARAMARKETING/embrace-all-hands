@@ -129,6 +129,7 @@ function GameLogic({
     bounceSquash.current = 0;
     spinVelocity.current = 0;
     accumulator.current = 0;
+    trailRef.current?.reset();
     if (ballRef.current) {
       ballRef.current.position.set(0, 0.5, CONSTANTS.BALL_TRACK_RADIUS);
       ballRef.current.rotation.set(0, 0, 0);
