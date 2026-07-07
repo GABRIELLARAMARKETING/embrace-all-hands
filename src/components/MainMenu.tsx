@@ -129,10 +129,10 @@ export function MainMenu(_props: { onOpenThemes?: () => void; onOpenSkins?: () =
 
           <div className="w-full">
             {isLoading && (
-              <div className="grid h-[340px] place-items-center text-white/60">Carregando temas…</div>
+              <div className="grid h-[240px] sm:h-[340px] place-items-center text-white/60">Carregando temas…</div>
             )}
             {error && (
-              <div className="grid h-[340px] place-items-center text-red-300">
+              <div className="grid h-[240px] sm:h-[340px] place-items-center text-red-300">
                 Erro ao carregar temas
               </div>
             )}
