@@ -16,6 +16,7 @@ import { Route as AdminMeusSaquesRouteImport } from './routes/admin.meus-saques'
 import { Route as AdminIndicarRouteImport } from './routes/admin.indicar'
 import { Route as AdminIndicadosRouteImport } from './routes/admin.indicados'
 import { Route as AdminCriarDemoRouteImport } from './routes/admin.criar-demo'
+import { Route as AdminAjustesIndicadosRouteImport } from './routes/admin.ajustes-indicados'
 
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
@@ -52,10 +53,16 @@ const AdminCriarDemoRoute = AdminCriarDemoRouteImport.update({
   path: '/criar-demo',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAjustesIndicadosRoute = AdminAjustesIndicadosRouteImport.update({
+  id: '/ajustes-indicados',
+  path: '/ajustes-indicados',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin/ajustes-indicados': typeof AdminAjustesIndicadosRoute
   '/admin/criar-demo': typeof AdminCriarDemoRoute
   '/admin/indicados': typeof AdminIndicadosRoute
   '/admin/indicar': typeof AdminIndicarRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin/ajustes-indicados': typeof AdminAjustesIndicadosRoute
   '/admin/criar-demo': typeof AdminCriarDemoRoute
   '/admin/indicados': typeof AdminIndicadosRoute
   '/admin/indicar': typeof AdminIndicarRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin/ajustes-indicados': typeof AdminAjustesIndicadosRoute
   '/admin/criar-demo': typeof AdminCriarDemoRoute
   '/admin/indicados': typeof AdminIndicadosRoute
   '/admin/indicar': typeof AdminIndicarRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/admin/ajustes-indicados'
     | '/admin/criar-demo'
     | '/admin/indicados'
     | '/admin/indicar'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/admin/ajustes-indicados'
     | '/admin/criar-demo'
     | '/admin/indicados'
     | '/admin/indicar'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/admin/ajustes-indicados'
     | '/admin/criar-demo'
     | '/admin/indicados'
     | '/admin/indicar'
@@ -167,10 +179,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCriarDemoRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/ajustes-indicados': {
+      id: '/admin/ajustes-indicados'
+      path: '/ajustes-indicados'
+      fullPath: '/admin/ajustes-indicados'
+      preLoaderRoute: typeof AdminAjustesIndicadosRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminAjustesIndicadosRoute: typeof AdminAjustesIndicadosRoute
   AdminCriarDemoRoute: typeof AdminCriarDemoRoute
   AdminIndicadosRoute: typeof AdminIndicadosRoute
   AdminIndicarRoute: typeof AdminIndicarRoute
@@ -179,6 +199,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAjustesIndicadosRoute: AdminAjustesIndicadosRoute,
   AdminCriarDemoRoute: AdminCriarDemoRoute,
   AdminIndicadosRoute: AdminIndicadosRoute,
   AdminIndicarRoute: AdminIndicarRoute,
