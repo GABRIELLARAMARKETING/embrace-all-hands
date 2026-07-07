@@ -197,7 +197,7 @@ function GameLogic({
 
       const prevY = ball.position.y;
       const nextY = prevY + velocity.current * sdt;
-      if (step === 0) dbgPrev = prevY;
+      if (stepsTaken === 1) dbgPrev = prevY;
 
       let landedY: number | null = null;
 
