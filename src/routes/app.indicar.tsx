@@ -77,16 +77,17 @@ function IndicarPage() {
           ...prev,
           affiliateBalance: result.affiliateBalance,
           totalReceived: result.totalReceived,
-          stats: prev.stats.map((s) =>
-            s.tier === "TOTAL"
-              ? { ...s, deposits: (s.deposits ?? 0) + result.withdrawal.amount }
-              : s,
-          ),
+          stats: {
+            ...prev.stats,
+            TOTAL: {
+              ...prev.stats.TOTAL,
+              deposits: (prev.stats.TOTAL.deposits ?? 0) + result.withdrawal.amount,
+            },
+          },
         };
       });
-      setReferralStats(
-        (queryClient.getQueryData(["referral-stats"]) as typeof data)?.stats ?? data.stats,
-      );
+      const next = queryClient.getQueryData(["referral-stats"]) as typeof data | undefined;
+      if (next) setReferralStats(next.stats);
       toast.success("Solicitação de saque registrada com sucesso!");
       setConfirmOpen(false);
       // Revalidate in the background to sync any server-side changes
