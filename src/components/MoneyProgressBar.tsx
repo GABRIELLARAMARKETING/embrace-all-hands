@@ -61,7 +61,7 @@ export function MoneyProgressBar() {
             onClick={() => {
               window.dispatchEvent(new CustomEvent("redeem-reward", { detail: { value: GOAL } }));
             }}
-            className="pointer-events-auto flex h-[78px] w-[86%] max-w-[360px] items-center justify-center gap-[10px] whitespace-nowrap rounded-full border-none bg-gradient-to-r from-[#FFC400] to-[#FFAB00] text-[22px] font-black tracking-[-0.3px] text-[#050505] shadow-[0_14px_28px_rgba(0,0,0,0.22)] outline-none transition-transform duration-150 active:scale-[0.98]"
+            className="pointer-events-auto flex h-[64px] w-[78%] max-w-[300px] items-center justify-center gap-[10px] whitespace-nowrap rounded-full border-none bg-gradient-to-r from-[#FFC400] to-[#FFAB00] text-[18px] font-black tracking-[-0.3px] text-[#050505] shadow-[0_14px_28px_rgba(0,0,0,0.22)] outline-none transition-transform duration-150 active:scale-[0.98]"
           >
             <span className="text-[20px] leading-none">🏆</span>
             <span>RESGATAR R$ 20,00</span>
