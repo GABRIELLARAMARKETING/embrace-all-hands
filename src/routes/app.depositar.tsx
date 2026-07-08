@@ -12,6 +12,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { depositSchema, type DepositFormValues } from "@/utils/playerValidators";
 import { copyToClipboard } from "@/utils/clipboard";
 import { cn } from "@/lib/utils";
+import helixLogo from "@/assets/helix-multi-logo.png";
 
 export const Route = createFileRoute("/app/depositar")({
   head: () => ({
@@ -51,36 +52,39 @@ function DepositarPage() {
 
   return (
     <AppLayout title="Depositar via PIX">
-      <GameLogo />
+      <div className="relative pt-14">
+        <GameLogo />
 
-      <PlayerCard className="mt-4 p-4">
-        <div className="flex items-center gap-3">
-          <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-400">
-            <DollarSign className="h-6 w-6" />
+        <PlayerCard className="p-4 pt-8">
+          <div className="flex items-center gap-3">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-400">
+              <DollarSign className="h-6 w-6" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[11px] font-bold tracking-widest text-white/60">SALDO ATUAL</div>
+              <div className="text-2xl font-black text-emerald-400">{formatCurrency(balance)}</div>
+            </div>
+            <div className="shrink-0 text-right text-xs text-white/50 leading-tight">
+              disponível<br />na conta
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-[11px] font-bold tracking-widest text-white/60">SALDO ATUAL</div>
-            <div className="text-2xl font-black text-emerald-400">{formatCurrency(balance)}</div>
-          </div>
-          <div className="shrink-0 text-right text-xs text-white/50 leading-tight">
-            disponível<br />na conta
-          </div>
-        </div>
-      </PlayerCard>
+        </PlayerCard>
+      </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <PlayerCard className="mt-4 p-4">
           <div className="text-[11px] font-bold tracking-widest text-[#C084FC]">VALOR RÁPIDO</div>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-3 grid grid-cols-5 gap-2">
             {PLAYER_MOCK.depositOptions.map((v) => {
               const badge = DEPOSIT_BADGES[v];
               const active = amount === v;
+              const isBonus = badge?.tone === "bonus";
               return (
                 <div key={v} className="relative pt-3">
                   {badge && (
                     <span
                       className={cn(
-                        "absolute -top-0 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-black tracking-wide",
+                        "absolute -top-0 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full px-1.5 py-0.5 text-[8px] font-black tracking-wide shadow",
                         BADGE_COLORS[badge.tone],
                       )}
                     >
@@ -91,18 +95,25 @@ function DepositarPage() {
                     type="button"
                     onClick={() => setValue("amount", v, { shouldValidate: true })}
                     className={cn(
-                      "rounded-full px-4 py-2 text-sm font-bold transition-all",
-                      active
-                        ? "bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] text-white shadow-[0_0_18px_rgba(168,85,247,0.55)]"
-                        : "bg-white/[0.05] text-white/80",
+                      "flex w-full flex-col items-center justify-center rounded-full px-2 py-2 text-sm font-black transition-all",
+                      isBonus
+                        ? "border-2 border-[#FFD600] bg-[#1a0b2e] text-white shadow-[0_0_14px_rgba(255,214,0,0.35)]"
+                        : active
+                          ? "bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] text-white shadow-[0_0_18px_rgba(168,85,247,0.55)]"
+                          : "bg-white/[0.05] text-white/80",
+                      active && isBonus && "ring-2 ring-[#EC5FA3]/60",
                     )}
                   >
-                    R${v}
+                    <span>R${v}</span>
+                    {isBonus && (
+                      <span className="text-[9px] font-black text-[#00D084]">+100%</span>
+                    )}
                   </button>
                 </div>
               );
             })}
           </div>
+
 
           <div className="mt-4 flex items-center gap-2 rounded-2xl bg-white/[0.05] px-4 py-3">
             <span className="text-sm font-semibold text-white/60">R$</span>
@@ -146,15 +157,15 @@ function DepositarPage() {
 
 function GameLogo() {
   return (
-    <div className="mt-2 flex justify-center">
-      <div className="rounded-2xl bg-gradient-to-br from-[#7c1e9c] to-[#1e0938] px-6 py-3 shadow-[0_0_28px_rgba(168,85,247,0.45)]">
-        <div className="text-2xl font-black tracking-tighter">
-          <span className="bg-gradient-to-r from-[#00D084] via-[#FFD600] to-[#EC5FA3] bg-clip-text text-transparent">
-            Helix
-          </span>
-          <span className="ml-1 text-white/90">MULTI</span>
-        </div>
-      </div>
+    <div className="pointer-events-none absolute left-1/2 top-0 z-10 -translate-x-1/2">
+      <img
+        src={helixLogo}
+        alt="Helix Multi"
+        width={112}
+        height={112}
+        loading="lazy"
+        className="h-28 w-28 drop-shadow-[0_0_20px_rgba(168,85,247,0.55)]"
+      />
     </div>
   );
 }
