@@ -71,7 +71,7 @@ export const listManagers = createServerFn({ method: "GET" })
       .in("manager_id", managerIds);
     if (linkedErr) throw new Error(linkedErr.message);
     const counts = new Map<string, number>();
-    for (const row of (linked ?? []) as Array<{ manager_id: string | null }>) {
+    for (const row of (linked ?? []) as unknown as Array<{ manager_id: string | null }>) {
       if (!row.manager_id) continue;
       counts.set(row.manager_id, (counts.get(row.manager_id) ?? 0) + 1);
     }
