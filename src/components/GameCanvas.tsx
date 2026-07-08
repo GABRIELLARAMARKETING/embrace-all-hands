@@ -107,6 +107,8 @@ function GameLogic({
   const velocity = useRef(0);
   const lastBounceRing = useRef<number>(-1);
   const collisionCooldownUntil = useRef(0);
+  const dangerHitFrames = useRef(0);
+
   const passedSincelastBounce = useRef(0);
   const feverUntil = useRef(0);
   const spinVelocity = useRef(0);
