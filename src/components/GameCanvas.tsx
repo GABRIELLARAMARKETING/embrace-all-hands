@@ -149,7 +149,7 @@ function GameLogic({
       ballRef.current.rotation.set(0, 0, 0);
       ballRef.current.scale.set(1, 1, 1);
     }
-    cameraTargetY.current = 0;
+    cameraTargetY.current = 0.5 + CONSTANTS.CAMERA_HEIGHT_OFFSET;
     brokenRingsRef.current = new Set();
     breakingRingsRef.current = new Map();
     deepestRingRef.current = -1;
