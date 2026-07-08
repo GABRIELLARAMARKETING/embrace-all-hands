@@ -6,6 +6,7 @@ import { PLAYER_MOCK } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { copyToClipboard } from "@/utils/clipboard";
+import helixLogo from "@/assets/helix-multi-logo.png";
 
 export const Route = createFileRoute("/app/indicar")({
   head: () => ({
@@ -28,17 +29,18 @@ function IndicarPage() {
 
   return (
     <AppLayout title="Indicar Amigos">
-      <Logo />
-
-      <PlayerCard className="mt-4 p-5">
-        <div className="flex items-start gap-3">
-          <PartyPopper className="h-5 w-5 shrink-0 text-[#FFD600]" />
-          <p className="text-sm text-white/85">
-            Ganhe <span className="font-bold text-[#C084FC]">{PLAYER_MOCK.commissionPercent}%</span> de comissão
-            para cada amigo que fizer o primeiro depósito!
-          </p>
-        </div>
-      </PlayerCard>
+      <div className="relative pt-14">
+        <Logo />
+        <PlayerCard className="p-5 pt-8">
+          <div className="flex items-start gap-3">
+            <PartyPopper className="h-5 w-5 shrink-0 text-[#FFD600]" />
+            <p className="text-sm text-white/85 text-center flex-1">
+              Ganhe <span className="font-bold text-[#C084FC]">{PLAYER_MOCK.commissionPercent}%</span> de comissão
+              para cada amigo que fizer o primeiro depósito!
+            </p>
+          </div>
+        </PlayerCard>
+      </div>
 
       <div className="mt-4 rounded-3xl bg-gradient-to-br from-[#A855F7] to-[#EC5FA3] p-5 shadow-[0_10px_30px_-10px_rgba(236,95,163,0.6)]">
         <div className="flex items-start justify-between gap-4">
@@ -94,15 +96,15 @@ function StatCard({ tier, subtitle }: { tier: string; subtitle: string }) {
 
 function Logo() {
   return (
-    <div className="mt-2 flex justify-center">
-      <div className="rounded-2xl bg-gradient-to-br from-[#7c1e9c] to-[#1e0938] px-6 py-3 shadow-[0_0_28px_rgba(168,85,247,0.45)]">
-        <div className="text-2xl font-black tracking-tighter">
-          <span className="bg-gradient-to-r from-[#00D084] via-[#FFD600] to-[#EC5FA3] bg-clip-text text-transparent">
-            Helix
-          </span>
-          <span className="ml-1 text-white/90">MULTI</span>
-        </div>
-      </div>
+    <div className="pointer-events-none absolute left-1/2 top-0 z-10 -translate-x-1/2">
+      <img
+        src={helixLogo}
+        alt="Helix Multi"
+        width={112}
+        height={112}
+        loading="lazy"
+        className="h-28 w-28 drop-shadow-[0_0_20px_rgba(168,85,247,0.55)]"
+      />
     </div>
   );
 }
