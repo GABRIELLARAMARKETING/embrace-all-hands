@@ -157,17 +157,18 @@ function DepositarPage() {
 
 function GameLogo() {
   return (
-    <div className="mt-2 flex justify-center">
-      <div className="rounded-2xl bg-gradient-to-br from-[#7c1e9c] to-[#1e0938] px-6 py-3 shadow-[0_0_28px_rgba(168,85,247,0.45)]">
-        <div className="text-2xl font-black tracking-tighter">
-          <span className="bg-gradient-to-r from-[#00D084] via-[#FFD600] to-[#EC5FA3] bg-clip-text text-transparent">
-            Helix
-          </span>
-          <span className="ml-1 text-white/90">MULTI</span>
-        </div>
-      </div>
+    <div className="pointer-events-none absolute left-1/2 top-0 z-10 -translate-x-1/2">
+      <img
+        src={helixLogo}
+        alt="Helix Multi"
+        width={112}
+        height={112}
+        loading="lazy"
+        className="h-28 w-28 drop-shadow-[0_0_20px_rgba(168,85,247,0.55)]"
+      />
     </div>
   );
+}
 }
 
 function PixQrModal({ open, onClose, amount }: { open: boolean; onClose: () => void; amount: number }) {
