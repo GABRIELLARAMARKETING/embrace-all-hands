@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Copy, Link as LinkIcon, Lock, LogOut } from "lucide-react";
 import { AppLayout, PlayerCard, GradientButton } from "@/components/player/AppLayout";
@@ -7,28 +8,77 @@ import { PLAYER_MOCK } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { copyToClipboard } from "@/utils/clipboard";
+import { supabase } from "@/integrations/supabase/client";
+import { getMyProfile } from "@/lib/profile.functions";
 import helixLogo from "@/assets/helix-multi-logo.png";
 
+const myProfileQuery = queryOptions({
+  queryKey: ["my-profile"],
+  queryFn: () => getMyProfile(),
+});
+
 export const Route = createFileRoute("/app/perfil")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Meu Perfil — MultiHelixBr" },
       { name: "description", content: "Perfil do jogador." },
     ],
   }),
+  errorComponent: ({ error }) => (
+    <div className="p-6 text-sm text-red-400">Erro ao carregar perfil: {error.message}</div>
+  ),
+  notFoundComponent: () => <div className="p-6 text-sm text-white/70">Não encontrado.</div>,
   component: PerfilPage,
 });
 
+
 function PerfilPage() {
   const navigate = useNavigate();
-  const balance = usePlayerStore((s) => s.balance);
-  const affiliateBalance = usePlayerStore((s) => s.affiliateBalance);
-  const initial = PLAYER_MOCK.userName.charAt(0).toUpperCase();
+  const queryClient = useQueryClient();
+  const { data: profile } = useSuspenseQuery(myProfileQuery);
+  // Mirror server values into the local store when setters exist
+  const store = usePlayerStore.getState() as unknown as Record<string, unknown>;
+  useEffect(() => {
+    if (typeof store.setBalance === "function") (store.setBalance as (v: number) => void)(profile.balance);
+    if (typeof store.setAffiliateBalance === "function")
+      (store.setAffiliateBalance as (v: number) => void)(profile.affiliateBalance);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile.balance, profile.affiliateBalance]);
+
+
+  // Realtime: refresh when profile row or game_sessions change
+  useEffect(() => {
+    const channel = supabase
+      .channel(`profile-${profile.userId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "profiles", filter: `id=eq.${profile.userId}` },
+        () => queryClient.invalidateQueries({ queryKey: ["my-profile"] }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "game_sessions", filter: `user_id=eq.${profile.userId}` },
+        () => queryClient.invalidateQueries({ queryKey: ["my-profile"] }),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile.userId, queryClient]);
+
+  const balance = profile.balance;
+  const affiliateBalance = profile.affiliateBalance;
+  const matchesPlayed = profile.matchesPlayed;
+  const displayName = profile.displayName;
+  const email = profile.email;
+  const initial = (displayName || "?").charAt(0).toUpperCase();
 
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
   const [saving, setSaving] = useState(false);
+
 
   const copyLink = async () => {
     const ok = await copyToClipboard(PLAYER_MOCK.referralUrl);
@@ -79,13 +129,14 @@ function PerfilPage() {
         <div className="mt-3 grid h-24 w-24 place-items-center rounded-full bg-gradient-to-br from-[#EC5FA3] to-[#A855F7] text-4xl font-black text-white shadow-[0_0_30px_rgba(236,95,163,0.55)]">
           {initial}
         </div>
-        <h2 className="mt-3 text-xl font-black text-white">{PLAYER_MOCK.userName}</h2>
-        <p className="text-sm text-white/60">{PLAYER_MOCK.userEmail}</p>
+        <h2 className="mt-3 text-xl font-black text-white">{displayName}</h2>
+        <p className="text-sm text-white/60">{email}</p>
       </div>
 
       <div className="mt-5 grid grid-cols-3 gap-3">
         <StatBox value={formatCurrency(balance)} label="SALDO" tone="green" />
-        <StatBox value={String(PLAYER_MOCK.matchesPlayed)} label="PARTIDAS" tone="purple" />
+        <StatBox value={String(matchesPlayed)} label="PARTIDAS" tone="purple" />
+
         <StatBox value={formatCurrency(affiliateBalance)} label="AFILIADO" tone="yellow" />
       </div>
 
