@@ -129,13 +129,14 @@ function PerfilPage() {
         <div className="mt-3 grid h-24 w-24 place-items-center rounded-full bg-gradient-to-br from-[#EC5FA3] to-[#A855F7] text-4xl font-black text-white shadow-[0_0_30px_rgba(236,95,163,0.55)]">
           {initial}
         </div>
-        <h2 className="mt-3 text-xl font-black text-white">{PLAYER_MOCK.userName}</h2>
-        <p className="text-sm text-white/60">{PLAYER_MOCK.userEmail}</p>
+        <h2 className="mt-3 text-xl font-black text-white">{displayName}</h2>
+        <p className="text-sm text-white/60">{email}</p>
       </div>
 
       <div className="mt-5 grid grid-cols-3 gap-3">
         <StatBox value={formatCurrency(balance)} label="SALDO" tone="green" />
-        <StatBox value={String(PLAYER_MOCK.matchesPlayed)} label="PARTIDAS" tone="purple" />
+        <StatBox value={String(matchesPlayed)} label="PARTIDAS" tone="purple" />
+
         <StatBox value={formatCurrency(affiliateBalance)} label="AFILIADO" tone="yellow" />
       </div>
 
