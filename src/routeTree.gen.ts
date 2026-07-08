@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as GerenteSaquesRouteImport } from './routes/gerente.saques'
 import { Route as GerentePainelRouteImport } from './routes/gerente.painel'
 import { Route as GerenteNotificacoesRouteImport } from './routes/gerente.notificacoes'
 import { Route as GerenteMeusSaquesRouteImport } from './routes/gerente.meus-saques'
@@ -64,6 +65,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
+} as any)
+const GerenteSaquesRoute = GerenteSaquesRouteImport.update({
+  id: '/saques',
+  path: '/saques',
+  getParentRoute: () => GerenteRoute,
 } as any)
 const GerentePainelRoute = GerentePainelRouteImport.update({
   id: '/painel',
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/gerente/meus-saques': typeof GerenteMeusSaquesRoute
   '/gerente/notificacoes': typeof GerenteNotificacoesRoute
   '/gerente/painel': typeof GerentePainelRoute
+  '/gerente/saques': typeof GerenteSaquesRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/gerente/meus-saques': typeof GerenteMeusSaquesRoute
   '/gerente/notificacoes': typeof GerenteNotificacoesRoute
   '/gerente/painel': typeof GerentePainelRoute
+  '/gerente/saques': typeof GerenteSaquesRoute
   '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/gerente/meus-saques': typeof GerenteMeusSaquesRoute
   '/gerente/notificacoes': typeof GerenteNotificacoesRoute
   '/gerente/painel': typeof GerentePainelRoute
+  '/gerente/saques': typeof GerenteSaquesRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
     | '/gerente/meus-saques'
     | '/gerente/notificacoes'
     | '/gerente/painel'
+    | '/gerente/saques'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/gerente/meus-saques'
     | '/gerente/notificacoes'
     | '/gerente/painel'
+    | '/gerente/saques'
     | '/app'
   id:
     | '__root__'
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | '/gerente/meus-saques'
     | '/gerente/notificacoes'
     | '/gerente/painel'
+    | '/gerente/saques'
     | '/app/'
   fileRoutesById: FileRoutesById
 }
@@ -324,6 +336,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/gerente/saques': {
+      id: '/gerente/saques'
+      path: '/saques'
+      fullPath: '/gerente/saques'
+      preLoaderRoute: typeof GerenteSaquesRouteImport
+      parentRoute: typeof GerenteRoute
     }
     '/gerente/painel': {
       id: '/gerente/painel'
@@ -448,6 +467,7 @@ interface GerenteRouteChildren {
   GerenteMeusSaquesRoute: typeof GerenteMeusSaquesRoute
   GerenteNotificacoesRoute: typeof GerenteNotificacoesRoute
   GerentePainelRoute: typeof GerentePainelRoute
+  GerenteSaquesRoute: typeof GerenteSaquesRoute
 }
 
 const GerenteRouteChildren: GerenteRouteChildren = {
@@ -459,6 +479,7 @@ const GerenteRouteChildren: GerenteRouteChildren = {
   GerenteMeusSaquesRoute: GerenteMeusSaquesRoute,
   GerenteNotificacoesRoute: GerenteNotificacoesRoute,
   GerentePainelRoute: GerentePainelRoute,
+  GerenteSaquesRoute: GerenteSaquesRoute,
 }
 
 const GerenteRouteWithChildren =
