@@ -1,76 +1,108 @@
-# Painel Admin Helix — Plano
+# Painel Gerente Helix — Backend Real e Integração
 
-## 1. Stack detectada (não é a sugerida)
+Este é um escopo grande (12 telas + regras multinível + comissões + saques + auditoria). Vou entregar em **fases sequenciais**, cada uma testável, sem quebrar o que já existe.
 
-O projeto **não** usa Next.js/Prisma/NextAuth. Ele usa:
+## Contexto atual (o que já está no projeto)
 
-- **TanStack Start** (file-based routing em `src/routes/`), React 19, Vite 7
-- **Tailwind v4 + shadcn/ui** (já configurados)
-- **Lovable Cloud (Supabase)** — Postgres + Auth + RLS + Realtime
-- **Server functions** via `createServerFn` (`@tanstack/react-start`), não API Routes
-- **TanStack Query** para cache/mutations
-- **Zustand** para estado de UI/mock (já existe `useAdminStore`)
-- **Zod + React Hook Form**, Recharts disponível via shadcn
+- **Stack**: TanStack Start (React 19 + Vite 7) + Lovable Cloud (Supabase). Sem Next.js, sem backend Express separado — backend = `createServerFn` + Supabase.
+- **Painel Gerente já existe visualmente** em `src/routes/gerente.*.tsx` (painel, indicar, meus-saques, indicados, ajustes-indicados, criar-demo, gerentes, saques, notificacoes) com store Zustand mockada (`useAdminStore`).
+- **Auth/RBAC**: já existe `user_roles` (enum `app_role`), função `has_role`, e a rota `/gerente` já bloqueia por `admin`/`super_admin`. **Precisa acrescentar role `manager`** ou reusar `admin` — decisão abaixo.
+- **Tabelas existentes relevantes**: `profiles` (com `manager_id`, `affiliate_balance`, `total_received`), `commissions`, `affiliate_withdrawals`, `transactions`, `audit_logs`, `platform_settings`.
+- **Já implementado no lado Admin**: dashboard, gerentes, afiliados, saques, finance, commissions, risk-alerts, audit-logs, settings, reports + realtime.
 
-Vou **adaptar** o escopo a essa stack (mantendo o mesmo resultado funcional). Prisma/NextAuth não entram.
+## Decisões que preciso confirmar antes de codar
 
-## 2. Estrutura atual relevante
+Como o escopo é enorme, preciso alinhar 4 pontos que mudam o desenho:
 
-- Rotas de painel já renomeadas para `/gerente/*` (painel, indicar, indicados, meus-saques, ajustes-indicados, criar-demo, notificações, login).
-- Componentes admin em `src/components/admin/*` (AdminCard, AdminTable, StatCard, Badge, etc.) — reaproveitáveis.
-- Área do jogador em `/app/*` com perfil, saque, indicação já conectados ao backend (`profiles`, `affiliate_withdrawals`, `game_sessions`).
-- Tabelas Supabase existentes: `profiles`, `affiliate_withdrawals`, `game_sessions`, `live_matches`, `game_themes`, `user_theme_inventory`, `user_theme_preferences`.
-- Sem tabela de roles ainda, sem audit log, sem alerts, sem transactions genéricas.
+1. **Role do gerente**: hoje `/gerente` exige role `admin`. Prompt pede role `MANAGER` separada. Crio nova role `manager` no enum `app_role` e mudo o gate de `/gerente` para aceitar `manager` (admins continuam entrando)?
+2. **Subgerentes**: o schema atual não tem hierarquia entre gerentes. Deixo a tela `/gerente/gerentes` como "preparado, retorna vazio" (como o próprio prompt permite no item 10)?
+3. **Contas demo**: criar `auth.users` reais via Admin API é caro em quota e polui a base. Ok gravar as demos só em `profiles` com `is_demo=true` sem `auth.users` (login demo fica desabilitado nesta fase)?
+4. **Cadastro via `?ref=CODIGO`**: hoje `/auth` existe mas não lê `ref`. Ok eu adicionar leitura do `?ref` no signup e vincular `referred_by_id`/`manager_id` automaticamente?
 
-## 3. Gaps entre o pedido e o que existe
+Assumindo **sim para todas**, o plano abaixo é o que executo.
 
-Faltam para virar "admin panel de verdade":
+## Plano de execução (fases)
 
-- **RBAC real**: `app_role` enum + `user_roles` + `has_role()` (padrão Lovable) — hoje o `/gerente/login` só grava flag em localStorage.
-- **Novas tabelas**: `manager_profiles`, `affiliate_links`, `commissions`, `transactions`, `audit_logs`, `risk_alerts`, `platform_settings`, `login_logs`.
-- **Server functions** (`src/lib/*.functions.ts`) para cada domínio, sempre com `requireSupabaseAuth` + checagem `has_role`.
-- **Novas rotas** sob `/gerente/*` (dashboard já existe como `painel`, faltam: usuários, gerentes, afiliados, saques admin, comissões, financeiro, relatórios, audit-logs, alertas, configurações, perfil admin).
-- **Gate de rota**: mover `/gerente/*` para `_authenticated/` + checagem de role no `beforeLoad`.
+### Fase 1 — Schema + helpers (1 migration)
 
-## 4. Escopo é grande demais para uma entrega — proposta de fases
+Adiciona ao banco:
 
-Entregar tudo de uma vez vira código superficial. Sugiro fatiar assim (cada fase é 1 iteração completa: schema + policies + server fns + UI + testes manuais):
+- Enum `app_role`: acrescentar valor `manager`.
+- `profiles`: colunas `affiliate_code text unique`, `referred_by_id uuid`, `is_demo bool default false`, `is_influencer bool default false`.
+- `manager_profiles`: `user_id`, `total_budget_percent`, `level1_percent`, `level2_percent`, `level3_percent` (defaults 50/5/1, budget 70).
+- `referrals`: `referrer_id`, `referred_id`, `manager_id`, `level (1..3)`, `source_code`.
+- `referral_logs`: `referrer_id`, `referred_id`, `source_code`, `ip`, `user_agent`.
+- `deposits` (nova, separada de `transactions` que hoje é genérica): status enum + `confirmed_at`.
+- `demo_account_batches` + `demo_accounts`.
+- Função `generate_affiliate_code()` (6 chars, checa colisão) e trigger em `profiles` para preencher `affiliate_code` no insert.
+- Trigger `handle_new_user` estendido: lê `raw_user_meta_data->>'ref'`, resolve dono do código, monta cadeia de 3 níveis em `referrals`, define `referred_by_id` e `manager_id`, grava `referral_logs`.
+- Função `process_deposit_commissions(deposit_id uuid)` (SECURITY DEFINER, idempotente por `deposit_id`): calcula N1/N2/N3 + resto para o gerente com base em `manager_profiles`, grava em `commissions` + `transactions`.
+- RLS + GRANTs para todas as novas tabelas (managers leem só a própria rede via `has_role` + `manager_id = auth.uid()`).
 
-**Fase 1 — Fundação (sem UI nova)**
-- Enum `app_role` (super_admin, admin, gerente, afiliado), tabela `user_roles`, função `has_role()`, RLS.
-- Mover `/gerente/*` para `_authenticated/gerente/*` + gate por role.
-- Substituir login mock por Supabase Auth.
-- Tabela `audit_logs` + helper `logAudit()` para uso nas próximas fases.
+### Fase 2 — Server functions (`src/lib/manager.functions.ts`)
 
-**Fase 2 — Saques (admin)**
-- Estender `affiliate_withdrawals` com status expandido, `reviewed_by`, `reviewed_at`, `rejection_reason`, `paid_at`, `ip`, `user_agent`, `notes`.
-- Server fns: listar, aprovar, recusar, marcar pago — tudo em transação, com audit log.
-- Tela `/gerente/saques` (fila + detalhe + modais de confirmação).
+Middleware `requireManager` (aceita `manager`, `admin`, `super_admin`). Funções:
 
-**Fase 3 — Gerentes & Afiliados**
-- `manager_profiles`, vínculo afiliado→gerente em `profiles`.
-- Telas de listagem, detalhe, ativar/bloquear/trocar gerente.
+- `getManagerDashboardSummary` — depósitos/saques pendentes, recebido/sacado 24h, total indicados por nível.
+- `getManagerReferralLink` — retorna `affiliate_code`, link `${APP_PUBLIC_URL}/?ref=CODE`, contadores.
+- `listManagerReferrals(level)` — nível 1/2/3 com totais depositados/comissão gerada.
+- `listNetworkWithdrawals(status, search)` — saques dos usuários da rede.
+- `getMyCommissionSummary` + `listMyWithdrawals` + `requestMyWithdrawal({pixKey, amount})`.
+- `getCommissionSettings` + `updateCommissionSettings({n1,n2,n3})` + `resetCommissionSettings`.
+- `createDemoAccounts({namePattern, passwordPattern, quantity, initialBalance})` + `listDemoAccounts`.
+- `listSubmanagers` — retorna vazio (preparado, conforme item 10).
 
-**Fase 4 — Comissões & Financeiro**
-- `commissions`, `transactions`, view de saldo sacável.
-- Telas de listagem + filtros + export CSV.
+Todas com auditoria em `audit_logs` para ações críticas.
 
-**Fase 5 — Dashboard, Alertas, Logs, Configurações, Relatórios**
-- Gráficos Recharts, `risk_alerts`, `platform_settings`, viewer de `audit_logs`, export.
+### Fase 3 — Frontend: trocar mocks pelo real
 
-## 5. Riscos técnicos
+Cada tela `/gerente/*` passa a usar TanStack Query chamando as server functions:
 
-- **Roles em `profiles` = falha de segurança conhecida** — precisa ser tabela separada (regra Lovable).
-- Sem gate de rota atual, qualquer usuário logado acessaria `/gerente/*`.
-- `affiliate_withdrawals` já tem policies — alterar schema exige revisar RLS e não quebrar `/app/sacar`.
-- Migrations Supabase são aprovadas 1 a 1 pelo usuário; cada fase = 1 ou 2 migrations.
-- Recharts + tabelas grandes exigem paginação server-side desde o começo (não fazer client-side).
+- `gerente.painel.tsx` — cards reais + skeleton + botão atualizar.
+- `gerente.indicar.tsx` — link real do usuário + contadores + toggle influencer persistente.
+- `gerente.indicados.tsx` — 3 níveis reais + busca.
+- `gerente.meus-saques.tsx` — saldo real + histórico + solicitação persistida.
+- `gerente.ajustes-indicados.tsx` — carrega/salva percentuais reais com validação de orçamento.
+- `gerente.criar-demo.tsx` — cria lote real, mostra credenciais uma vez, lista batches.
+- `gerente.saques.tsx` — saques da rede com filtros funcionais + realtime.
+- `gerente.gerentes.tsx` — empty state real "sem subgerentes".
 
-## 6. Decisões que preciso de você antes de começar a Fase 1
+Manter layout, componentes visuais (`AdminCard`, `StatCard`, `AdminTable`) e navegação.
 
-1. **Confirma adaptar para a stack atual** (TanStack Start + Lovable Cloud) em vez de Next.js/Prisma?
-2. **Quem é o primeiro super_admin?** Me diga o e-mail da conta que já existe no Auth (ou crio uma nova) — sem isso o painel trava você fora depois do gate.
-3. **Começar pela Fase 1 (fundação + gate + auth real) e Fase 2 (saques admin)?** São as duas mais críticas — resto vem em seguida.
-4. **Manter os componentes visuais atuais** (`AdminCard`, `AdminTable`, sidebar neon) ou refazer com shadcn puro?
+### Fase 4 — Fluxo `?ref=CODE` no signup
 
-Depois que você responder, eu executo Fase 1 já com a migration, o gate e a auth real, sem tocar no que já funciona em `/app/*`.
+- `/auth` lê `?ref` da URL e passa em `options.data.ref` no `signUp`; a trigger `handle_new_user` já criada na Fase 1 faz o vínculo.
+- Adicionar `APP_PUBLIC_URL` como `PlatformSetting` (default `https://helixfast.lovable.app`) — usado pelo backend para montar o link.
+
+### Fase 5 — Processamento de comissão
+
+- Nesta fase **não há gateway PIX** (prompt proíbe). Deixo função `process_deposit_commissions` pronta + um endpoint admin `POST /api/public/internal/deposits/:id/process-commissions` protegido por secret (`INTERNAL_WEBHOOK_SECRET` via `add_secret`) para uso futuro do gateway.
+- Botão manual em `/admin/finance` "aprovar depósito" chama a mesma função (útil para testes).
+
+### Fase 6 — Seed
+
+Prompt pede seed grande (1 super admin, 3 gerentes, 150 usuários, depósitos, saques, comissões). Faço **seed enxuto** via migration: cria 1 `manager_profiles` default para cada `admin` existente + PlatformSettings default. **Não crio auth.users** em seed (perigoso em produção; usuários criam via `/auth`).
+
+## Detalhes técnicos
+
+- **Grants**: cada tabela nova tem `GRANT SELECT ON ... TO authenticated` + policies escopadas por `has_role` + `manager_id = auth.uid()`.
+- **Idempotência**: `commissions` ganha unique `(deposit_id, level)` para bloquear duplicação.
+- **PIX**: sempre retornado mascarado (`***1234`) em qualquer listagem.
+- **Realtime**: reusa `useAdminRealtime` já existente para `affiliate_withdrawals` no `/gerente/saques`.
+- **Sem gateway PIX real**, sem alterar jogo, sem expor `password_hash` (não existe — Supabase gerencia).
+
+## Arquivos que vão mudar
+
+Criados: 1 migration Fase 1, `src/lib/manager.functions.ts`, `src/hooks/useManagerQueries.ts`.
+Editados: 8 rotas `/gerente/*`, `/auth` (leitura de `?ref`), `useAdminStore` (remoção dos mocks migrados).
+
+## Fora do escopo desta entrega
+
+- Gateway PIX real (proibido no prompt).
+- Rate limit em login (Supabase já faz).
+- Envio de e-mail transacional.
+- Subgerentes reais (modelo preparado, UI vazia — permitido pelo prompt).
+
+---
+
+**Posso prosseguir com essas 4 decisões (nova role `manager`, subgerentes preparados-mas-vazios, demos sem `auth.users`, `?ref` no signup)?** Se sim, começo pela Fase 1 (migration) — que precisa da sua aprovação separada por ser mudança de schema.
