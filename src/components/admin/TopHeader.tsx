@@ -1,6 +1,6 @@
 import { Menu } from "lucide-react";
 import type { ReactNode } from "react";
-import { useAdminUI } from "@/routes/admin";
+import { useAdminUI } from "@/routes/gerente";
 
 interface Props {
   title: string;
