@@ -6,6 +6,7 @@ import { PLAYER_MOCK } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { copyToClipboard } from "@/utils/clipboard";
+import helixLogo from "@/assets/helix-multi-logo.png";
 
 export const Route = createFileRoute("/app/indicar")({
   head: () => ({
