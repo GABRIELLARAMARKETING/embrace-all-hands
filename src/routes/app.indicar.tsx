@@ -140,7 +140,96 @@ function IndicarPage() {
           );
         })}
       </div>
+
+      <ConfirmWithdrawModal
+        open={confirmOpen}
+        onClose={() => (processing ? null : setConfirmOpen(false))}
+        onConfirm={confirmWithdraw}
+        amount={affiliateBalance}
+        minAmount={withdrawMin}
+        processing={processing}
+      />
     </AppLayout>
+  );
+}
+
+function ConfirmWithdrawModal({
+  open,
+  onClose,
+  onConfirm,
+  amount,
+  minAmount,
+  processing,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  amount: number;
+  minAmount: number;
+  processing: boolean;
+}) {
+  const insufficient = amount < minAmount;
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-withdraw-title"
+        >
+          <motion.div
+            initial={{ scale: 0.95, y: 10 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="relative w-full max-w-sm rounded-3xl border border-white/10 bg-[#160828] p-6 text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={onClose}
+              disabled={processing}
+              aria-label="Fechar"
+              className="absolute right-4 top-4 text-white/60 hover:text-white disabled:opacity-40"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            {insufficient ? (
+              <AlertTriangle className="mx-auto h-12 w-12 text-amber-400" />
+            ) : (
+              <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-400" />
+            )}
+            <h3 id="confirm-withdraw-title" className="mt-3 text-lg font-bold text-white">
+              Confirmar saque
+            </h3>
+            <p className="mt-1 text-sm text-white/70">
+              {insufficient
+                ? `Você precisa de no mínimo ${formatCurrency(minAmount)} para solicitar o saque.`
+                : `Você deseja sacar ${formatCurrency(amount)} da sua comissão de afiliado?`}
+            </p>
+            <div className="mt-5 flex flex-col gap-2">
+              <GradientButton
+                onClick={onConfirm}
+                disabled={insufficient || processing}
+                className="disabled:opacity-60"
+              >
+                {processing ? "Processando..." : "Confirmar Saque"}
+              </GradientButton>
+              <button
+                onClick={onClose}
+                disabled={processing}
+                className="w-full rounded-full border border-white/15 py-3 text-sm font-semibold text-white/80 hover:bg-white/5 disabled:opacity-40"
+              >
+                Cancelar
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
