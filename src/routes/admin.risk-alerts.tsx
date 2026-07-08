@@ -48,6 +48,12 @@ function Page() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  useAdminRealtime({
+    table: "risk_alerts",
+    invalidateKeys: [["admin", "risk-alerts"], ["admin", "dashboard-summary"]],
+    toastOnInsert: (row) => `Novo alerta: ${(row.title as string) ?? "risco detectado"}`,
+  });
+
   return (
     <div className="space-y-6">
       <div>
