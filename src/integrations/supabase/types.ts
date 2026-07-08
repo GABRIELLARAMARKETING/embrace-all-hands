@@ -264,6 +264,8 @@ export type Database = {
           display_name: string | null
           id: string
           level: number
+          manager_id: string | null
+          status: string
           total_received: number
           updated_at: string
         }
@@ -275,6 +277,8 @@ export type Database = {
           display_name?: string | null
           id: string
           level?: number
+          manager_id?: string | null
+          status?: string
           total_received?: number
           updated_at?: string
         }
@@ -286,10 +290,20 @@ export type Database = {
           display_name?: string | null
           id?: string
           level?: number
+          manager_id?: string | null
+          status?: string
           total_received?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
