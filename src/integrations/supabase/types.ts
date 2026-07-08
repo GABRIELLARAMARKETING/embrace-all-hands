@@ -120,7 +120,9 @@ export type Database = {
           available_at: string | null
           base_amount: number
           created_at: string
+          deposit_id: string | null
           id: string
+          level: number | null
           manager_id: string | null
           percentage: number
           source_user_id: string | null
@@ -133,7 +135,9 @@ export type Database = {
           available_at?: string | null
           base_amount: number
           created_at?: string
+          deposit_id?: string | null
           id?: string
+          level?: number | null
           manager_id?: string | null
           percentage: number
           source_user_id?: string | null
@@ -146,12 +150,129 @@ export type Database = {
           available_at?: string | null
           base_amount?: number
           created_at?: string
+          deposit_id?: string | null
           id?: string
+          level?: number | null
           manager_id?: string | null
           percentage?: number
           source_user_id?: string | null
           status?: Database["public"]["Enums"]["commission_status"]
           updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commissions_deposit_id_fkey"
+            columns: ["deposit_id"]
+            isOneToOne: false
+            referencedRelation: "deposits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      demo_account_batches: {
+        Row: {
+          created_at: string
+          id: string
+          initial_balance: number
+          manager_id: string
+          name_pattern: string
+          password_pattern: string | null
+          quantity: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          initial_balance?: number
+          manager_id: string
+          name_pattern: string
+          password_pattern?: string | null
+          quantity: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          initial_balance?: number
+          manager_id?: string
+          name_pattern?: string
+          password_pattern?: string | null
+          quantity?: number
+        }
+        Relationships: []
+      }
+      demo_accounts: {
+        Row: {
+          affiliate_code: string
+          balance: number
+          batch_id: string | null
+          created_at: string
+          display_name: string
+          id: string
+          manager_id: string
+          phone: string
+        }
+        Insert: {
+          affiliate_code: string
+          balance?: number
+          batch_id?: string | null
+          created_at?: string
+          display_name: string
+          id?: string
+          manager_id: string
+          phone: string
+        }
+        Update: {
+          affiliate_code?: string
+          balance?: number
+          batch_id?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          manager_id?: string
+          phone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_accounts_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "demo_account_batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deposits: {
+        Row: {
+          amount: number
+          confirmed_at: string | null
+          created_at: string
+          external_id: string | null
+          id: string
+          payment_method: string | null
+          status: Database["public"]["Enums"]["deposit_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          confirmed_at?: string | null
+          created_at?: string
+          external_id?: string | null
+          id?: string
+          payment_method?: string | null
+          status?: Database["public"]["Enums"]["deposit_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          confirmed_at?: string | null
+          created_at?: string
+          external_id?: string | null
+          id?: string
+          payment_method?: string | null
+          status?: Database["public"]["Enums"]["deposit_status"]
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -330,6 +451,39 @@ export type Database = {
         }
         Relationships: []
       }
+      manager_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          level1_percent: number
+          level2_percent: number
+          level3_percent: number
+          total_budget_percent: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          level1_percent?: number
+          level2_percent?: number
+          level3_percent?: number
+          total_budget_percent?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          level1_percent?: number
+          level2_percent?: number
+          level3_percent?: number
+          total_budget_percent?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           created_at: string
@@ -369,39 +523,51 @@ export type Database = {
       profiles: {
         Row: {
           affiliate_balance: number
+          affiliate_code: string | null
           avatar_url: string | null
           coins: number
           created_at: string
           display_name: string | null
           id: string
+          is_demo: boolean
+          is_influencer: boolean
           level: number
           manager_id: string | null
+          referred_by_id: string | null
           status: string
           total_received: number
           updated_at: string
         }
         Insert: {
           affiliate_balance?: number
+          affiliate_code?: string | null
           avatar_url?: string | null
           coins?: number
           created_at?: string
           display_name?: string | null
           id: string
+          is_demo?: boolean
+          is_influencer?: boolean
           level?: number
           manager_id?: string | null
+          referred_by_id?: string | null
           status?: string
           total_received?: number
           updated_at?: string
         }
         Update: {
           affiliate_balance?: number
+          affiliate_code?: string | null
           avatar_url?: string | null
           coins?: number
           created_at?: string
           display_name?: string | null
           id?: string
+          is_demo?: boolean
+          is_influencer?: boolean
           level?: number
           manager_id?: string | null
+          referred_by_id?: string | null
           status?: string
           total_received?: number
           updated_at?: string
@@ -415,6 +581,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      referral_logs: {
+        Row: {
+          created_at: string
+          id: string
+          ip: string | null
+          referred_id: string | null
+          referrer_id: string | null
+          source_code: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip?: string | null
+          referred_id?: string | null
+          referrer_id?: string | null
+          source_code?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip?: string | null
+          referred_id?: string | null
+          referrer_id?: string | null
+          source_code?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          level: number
+          manager_id: string | null
+          referred_id: string
+          referrer_id: string
+          source_code: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          level: number
+          manager_id?: string | null
+          referred_id: string
+          referrer_id: string
+          source_code?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          level?: number
+          manager_id?: string | null
+          referred_id?: string
+          referrer_id?: string
+          source_code?: string | null
+        }
+        Relationships: []
       }
       report_exports: {
         Row: {
@@ -650,6 +876,7 @@ export type Database = {
       }
     }
     Functions: {
+      generate_affiliate_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -658,6 +885,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      process_deposit_commissions: {
+        Args: { _deposit_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "super_admin" | "admin" | "gerente" | "afiliado"
@@ -667,6 +898,13 @@ export type Database = {
         | "canceled"
         | "available"
         | "disputed"
+      deposit_status:
+        | "pending"
+        | "approved"
+        | "paid"
+        | "rejected"
+        | "canceled"
+        | "failed"
       risk_alert_status: "open" | "reviewing" | "resolved" | "ignored"
       risk_severity: "low" | "medium" | "high" | "critical"
       transaction_type:
@@ -821,6 +1059,14 @@ export const Constants = {
         "canceled",
         "available",
         "disputed",
+      ],
+      deposit_status: [
+        "pending",
+        "approved",
+        "paid",
+        "rejected",
+        "canceled",
+        "failed",
       ],
       risk_alert_status: ["open", "reviewing", "resolved", "ignored"],
       risk_severity: ["low", "medium", "high", "critical"],
