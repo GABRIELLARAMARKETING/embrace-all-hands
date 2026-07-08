@@ -129,7 +129,7 @@ export const listAllWithdrawals = createServerFn({ method: "GET" })
       )
       .order("created_at", { ascending: false })
       .limit(200);
-    if (data.status) query = query.eq("status", data.status);
+    if (data.status) query = query.eq("status", data.status as never);
 
     const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
