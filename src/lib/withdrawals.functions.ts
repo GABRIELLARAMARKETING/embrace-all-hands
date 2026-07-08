@@ -51,3 +51,25 @@ export const requestAffiliateWithdrawal = createServerFn({ method: "POST" })
       totalReceived: profile.total_received ?? 0,
     };
   });
+
+export type WithdrawalHistoryItem = {
+  id: string;
+  amount: number;
+  status: string;
+  pix_key: string | null;
+  created_at: string;
+};
+
+export const listAffiliateWithdrawals = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<WithdrawalHistoryItem[]> => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("affiliate_withdrawals")
+      .select("id, amount, status, pix_key, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });

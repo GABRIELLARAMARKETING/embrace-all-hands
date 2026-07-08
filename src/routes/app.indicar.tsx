@@ -11,12 +11,17 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { copyToClipboard } from "@/utils/clipboard";
 import { getReferralStats } from "@/lib/referral.functions";
-import { requestAffiliateWithdrawal } from "@/lib/withdrawals.functions";
+import { requestAffiliateWithdrawal, listAffiliateWithdrawals, type WithdrawalHistoryItem } from "@/lib/withdrawals.functions";
 import helixLogo from "@/assets/helix-multi-logo.png";
 
 const referralStatsQuery = queryOptions({
   queryKey: ["referral-stats"],
   queryFn: () => getReferralStats(),
+});
+
+const withdrawalsQuery = queryOptions({
+  queryKey: ["affiliate-withdrawals"],
+  queryFn: () => listAffiliateWithdrawals(),
 });
 
 export const Route = createFileRoute("/app/indicar")({
@@ -36,6 +41,7 @@ export const Route = createFileRoute("/app/indicar")({
 
 function IndicarPage() {
   const { data } = useSuspenseQuery(referralStatsQuery);
+  const { data: withdrawals = [] } = useSuspenseQuery(withdrawalsQuery);
   const setReferralStats = usePlayerStore((s) => s.setReferralStats);
   const queryClient = useQueryClient();
   const submitWithdrawal = useServerFn(requestAffiliateWithdrawal);
@@ -92,6 +98,7 @@ function IndicarPage() {
       setConfirmOpen(false);
       // Revalidate in the background to sync any server-side changes
       queryClient.invalidateQueries({ queryKey: ["referral-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["affiliate-withdrawals"] });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erro ao solicitar saque.";
       toast.error(message);
@@ -165,6 +172,10 @@ function IndicarPage() {
           );
         })}
       </div>
+
+      <WithdrawalHistory items={withdrawals} />
+
+
 
       <ConfirmWithdrawModal
         open={confirmOpen}
@@ -293,5 +304,58 @@ function Logo() {
         className="h-28 w-28 drop-shadow-[0_0_20px_rgba(168,85,247,0.55)]"
       />
     </div>
+  );
+}
+
+function statusMeta(status: string) {
+  const s = status.toLowerCase();
+  if (s === "approved" || s === "paid" || s === "completed")
+    return { label: "Aprovado", cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" };
+  if (s === "rejected" || s === "failed" || s === "canceled")
+    return { label: "Recusado", cls: "bg-red-500/15 text-red-300 border-red-500/30" };
+  return { label: "Pendente", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" };
+}
+
+function WithdrawalHistory({ items }: { items: WithdrawalHistoryItem[] }) {
+  return (
+    <PlayerCard className="mt-4 p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-sm font-bold text-white">Histórico de saques</div>
+        <div className="text-[10px] font-bold tracking-widest text-white/50">
+          {items.length} {items.length === 1 ? "registro" : "registros"}
+        </div>
+      </div>
+      {items.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-white/10 py-6 text-center text-xs text-white/50">
+          Você ainda não solicitou nenhum saque.
+        </div>
+      ) : (
+        <ul className="divide-y divide-white/5">
+          {items.map((w) => {
+            const meta = statusMeta(w.status);
+            const date = new Date(w.created_at).toLocaleString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            return (
+              <li key={w.id} className="flex items-center justify-between py-3">
+                <div>
+                  <div className="text-sm font-bold text-white">{formatCurrency(w.amount)}</div>
+                  <div className="text-[11px] text-white/50">{date}</div>
+                </div>
+                <span
+                  className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${meta.cls}`}
+                >
+                  {meta.label}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </PlayerCard>
   );
 }
