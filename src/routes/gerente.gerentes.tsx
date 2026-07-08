@@ -48,16 +48,25 @@ function GerentesAdminPage() {
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [viewing, setViewing] = useState<ManagerRow | null>(null);
 
-  const { data, isLoading, isFetching, error, refetch } = useQuery({
+  const query = useQuery({
     queryKey: ["admin-managers"],
     queryFn: () => listFn(),
     staleTime: 15_000,
   });
 
   const rows = useMemo(() => {
-    const all = data ?? [];
+    const all = query.data ?? [];
     return filter === "all" ? all : all.filter((r) => r.status === filter);
-  }, [data, filter]);
+  }, [query.data, filter]);
+
+  const counts = useMemo(() => {
+    const all = query.data ?? [];
+    return {
+      active: all.filter((r) => r.status === "active").length,
+      inactive: all.filter((r) => r.status === "inactive").length,
+      blocked: all.filter((r) => r.status === "blocked").length,
+    };
+  }, [query.data]);
 
   const statusMut = useMutation({
     mutationFn: (input: { managerId: string; status: ManagerRow["status"] }) =>
@@ -76,159 +85,185 @@ function GerentesAdminPage() {
       toast.error(err instanceof Error ? err.message : "Não foi possível atualizar."),
   });
 
+  const filters: { key: StatusFilter; label: string }[] = [
+    { key: "all", label: "Todos" },
+    { key: "active", label: "Ativos" },
+    { key: "inactive", label: "Inativos" },
+    { key: "blocked", label: "Bloqueados" },
+  ];
+
   return (
-    <div className="flex flex-col gap-6">
+    <>
       <TopHeader
         title="Gerentes"
-        subtitle="Gerencie contas de gerentes: bloquear, ativar/desativar e ver afiliados vinculados."
+        subtitle="Bloqueie, ative/desative e veja os afiliados vinculados a cada gerente."
+        context={`${counts.active} ativo(s) · ${counts.inactive} inativo(s) · ${counts.blocked} bloqueado(s)`}
       />
-
-      <AdminCard
-        title="Filtros"
-        right={
-          <AdminButton
-            variant="ghost"
-            onClick={() => refetch()}
-            disabled={isFetching}
-          >
-            <RefreshCw size={14} className={isFetching ? "animate-spin" : ""} />
-            Atualizar
-          </AdminButton>
-        }
-      >
-        <div className="flex flex-wrap gap-2">
-          {(["all", "active", "inactive", "blocked"] as StatusFilter[]).map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setFilter(s)}
-              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                filter === s
-                  ? "border-[color:var(--admin-neon)] bg-[color:var(--admin-green)]/15 text-[color:var(--admin-neon)]"
-                  : "border-[color:var(--admin-line)] text-[color:var(--admin-text-2)] hover:text-white"
-              }`}
+      <div className="space-y-4 p-4 sm:p-5">
+        <AdminCard>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap gap-2">
+              {filters.map((f) => (
+                <button
+                  key={f.key}
+                  type="button"
+                  onClick={() => setFilter(f.key)}
+                  className={
+                    "rounded-full border px-3 py-1 text-xs font-semibold transition " +
+                    (filter === f.key
+                      ? "border-[color:var(--admin-green)]/40 bg-[color:var(--admin-green)]/15 text-[color:var(--admin-neon)]"
+                      : "border-[color:var(--admin-border)] bg-transparent text-[color:var(--admin-text-2)] hover:bg-white/[0.03]")
+                  }
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+            <AdminButton
+              variant="ghost"
+              onClick={() => query.refetch()}
+              disabled={query.isFetching}
             >
-              {s === "all" ? "Todos" : statusMeta[s as ManagerRow["status"]].label}
-            </button>
-          ))}
-        </div>
-      </AdminCard>
+              <RefreshCw size={14} className={query.isFetching ? "animate-spin" : ""} />
+              Atualizar
+            </AdminButton>
+          </div>
+        </AdminCard>
 
-      <AdminCard title={`Gerentes (${rows.length})`}>
-        {error ? (
-          <EmptyState
-            title="Erro ao carregar"
-            description={error instanceof Error ? error.message : "Tente novamente."}
-          />
-        ) : isLoading ? (
-          <p className="py-8 text-center text-sm text-[color:var(--admin-text-3)]">
-            Carregando…
-          </p>
-        ) : !rows.length ? (
-          <EmptyState
-            title="Nenhum gerente"
-            description="Nenhum gerente encontrado para o filtro atual."
-          />
-        ) : (
-          <AdminTable>
-            <thead>
-              <tr>
-                <th>Gerente</th>
-                <th>E-mail</th>
-                <th>Status</th>
-                <th className="text-right">Afiliados</th>
-                <th className="text-right">Total recebido</th>
-                <th>Criado em</th>
-                <th className="text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((m) => {
-                const meta = statusMeta[m.status];
-                const busy = statusMut.isPending && statusMut.variables?.managerId === m.id;
-                return (
-                  <tr key={m.id}>
-                    <td className="font-medium text-white">
-                      {m.display_name ?? "—"}
-                    </td>
-                    <td className="text-[color:var(--admin-text-2)]">
-                      {m.email ?? "—"}
-                    </td>
-                    <td>
-                      <Badge tone={meta.tone}>{meta.label}</Badge>
-                    </td>
-                    <td className="text-right tabular-nums">{m.affiliate_count}</td>
-                    <td className="text-right tabular-nums">
-                      {formatCurrency(m.total_received)}
-                    </td>
-                    <td className="text-[color:var(--admin-text-3)]">
-                      {formatDate(m.created_at)}
-                    </td>
-                    <td>
-                      <div className="flex justify-end gap-2">
+        <AdminCard padding="sm">
+          <AdminTable<ManagerRow>
+            rows={rows}
+            getRowKey={(r) => r.id}
+            emptyState={<EmptyState message="Nenhum gerente encontrado para este filtro." />}
+            columns={[
+              {
+                key: "manager",
+                header: "Gerente",
+                render: (r) => (
+                  <div className="min-w-0">
+                    <p className="truncate text-sm text-white">
+                      {r.display_name ?? "—"}
+                    </p>
+                    <p className="truncate text-[11px] text-[color:var(--admin-text-3)]">
+                      {r.email ?? r.id.slice(0, 8)}
+                    </p>
+                  </div>
+                ),
+              },
+              {
+                key: "status",
+                header: "Status",
+                render: (r) => {
+                  const m = statusMeta[r.status];
+                  return <Badge tone={m.tone}>{m.label}</Badge>;
+                },
+              },
+              {
+                key: "affiliates",
+                header: "Afiliados",
+                render: (r) => (
+                  <span className="tabular-nums text-white">{r.affiliate_count}</span>
+                ),
+              },
+              {
+                key: "total",
+                header: "Total recebido",
+                render: (r) => (
+                  <span className="tabular-nums text-white">
+                    {formatCurrency(r.total_received / 100)}
+                  </span>
+                ),
+              },
+              {
+                key: "created",
+                header: "Criado em",
+                render: (r) => (
+                  <span className="text-xs text-[color:var(--admin-text-2)]">
+                    {formatDate(r.created_at)}
+                  </span>
+                ),
+              },
+              {
+                key: "actions",
+                header: "Ações",
+                render: (r) => {
+                  const busy =
+                    statusMut.isPending && statusMut.variables?.managerId === r.id;
+                  return (
+                    <div className="flex flex-wrap gap-1.5">
+                      <AdminButton
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setViewing(r)}
+                      >
+                        <Users size={12} />
+                        Afiliados
+                      </AdminButton>
+                      {r.status !== "active" && (
                         <AdminButton
-                          variant="ghost"
-                          onClick={() => setViewing(m)}
-                          title="Ver afiliados vinculados"
+                          size="sm"
+                          onClick={() =>
+                            statusMut.mutate({ managerId: r.id, status: "active" })
+                          }
+                          loading={busy && statusMut.variables?.status === "active"}
                         >
-                          <Users size={14} /> Afiliados
+                          <CheckCircle2 size={12} />
+                          Ativar
                         </AdminButton>
-                        {m.status !== "active" && (
-                          <AdminButton
-                            variant="ghost"
-                            disabled={busy}
-                            onClick={() =>
-                              statusMut.mutate({ managerId: m.id, status: "active" })
+                      )}
+                      {r.status === "active" && (
+                        <AdminButton
+                          size="sm"
+                          variant="ghost"
+                          onClick={() =>
+                            statusMut.mutate({ managerId: r.id, status: "inactive" })
+                          }
+                          loading={busy && statusMut.variables?.status === "inactive"}
+                        >
+                          <PauseCircle size={12} />
+                          Desativar
+                        </AdminButton>
+                      )}
+                      {r.status !== "blocked" && (
+                        <AdminButton
+                          size="sm"
+                          variant="danger"
+                          onClick={() => {
+                            if (
+                              confirm(
+                                `Bloquear ${r.display_name ?? "gerente"}? A ação será registrada em auditoria.`,
+                              )
+                            ) {
+                              statusMut.mutate({ managerId: r.id, status: "blocked" });
                             }
-                            title="Ativar"
-                          >
-                            <CheckCircle2 size={14} /> Ativar
-                          </AdminButton>
-                        )}
-                        {m.status !== "inactive" && m.status !== "blocked" && (
-                          <AdminButton
-                            variant="ghost"
-                            disabled={busy}
-                            onClick={() =>
-                              statusMut.mutate({ managerId: m.id, status: "inactive" })
-                            }
-                            title="Desativar"
-                          >
-                            <PauseCircle size={14} /> Desativar
-                          </AdminButton>
-                        )}
-                        {m.status !== "blocked" && (
-                          <AdminButton
-                            variant="danger"
-                            disabled={busy}
-                            onClick={() => {
-                              if (
-                                confirm(
-                                  `Bloquear ${m.display_name ?? "gerente"}? Esta ação será registrada em auditoria.`,
-                                )
-                              ) {
-                                statusMut.mutate({ managerId: m.id, status: "blocked" });
-                              }
-                            }}
-                            title="Bloquear"
-                          >
-                            <Ban size={14} /> Bloquear
-                          </AdminButton>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </AdminTable>
+                          }}
+                          loading={busy && statusMut.variables?.status === "blocked"}
+                        >
+                          <Ban size={12} />
+                          Bloquear
+                        </AdminButton>
+                      )}
+                    </div>
+                  );
+                },
+              },
+            ]}
+          />
+        </AdminCard>
+
+        {query.isError && (
+          <AdminCard className="border-[color:var(--admin-red)]/40 bg-[color:var(--admin-red)]/8">
+            <p className="text-sm text-[color:var(--admin-red)]">
+              Erro ao carregar gerentes: {(query.error as Error).message}
+            </p>
+          </AdminCard>
         )}
-      </AdminCard>
+      </div>
 
       {viewing && (
         <AffiliatesDialog manager={viewing} onClose={() => setViewing(null)} />
       )}
-    </div>
+    </>
   );
 }
 
@@ -240,13 +275,13 @@ function AffiliatesDialog({
   onClose: () => void;
 }) {
   const listFn = useServerFn(listAffiliatesForManager);
-  const { data, isLoading, error } = useQuery({
+  const q = useQuery({
     queryKey: ["admin-manager-affiliates", manager.id],
     queryFn: () => listFn({ data: { managerId: manager.id } }),
     staleTime: 15_000,
   });
 
-  const rows: AffiliateRow[] = data ?? [];
+  const rows: AffiliateRow[] = q.data ?? [];
 
   return (
     <div
@@ -256,7 +291,7 @@ function AffiliatesDialog({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-3xl rounded-[14px] border border-[color:var(--admin-line)] bg-[color:var(--admin-panel)] p-6"
+        className="relative w-full max-w-3xl rounded-[14px] border border-[color:var(--admin-border)] bg-[color:var(--admin-card)] p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -269,65 +304,71 @@ function AffiliatesDialog({
         </button>
 
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-white">
-            Afiliados vinculados
-          </h3>
+          <h3 className="text-lg font-semibold text-white">Afiliados vinculados</h3>
           <p className="text-sm text-[color:var(--admin-text-2)]">
             {manager.display_name ?? "Gerente"} · {manager.email ?? "sem e-mail"}
           </p>
         </div>
 
-        {error ? (
+        {q.isError ? (
           <EmptyState
-            title="Erro ao carregar"
-            description={error instanceof Error ? error.message : "Tente novamente."}
+            message={q.error instanceof Error ? q.error.message : "Erro ao carregar."}
           />
-        ) : isLoading ? (
+        ) : q.isLoading ? (
           <p className="py-8 text-center text-sm text-[color:var(--admin-text-3)]">
             Carregando…
           </p>
-        ) : !rows.length ? (
-          <EmptyState
-            title="Nenhum afiliado"
-            description="Este gerente ainda não possui afiliados vinculados."
-          />
         ) : (
           <div className="max-h-[60vh] overflow-auto">
-            <AdminTable>
-              <thead>
-                <tr>
-                  <th>Afiliado</th>
-                  <th>E-mail</th>
-                  <th>Status</th>
-                  <th className="text-right">Saldo</th>
-                  <th className="text-right">Total recebido</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((a) => {
-                  const meta = statusMeta[a.status];
-                  return (
-                    <tr key={a.id}>
-                      <td className="font-medium text-white">
+            <AdminTable<AffiliateRow>
+              rows={rows}
+              getRowKey={(r) => r.id}
+              emptyState={
+                <EmptyState message="Este gerente ainda não possui afiliados vinculados." />
+              }
+              columns={[
+                {
+                  key: "aff",
+                  header: "Afiliado",
+                  render: (a) => (
+                    <div className="min-w-0">
+                      <p className="truncate text-sm text-white">
                         {a.display_name ?? "—"}
-                      </td>
-                      <td className="text-[color:var(--admin-text-2)]">
-                        {a.email ?? "—"}
-                      </td>
-                      <td>
-                        <Badge tone={meta.tone}>{meta.label}</Badge>
-                      </td>
-                      <td className="text-right tabular-nums">
-                        {formatCurrency(a.affiliate_balance)}
-                      </td>
-                      <td className="text-right tabular-nums">
-                        {formatCurrency(a.total_received)}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </AdminTable>
+                      </p>
+                      <p className="truncate text-[11px] text-[color:var(--admin-text-3)]">
+                        {a.email ?? a.id.slice(0, 8)}
+                      </p>
+                    </div>
+                  ),
+                },
+                {
+                  key: "status",
+                  header: "Status",
+                  render: (a) => {
+                    const m = statusMeta[a.status];
+                    return <Badge tone={m.tone}>{m.label}</Badge>;
+                  },
+                },
+                {
+                  key: "balance",
+                  header: "Saldo",
+                  render: (a) => (
+                    <span className="tabular-nums text-white">
+                      {formatCurrency(a.affiliate_balance / 100)}
+                    </span>
+                  ),
+                },
+                {
+                  key: "total",
+                  header: "Total recebido",
+                  render: (a) => (
+                    <span className="tabular-nums text-white">
+                      {formatCurrency(a.total_received / 100)}
+                    </span>
+                  ),
+                },
+              ]}
+            />
           </div>
         )}
       </div>
