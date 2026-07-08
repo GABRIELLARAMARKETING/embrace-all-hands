@@ -47,6 +47,12 @@ function Page() {
   const reject = useServerFn(rejectWithdrawal);
   const pay = useServerFn(markWithdrawalPaid);
 
+  useAdminRealtime({
+    table: "affiliate_withdrawals",
+    invalidateKeys: [["admin", "withdrawals"], ["admin", "dashboard-summary"]],
+    toastOnInsert: () => "Novo saque solicitado",
+  });
+
   const { data = [], isFetching } = useQuery({
     ...withdrawalsQuery(filter),
     queryFn: () => fetchList({ data: filter ? { status: filter } : {} }),
