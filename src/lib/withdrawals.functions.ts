@@ -78,27 +78,19 @@ export const listAffiliateWithdrawals = createServerFn({ method: "GET" })
  * ADMIN — precisa de papel admin/super_admin
  * ============================================================ */
 
-async function ensureAdmin(context: { supabase: ReturnType<typeof requireAdminType>; userId: string }): Promise<void> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function ensureAdmin(context: any): Promise<void> {
   const { data, error } = await context.supabase
     .from("user_roles")
     .select("role")
     .eq("user_id", context.userId);
   if (error) throw new Error(error.message);
-  const roles = new Set((data ?? []).map((r) => r.role));
+  const roles = new Set((data ?? []).map((r: { role: string }) => r.role));
   if (!roles.has("admin") && !roles.has("super_admin")) {
     throw new Error("Sem permissão.");
   }
 }
-// helper type import kept minimal
-type SupabaseCtx = Parameters<Parameters<typeof requireSupabaseAuth.server>[0]>[0] extends { context: infer C }
-  ? C extends { supabase: infer S }
-    ? S
-    : never
-  : never;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function requireAdminType() {
-  return null as unknown as SupabaseCtx;
-}
+
 
 export type AdminWithdrawalRow = {
   id: string;
