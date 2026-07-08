@@ -335,6 +335,7 @@ export const listAuditLogs = createServerFn({ method: "GET" })
 export type PlatformSettingRow = {
   id: string;
   key: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
   type: string;
   description: string | null;
