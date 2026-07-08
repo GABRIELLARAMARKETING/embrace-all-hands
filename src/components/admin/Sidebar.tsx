@@ -24,6 +24,7 @@ interface NavItem {
 const items: NavItem[] = [
   { to: "/gerente/painel", label: "Painel", icon: <Home size={18} /> },
   { to: "/gerente/saques", label: "Saques (admin)", icon: <ShieldCheck size={18} /> },
+  { to: "/gerente/gerentes", label: "Gerentes", icon: <Users size={18} /> },
   { to: "/gerente/criar-demo", label: "Criar Demo", icon: <Sparkles size={18} /> },
   { to: "/gerente/indicar", label: "Indicar", icon: <UserPlus size={18} /> },
   { to: "/gerente/indicados", label: "Indicados", icon: <Users size={18} /> },

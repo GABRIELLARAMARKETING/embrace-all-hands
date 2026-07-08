@@ -23,6 +23,7 @@ import { Route as GerenteMeusSaquesRouteImport } from './routes/gerente.meus-saq
 import { Route as GerenteLoginRouteImport } from './routes/gerente.login'
 import { Route as GerenteIndicarRouteImport } from './routes/gerente.indicar'
 import { Route as GerenteIndicadosRouteImport } from './routes/gerente.indicados'
+import { Route as GerenteGerentesRouteImport } from './routes/gerente.gerentes'
 import { Route as GerenteCriarDemoRouteImport } from './routes/gerente.criar-demo'
 import { Route as GerenteAjustesIndicadosRouteImport } from './routes/gerente.ajustes-indicados'
 import { Route as AppSacarRouteImport } from './routes/app.sacar'
@@ -101,6 +102,11 @@ const GerenteIndicadosRoute = GerenteIndicadosRouteImport.update({
   path: '/indicados',
   getParentRoute: () => GerenteRoute,
 } as any)
+const GerenteGerentesRoute = GerenteGerentesRouteImport.update({
+  id: '/gerentes',
+  path: '/gerentes',
+  getParentRoute: () => GerenteRoute,
+} as any)
 const GerenteCriarDemoRoute = GerenteCriarDemoRouteImport.update({
   id: '/criar-demo',
   path: '/criar-demo',
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/app/sacar': typeof AppSacarRoute
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
   '/gerente/criar-demo': typeof GerenteCriarDemoRoute
+  '/gerente/gerentes': typeof GerenteGerentesRoute
   '/gerente/indicados': typeof GerenteIndicadosRoute
   '/gerente/indicar': typeof GerenteIndicarRoute
   '/gerente/login': typeof GerenteLoginRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByTo {
   '/app/sacar': typeof AppSacarRoute
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
   '/gerente/criar-demo': typeof GerenteCriarDemoRoute
+  '/gerente/gerentes': typeof GerenteGerentesRoute
   '/gerente/indicados': typeof GerenteIndicadosRoute
   '/gerente/indicar': typeof GerenteIndicarRoute
   '/gerente/login': typeof GerenteLoginRoute
@@ -197,6 +205,7 @@ export interface FileRoutesById {
   '/app/sacar': typeof AppSacarRoute
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
   '/gerente/criar-demo': typeof GerenteCriarDemoRoute
+  '/gerente/gerentes': typeof GerenteGerentesRoute
   '/gerente/indicados': typeof GerenteIndicadosRoute
   '/gerente/indicar': typeof GerenteIndicarRoute
   '/gerente/login': typeof GerenteLoginRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/app/sacar'
     | '/gerente/ajustes-indicados'
     | '/gerente/criar-demo'
+    | '/gerente/gerentes'
     | '/gerente/indicados'
     | '/gerente/indicar'
     | '/gerente/login'
@@ -244,6 +254,7 @@ export interface FileRouteTypes {
     | '/app/sacar'
     | '/gerente/ajustes-indicados'
     | '/gerente/criar-demo'
+    | '/gerente/gerentes'
     | '/gerente/indicados'
     | '/gerente/indicar'
     | '/gerente/login'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/app/sacar'
     | '/gerente/ajustes-indicados'
     | '/gerente/criar-demo'
+    | '/gerente/gerentes'
     | '/gerente/indicados'
     | '/gerente/indicar'
     | '/gerente/login'
@@ -386,6 +398,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GerenteIndicadosRouteImport
       parentRoute: typeof GerenteRoute
     }
+    '/gerente/gerentes': {
+      id: '/gerente/gerentes'
+      path: '/gerentes'
+      fullPath: '/gerente/gerentes'
+      preLoaderRoute: typeof GerenteGerentesRouteImport
+      parentRoute: typeof GerenteRoute
+    }
     '/gerente/criar-demo': {
       id: '/gerente/criar-demo'
       path: '/criar-demo'
@@ -461,6 +480,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 interface GerenteRouteChildren {
   GerenteAjustesIndicadosRoute: typeof GerenteAjustesIndicadosRoute
   GerenteCriarDemoRoute: typeof GerenteCriarDemoRoute
+  GerenteGerentesRoute: typeof GerenteGerentesRoute
   GerenteIndicadosRoute: typeof GerenteIndicadosRoute
   GerenteIndicarRoute: typeof GerenteIndicarRoute
   GerenteLoginRoute: typeof GerenteLoginRoute
@@ -473,6 +493,7 @@ interface GerenteRouteChildren {
 const GerenteRouteChildren: GerenteRouteChildren = {
   GerenteAjustesIndicadosRoute: GerenteAjustesIndicadosRoute,
   GerenteCriarDemoRoute: GerenteCriarDemoRoute,
+  GerenteGerentesRoute: GerenteGerentesRoute,
   GerenteIndicadosRoute: GerenteIndicadosRoute,
   GerenteIndicarRoute: GerenteIndicarRoute,
   GerenteLoginRoute: GerenteLoginRoute,
