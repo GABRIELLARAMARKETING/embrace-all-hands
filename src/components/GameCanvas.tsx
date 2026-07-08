@@ -136,6 +136,8 @@ function GameLogic({
     velocity.current = 0;
     lastBounceRing.current = -1;
     collisionCooldownUntil.current = 0;
+    dangerHitFrames.current = 0;
+
     passedSincelastBounce.current = 0;
     feverUntil.current = 0;
     setCollectedCoins(new Set());
