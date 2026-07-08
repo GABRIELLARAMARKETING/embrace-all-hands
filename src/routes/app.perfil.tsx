@@ -18,6 +18,11 @@ const myProfileQuery = queryOptions({
   queryFn: () => getMyProfile(),
 });
 
+const withdrawalsQuery = queryOptions({
+  queryKey: ["affiliate-withdrawals"],
+  queryFn: () => listAffiliateWithdrawals(),
+});
+
 export const Route = createFileRoute("/app/perfil")({
   ssr: false,
   head: () => ({
