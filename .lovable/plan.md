@@ -1,64 +1,54 @@
-# Plano: Painel "Gerente Helix"
+# Plano: App do jogador (rotas `/app/*`)
 
-Vou construir um painel administrativo completo, dark, com verde neon, integrado ao projeto atual (TanStack Start + Tailwind v4), sem afetar o jogo existente na rota `/`.
+Vou criar as 5 telas internas mobile-first inspiradas nas capturas, sem tocar no jogo (`/game`) nem no painel gerente (`/admin/*`). É protótipo visual: dados mockados, sem pagamento/saque real.
 
-## Stack e adaptações
-- **Router**: TanStack Router (já no projeto) em vez de React Router — mesma capacidade, é o padrão da stack.
-- **Estado**: Zustand (já usado no jogo).
-- **Forms**: React Hook Form + Zod.
-- **Ícones**: lucide-react. **Animações**: framer-motion. Ambos já instalados.
-- **Persistência**: localStorage via camada de `services/` preparada para backend real.
+## Stack (mantendo o que já existe)
+- TanStack Router (é o padrão do projeto — equivalente a react-router-dom pedido).
+- Tailwind v4 já configurado, shadcn/ui, framer-motion, lucide-react, zustand, react-hook-form + zod, sonner (toast) — todos já instalados.
 
-## Rotas (arquivos em `src/routes/`)
+## Rotas (`src/routes/`)
 ```
-/login                        → login.tsx
-/admin                        → admin.tsx (layout com Sidebar + TopHeader + <Outlet/>)
-/admin/painel                 → admin.painel.tsx
-/admin/criar-demo             → admin.criar-demo.tsx
-/admin/indicar                → admin.indicar.tsx
-/admin/indicados              → admin.indicados.tsx
-/admin/meus-saques            → admin.meus-saques.tsx
-/admin/ajustes-indicados      → admin.ajustes-indicados.tsx
-/admin/notificacoes           → admin.notificacoes.tsx
+app.tsx              → layout com Header + <Outlet/> + BottomNav
+app.jogar.tsx        → Tela 1 (Jogar)
+app.depositar.tsx    → Tela 2 (Depositar via PIX)
+app.sacar.tsx        → Tela 3 (Solicitar Saque)
+app.indicar.tsx      → Telas 4+5 (Indicar + rede N1/N2/N3/Total)
+app.perfil.tsx       → Tela Perfil
 ```
-O jogo continua em `/`. Nenhuma rota do jogo é alterada.
+`/app` redireciona para `/app/jogar`. O jogo continua em `/game`, painel em `/admin/*`.
 
 ## Design tokens
-Adiciono em `src/styles.css` uma classe raiz `.admin-theme` com as cores solicitadas (#07080C, #111217, #161720, #1B1C26, #272936, #22C55E, #00E676, #3B82F6, etc.) mapeadas para variáveis (`--admin-bg`, `--admin-sidebar`, `--admin-card`, `--admin-neon`, …) e utilitários Tailwind arbitrários. Assim o jogo mantém seu próprio tema.
+Adiciono em `src/styles.css` uma classe `.player-theme` no layout com variáveis:
+`--player-bg` (#0B0416 → #1A0730 gradient), `--player-card` (#28133F/70), `--player-card-alt` (#111633),
+`--player-neon-purple` (#A855F7), `--player-neon-pink` (#EC5FA3), `--player-green` (#00D084),
+`--player-yellow` (#FFD600). Cards com backdrop-blur e borda `border-white/5`. Botões degradê `from-[#A855F7] to-[#EC5FA3]`. Isolado do jogo e do admin.
 
-## Componentes (`src/components/admin/`)
-`Sidebar`, `TopHeader`, `AdminLayout`, `StatCard`, `SectionTitle`, `AdminCard`, `AdminButton`, `AdminInput`, `AdminTable`, `EmptyState`, `ToggleSwitch`, `FloatingChatButton`, `CopyButton`, `Badge`, `MoneyValue`.
+## Componentes (`src/components/player/`)
+`AppLayout`, `AppHeader`, `BottomNav`, `BalanceCard`, `GradientButton`, `ValueChip`, `PlayMapCarousel`, `DepositForm`, `WithdrawForm`, `ReferralCard`, `ReferralStatsGrid`, `PixQrModal`, `WithdrawSuccessModal`, `SectionLabel`, `MapThumb` (placeholder puro CSS/gradiente por mapa).
 
-## Store e services
-- `src/store/useAdminStore.ts` — métricas, indicados, comissões, saques, contas demo, notificações, modo influencer. Persistência em localStorage.
-- `src/services/adminApi.ts` (+ `demoAccountsService`, `referralService`, `withdrawalService`, `notificationService`) com todas as funções listadas, async com delay curto, prontas para trocar por `fetch`.
-- `src/data/mockAdminData.ts` — estado inicial exatamente como pedido (métricas zeradas, `totalReferrals: 1`, link `?ref=YCWM29`, etc.).
-- `src/utils/`: `formatCurrency`, `formatDate`, `sanitize`, `validators`, `clipboard`.
+## Estado e dados
+- `src/data/playerMockData.ts` — todos os valores pedidos (userName, onlineUsers, balance 2390, referralCode DMDU4E20, playOptions, depositOptions, mapOptions).
+- `src/store/usePlayerStore.ts` (zustand) — `balance`, `affiliateBalance`, `selectedMap`, `selectedPlayValue`, ações `setBalance`, `selectMap`, etc. Persistência em localStorage.
+- `src/utils/formatCurrency.ts` já existe (reuso). Adiciono `src/utils/cpfMask.ts`.
+- `src/utils/playerValidators.ts` — schemas Zod:
+  - depósito: valor ≥ 20
+  - saque: valor ≥ 20 e ≤ saldo, pixKey obrigatório, cpf 11 dígitos
+  - jogar: valor > 0
 
-## Páginas — funcionalidades
-- **Painel**: 6 `StatCard`s no grid solicitado.
-- **Criar Demo**: form validado (Zod: qtd 1–100, saldo ≥ 0), gera `demo 1..N`, senha `nome@N`, toast de sucesso.
-- **Indicar**: link + botão Copiar (com feedback "Copiado!"), 2 mini-cards, toggle Influencer persistido.
-- **Indicados**: 4 cards de comissão + 3 blocos (N1/N2/N3) cada com busca, badge, tabela e empty state, botão Atualizar.
-- **Meus Saques**: 2 cards (saldo + form PIX), validação (valor > 0 e ≤ saldo), histórico em tabela.
-- **Ajustes Indicados**: banner orçamento 70%, 3 cards N1/N2/N3, cálculo "Usando: X%" em tempo real, bloqueio > 70%, botões Salvar/Restaurar.
-- **Notificações**: card informativo azul, webhook (Salvar/Testar/Remover) com validação de URL, 3 toggles de eventos (ligados por padrão).
-- **Login**: tela simples preparada para autenticação (sem backend agora; salva flag em localStorage).
+## Telas — resumo funcional
+- **Jogar**: card topo com avatar gradiente rosa/roxo, "MultiHelixBr / Escolha seu mapa e jogue", badge "● 311 online". Chips de valor (seleção única), input personalizado, card "RECOMPENSA MÍNIMA" (valor × 0 até definir cálculo — mostra R$ 0,00 inicialmente e atualiza p/ ex. `valor × 0` → uso `valor * 0.5` como preview, texto amarelo grande). Carrossel horizontal `overflow-x-auto snap-x` com thumbs (gradientes distintos por mapa), item selecionado com borda roxa neon e `scale-105`. Botão "▶ JOGAR — R$ X,XX" desabilitado sem valor; ao clicar navega para `/game`.
+- **Depositar**: saldo grande em verde, chips com selos (MÍNIMO/+CHANCES/POPULAR/BÔNUS +100%), input R$, linha "Tenho um cupom" (expande input simples), botão "Gerar QR Code PIX" → modal com QR placeholder (SVG pattern), botão "Copiar código PIX" (copia string mock, toast).
+- **Sacar**: saldo, 3 inputs (valor, PIX, CPF com máscara), aviso "⏱ Saques processados em até 24h úteis." em card com borda âmbar translúcida, botão "Solicitar Saque" → modal sucesso.
+- **Indicar**: card informativo (50% comissão), card gradiente com 2 colunas (saldo afiliado + total recebido) e botão "↑ Sacar Comissão", card "Seu link exclusivo" com URL + "Copiar" (toast), grid 2×2 N1/N2/N3/TOTAL.
+- **Perfil**: avatar (letra do nome em círculo gradiente), nome, email mock, 3 stat cards (saldo/partidas/afiliado), card link divulgação, botões "Meus dados", "Histórico", "Segurança", "Sair" (limpa flag e volta p/ `/`).
 
-## Layout
-- Sidebar fixa 280px desktop, colapsável no mobile via botão hambúrguer no `TopHeader`.
-- Logo "Gerente" (branco) + "Helix" (verde) no topo.
-- Item ativo: fundo verde translúcido + barra vertical verde à esquerda.
-- Item "Sair" fixado no rodapé da sidebar.
-- `TopHeader` com título/subtítulo, linha inferior, indicador online verde.
-- `FloatingChatButton` azul, canto inferior direito, presente em todas as rotas `/admin/*`.
-- Responsivo: cards 3→2→1 col, tabelas com `overflow-x-auto`.
+## Bottom nav
+Fixa (`fixed bottom-0`, `pb-[env(safe-area-inset-bottom)]`), 5 itens. Item central "Jogar" é um círculo maior elevado (`-translate-y-4`), gradiente roxo→rosa, com anel de brilho (`shadow-[0_0_30px_rgba(168,85,247,0.6)]`). Ativa detectada via `useRouterState`. Espaçamento inferior no `AppLayout` (`pb-28`) para conteúdo não sumir.
 
 ## Segurança
-- Sanitização (`sanitize.ts` — strip de `<`, `>`, controle de tamanho), validação Zod em todos os forms, sem `dangerouslySetInnerHTML`, sem `eval`, valores monetários validados, sem log de webhook, camada de service isolada da UI.
+Zod em todos os forms, `sanitize` já disponível, sem `dangerouslySetInnerHTML`, valores numéricos validados, sem chamadas externas.
 
-## Fora de escopo desta entrega
-- Autenticação real / backend (a estrutura fica pronta, `adminApi` centraliza chamadas).
-- Integração com o jogo (o painel é independente).
+## Fora do escopo
+Backend, pagamento real, saque real, autenticação. `/app/*` é público (protótipo).
 
-Depois de aprovado, implemento tudo em um único ciclo e valido o build.
+Depois de aprovado, entrego tudo em um único ciclo e valido o build.

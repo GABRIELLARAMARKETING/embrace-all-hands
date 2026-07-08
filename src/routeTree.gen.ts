@@ -12,8 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as GameRouteImport } from './routes/game'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppSacarRouteImport } from './routes/app.sacar'
+import { Route as AppPerfilRouteImport } from './routes/app.perfil'
+import { Route as AppJogarRouteImport } from './routes/app.jogar'
+import { Route as AppIndicarRouteImport } from './routes/app.indicar'
+import { Route as AppDepositarRouteImport } from './routes/app.depositar'
 import { Route as AdminPainelRouteImport } from './routes/admin.painel'
 import { Route as AdminNotificacoesRouteImport } from './routes/admin.notificacoes'
 import { Route as AdminMeusSaquesRouteImport } from './routes/admin.meus-saques'
@@ -38,6 +45,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -47,6 +59,36 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSacarRoute = AppSacarRouteImport.update({
+  id: '/sacar',
+  path: '/sacar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPerfilRoute = AppPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppJogarRoute = AppJogarRouteImport.update({
+  id: '/jogar',
+  path: '/jogar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppIndicarRoute = AppIndicarRouteImport.update({
+  id: '/indicar',
+  path: '/indicar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDepositarRoute = AppDepositarRouteImport.update({
+  id: '/depositar',
+  path: '/depositar',
+  getParentRoute: () => AppRoute,
 } as any)
 const AdminPainelRoute = AdminPainelRouteImport.update({
   id: '/painel',
@@ -92,6 +134,7 @@ const AdminAjustesIndicadosRoute = AdminAjustesIndicadosRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/game': typeof GameRoute
   '/login': typeof LoginRoute
@@ -103,6 +146,12 @@ export interface FileRoutesByFullPath {
   '/admin/meus-saques': typeof AdminMeusSaquesRoute
   '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/painel': typeof AdminPainelRoute
+  '/app/depositar': typeof AppDepositarRoute
+  '/app/indicar': typeof AppIndicarRoute
+  '/app/jogar': typeof AppJogarRoute
+  '/app/perfil': typeof AppPerfilRoute
+  '/app/sacar': typeof AppSacarRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -118,11 +167,18 @@ export interface FileRoutesByTo {
   '/admin/meus-saques': typeof AdminMeusSaquesRoute
   '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/painel': typeof AdminPainelRoute
+  '/app/depositar': typeof AppDepositarRoute
+  '/app/indicar': typeof AppIndicarRoute
+  '/app/jogar': typeof AppJogarRoute
+  '/app/perfil': typeof AppPerfilRoute
+  '/app/sacar': typeof AppSacarRoute
+  '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/game': typeof GameRoute
   '/login': typeof LoginRoute
@@ -134,12 +190,19 @@ export interface FileRoutesById {
   '/admin/meus-saques': typeof AdminMeusSaquesRoute
   '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/painel': typeof AdminPainelRoute
+  '/app/depositar': typeof AppDepositarRoute
+  '/app/indicar': typeof AppIndicarRoute
+  '/app/jogar': typeof AppJogarRoute
+  '/app/perfil': typeof AppPerfilRoute
+  '/app/sacar': typeof AppSacarRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/admin'
+    | '/app'
     | '/auth'
     | '/game'
     | '/login'
@@ -151,6 +214,12 @@ export interface FileRouteTypes {
     | '/admin/meus-saques'
     | '/admin/notificacoes'
     | '/admin/painel'
+    | '/app/depositar'
+    | '/app/indicar'
+    | '/app/jogar'
+    | '/app/perfil'
+    | '/app/sacar'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -166,10 +235,17 @@ export interface FileRouteTypes {
     | '/admin/meus-saques'
     | '/admin/notificacoes'
     | '/admin/painel'
+    | '/app/depositar'
+    | '/app/indicar'
+    | '/app/jogar'
+    | '/app/perfil'
+    | '/app/sacar'
+    | '/app'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/app'
     | '/auth'
     | '/game'
     | '/login'
@@ -181,11 +257,18 @@ export interface FileRouteTypes {
     | '/admin/meus-saques'
     | '/admin/notificacoes'
     | '/admin/painel'
+    | '/app/depositar'
+    | '/app/indicar'
+    | '/app/jogar'
+    | '/app/perfil'
+    | '/app/sacar'
+    | '/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
   GameRoute: typeof GameRoute
   LoginRoute: typeof LoginRoute
@@ -214,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -227,6 +317,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/sacar': {
+      id: '/app/sacar'
+      path: '/sacar'
+      fullPath: '/app/sacar'
+      preLoaderRoute: typeof AppSacarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/perfil': {
+      id: '/app/perfil'
+      path: '/perfil'
+      fullPath: '/app/perfil'
+      preLoaderRoute: typeof AppPerfilRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/jogar': {
+      id: '/app/jogar'
+      path: '/jogar'
+      fullPath: '/app/jogar'
+      preLoaderRoute: typeof AppJogarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/indicar': {
+      id: '/app/indicar'
+      path: '/indicar'
+      fullPath: '/app/indicar'
+      preLoaderRoute: typeof AppIndicarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/depositar': {
+      id: '/app/depositar'
+      path: '/depositar'
+      fullPath: '/app/depositar'
+      preLoaderRoute: typeof AppDepositarRouteImport
+      parentRoute: typeof AppRoute
     }
     '/admin/painel': {
       id: '/admin/painel'
@@ -311,9 +443,30 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface AppRouteChildren {
+  AppDepositarRoute: typeof AppDepositarRoute
+  AppIndicarRoute: typeof AppIndicarRoute
+  AppJogarRoute: typeof AppJogarRoute
+  AppPerfilRoute: typeof AppPerfilRoute
+  AppSacarRoute: typeof AppSacarRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppDepositarRoute: AppDepositarRoute,
+  AppIndicarRoute: AppIndicarRoute,
+  AppJogarRoute: AppJogarRoute,
+  AppPerfilRoute: AppPerfilRoute,
+  AppSacarRoute: AppSacarRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
   GameRoute: GameRoute,
   LoginRoute: LoginRoute,
@@ -321,13 +474,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
