@@ -55,20 +55,23 @@ export function MoneyProgressBar() {
       </div>
 
       {completed && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center px-6 pb-6 sm:pb-8">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center px-6 pb-8 sm:pb-10">
           <button
             type="button"
             onClick={() => {
               window.dispatchEvent(new CustomEvent("redeem-reward", { detail: { value: GOAL } }));
             }}
-            className="pointer-events-auto w-full max-w-sm rounded-full bg-gradient-to-b from-amber-300 to-yellow-500 px-6 py-4 text-base font-black tracking-tight text-amber-950 shadow-[0_10px_30px_rgba(0,0,0,0.35),inset_0_-3px_0_rgba(0,0,0,0.15)] ring-2 ring-amber-200/70 transition active:scale-[0.98]"
+            className="pointer-events-auto flex w-full max-w-sm items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#FFD24A] via-[#FFB627] to-[#F59E0B] px-8 py-4 text-[17px] font-extrabold uppercase tracking-tight text-white shadow-[0_12px_28px_-6px_rgba(245,158,11,0.55),inset_0_-4px_0_rgba(0,0,0,0.18),inset_0_2px_0_rgba(255,255,255,0.35)] transition active:translate-y-[1px] active:scale-[0.99]"
+            style={{ textShadow: "0 1px 0 rgba(0,0,0,0.18)" }}
           >
-            🏆 RESGATAR {formatCurrency(GOAL)}
+            <span className="text-xl leading-none">🏆</span>
+            <span>RESGATAR {formatCurrency(GOAL)}</span>
           </button>
-          <span className="mt-2 text-xs font-semibold text-amber-200/80 drop-shadow">
+          <span className="mt-3 text-[13px] font-semibold italic text-amber-300/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.25)]">
             Continue jogando para ganhar mais!
           </span>
         </div>
+
       )}
     </>
   );
