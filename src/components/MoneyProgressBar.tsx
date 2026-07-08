@@ -61,8 +61,8 @@ export function MoneyProgressBar() {
             onClick={() => {
               window.dispatchEvent(new CustomEvent("redeem-reward", { detail: { value: GOAL } }));
             }}
-            className="pointer-events-auto flex w-auto items-center justify-center gap-2.5 rounded-full bg-gradient-to-b from-[#FFD24A] via-[#FFB627] to-[#F59E0B] px-14 py-6 text-[19px] font-black tracking-tight text-white shadow-[0_16px_36px_-6px_rgba(245,158,11,0.65),inset_0_-5px_0_rgba(0,0,0,0.2),inset_0_2px_0_rgba(255,255,255,0.45)] transition active:translate-y-[1px] active:scale-[0.99]"
-            style={{ textShadow: "0 1px 0 rgba(0,0,0,0.2)" }}
+            className="pointer-events-auto flex w-auto items-center justify-center gap-2.5 rounded-full bg-gradient-to-b from-[#FFD24A] via-[#FFB627] to-[#F59E0B] px-14 py-6 text-[19px] font-black tracking-tight text-black shadow-[0_16px_36px_-6px_rgba(245,158,11,0.65),inset_0_-5px_0_rgba(0,0,0,0.2),inset_0_2px_0_rgba(255,255,255,0.45)] transition active:translate-y-[1px] active:scale-[0.99]"
+            style={{ textShadow: "0 1px 0 rgba(255,255,255,0.15)" }}
           >
             <span className="text-2xl leading-none">🏆</span>
             <span className="font-black">Resgatar R$20,00</span>
