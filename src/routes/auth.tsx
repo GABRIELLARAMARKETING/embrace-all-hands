@@ -59,7 +59,7 @@ function SignupPage() {
       if (error) throw error;
       setSuccess(true);
       toast.success("Conta criada!");
-      setTimeout(() => navigate({ to: "/game", replace: true }), 500);
+      setTimeout(() => navigate({ to: "/app/jogar", replace: true }), 500);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Falha ao criar conta";
       toast.error(msg);
@@ -222,7 +222,7 @@ function SignupPage() {
 
           <button
             type="button"
-            onClick={() => navigate({ to: "/game" })}
+            onClick={() => navigate({ to: "/app/jogar" })}
             className="mt-4 flex w-full items-center justify-center gap-1 text-sm text-violet-100/50 hover:text-violet-200"
           >
             <ChevronLeft size={16} /> Voltar ao início
