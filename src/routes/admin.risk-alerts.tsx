@@ -5,6 +5,7 @@ import { useState } from "react";
 import { listRiskAlerts, updateRiskAlertStatus } from "@/lib/admin-extras.functions";
 import { formatDate } from "@/utils/formatDate";
 import { toast } from "sonner";
+import { useAdminRealtime } from "@/hooks/use-admin-realtime";
 
 type Status = "open" | "reviewing" | "resolved" | "ignored";
 
