@@ -49,9 +49,12 @@ function Page() {
   });
 
   const mut = useMutation({
-    mutationFn: (
-      input: Parameters<typeof update>[0] extends { data: infer D } ? D : never,
-    ) => update({ data: input }),
+    mutationFn: (input: {
+      affiliateId: string;
+      status?: "active" | "inactive" | "blocked";
+      managerId?: string | null;
+      reason?: string;
+    }) => update({ data: input }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "affiliates"] }),
   });
 
