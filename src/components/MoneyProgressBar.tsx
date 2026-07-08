@@ -61,7 +61,7 @@ export function MoneyProgressBar() {
             onClick={() => {
               window.dispatchEvent(new CustomEvent("redeem-reward", { detail: { value: GOAL } }));
             }}
-            className="pointer-events-auto flex w-full max-w-xs items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#FFD24A] via-[#FFB627] to-[#F59E0B] px-10 py-5 text-[18px] font-black tracking-tight text-white shadow-[0_14px_32px_-6px_rgba(245,158,11,0.6),inset_0_-4px_0_rgba(0,0,0,0.18),inset_0_2px_0_rgba(255,255,255,0.4)] transition active:translate-y-[1px] active:scale-[0.99]"
+            className="pointer-events-auto flex w-auto items-center justify-center gap-2.5 rounded-full bg-gradient-to-b from-[#FFD24A] via-[#FFB627] to-[#F59E0B] px-14 py-6 text-[19px] font-black tracking-tight text-white shadow-[0_16px_36px_-6px_rgba(245,158,11,0.65),inset_0_-5px_0_rgba(0,0,0,0.2),inset_0_2px_0_rgba(255,255,255,0.45)] transition active:translate-y-[1px] active:scale-[0.99]"
             style={{ textShadow: "0 1px 0 rgba(0,0,0,0.2)" }}
           >
             <span className="text-xl leading-none">🏆</span>
