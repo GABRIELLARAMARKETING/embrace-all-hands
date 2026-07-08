@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Bell,
   Home,
@@ -8,9 +8,12 @@ import {
   UserPlus,
   Users,
   Wallet,
+  ShieldCheck,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+
 
 interface NavItem {
   to: string;
@@ -20,6 +23,7 @@ interface NavItem {
 
 const items: NavItem[] = [
   { to: "/gerente/painel", label: "Painel", icon: <Home size={18} /> },
+  { to: "/gerente/saques", label: "Saques (admin)", icon: <ShieldCheck size={18} /> },
   { to: "/gerente/criar-demo", label: "Criar Demo", icon: <Sparkles size={18} /> },
   { to: "/gerente/indicar", label: "Indicar", icon: <UserPlus size={18} /> },
   { to: "/gerente/indicados", label: "Indicados", icon: <Users size={18} /> },
@@ -32,12 +36,21 @@ const items: NavItem[] = [
   { to: "/gerente/notificacoes", label: "Notificações", icon: <Bell size={18} /> },
 ];
 
+
 interface Props {
   onNavigate?: () => void;
 }
 
 export function Sidebar({ onNavigate }: Props) {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    onNavigate?.();
+    navigate({ to: "/gerente/login" });
+  };
+
 
   return (
     <aside className="flex h-full w-full flex-col border-r border-[color:var(--admin-line)] bg-[color:var(--admin-sidebar)]">
@@ -91,22 +104,18 @@ export function Sidebar({ onNavigate }: Props) {
       </nav>
 
       <div className="border-t border-[color:var(--admin-line)] p-3">
-        <Link
-          to="/gerente/login"
-          onClick={() => {
-            if (typeof window !== "undefined") {
-              window.localStorage.removeItem("gerente-helix:auth");
-            }
-            onNavigate?.();
-          }}
-          className="flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-sm font-medium text-[color:var(--admin-text-2)] transition-colors hover:bg-[color:var(--admin-red)]/10 hover:text-[color:var(--admin-red)]"
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-[10px] px-3 py-2.5 text-sm font-medium text-[color:var(--admin-text-2)] transition-colors hover:bg-[color:var(--admin-red)]/10 hover:text-[color:var(--admin-red)]"
         >
           <span className="grid h-8 w-8 place-items-center rounded-md bg-white/[0.03]">
             <LogOut size={18} />
           </span>
           Sair
-        </Link>
+        </button>
       </div>
+
     </aside>
   );
 }
