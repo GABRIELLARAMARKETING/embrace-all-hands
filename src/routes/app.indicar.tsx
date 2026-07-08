@@ -69,10 +69,29 @@ function IndicarPage() {
   const confirmWithdraw = async () => {
     setProcessing(true);
     try {
-      await submitWithdrawal({ data: { amount: affiliateBalance } });
+      const result = await submitWithdrawal({ data: { amount: affiliateBalance } });
+      // Immediate optimistic update using server response — no reload needed
+      queryClient.setQueryData(["referral-stats"], (prev: typeof data | undefined) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          affiliateBalance: result.affiliateBalance,
+          totalReceived: result.totalReceived,
+          stats: {
+            ...prev.stats,
+            TOTAL: {
+              ...prev.stats.TOTAL,
+              deposits: (prev.stats.TOTAL.deposits ?? 0) + result.withdrawal.amount,
+            },
+          },
+        };
+      });
+      const next = queryClient.getQueryData(["referral-stats"]) as typeof data | undefined;
+      if (next) setReferralStats(next.stats);
       toast.success("Solicitação de saque registrada com sucesso!");
       setConfirmOpen(false);
-      await queryClient.invalidateQueries({ queryKey: ["referral-stats"] });
+      // Revalidate in the background to sync any server-side changes
+      queryClient.invalidateQueries({ queryKey: ["referral-stats"] });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erro ao solicitar saque.";
       toast.error(message);
