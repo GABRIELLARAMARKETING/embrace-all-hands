@@ -68,6 +68,11 @@ function PerfilPage() {
         { event: "*", schema: "public", table: "game_sessions", filter: `user_id=eq.${profile.userId}` },
         () => queryClient.invalidateQueries({ queryKey: ["my-profile"] }),
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "affiliate_withdrawals", filter: `user_id=eq.${profile.userId}` },
+        () => queryClient.invalidateQueries({ queryKey: ["affiliate-withdrawals"] }),
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
