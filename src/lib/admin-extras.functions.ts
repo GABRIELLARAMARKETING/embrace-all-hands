@@ -403,6 +403,7 @@ export type ReportExportRow = {
   type: string;
   status: string;
   file_url: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   filters: any;
   created_at: string;
 };
