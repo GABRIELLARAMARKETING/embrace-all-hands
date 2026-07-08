@@ -111,7 +111,7 @@ export const listCommissions = createServerFn({ method: "GET" })
   .inputValidator((raw: unknown) =>
     z
       .object({
-        status: z.enum(["pending", "available", "paid", "cancelled"]).optional(),
+        status: z.enum(["pending","available","approved","canceled","disputed"]).optional(),
       })
       .partial()
       .parse(raw ?? {}),
@@ -162,7 +162,7 @@ export const updateCommissionStatus = createServerFn({ method: "POST" })
     z
       .object({
         commissionId: z.string().uuid(),
-        status: z.enum(["pending", "available", "paid", "cancelled"]),
+        status: z.enum(["pending","available","approved","canceled","disputed"]),
         reason: z.string().trim().max(500).optional(),
       })
       .parse(raw),
@@ -204,7 +204,7 @@ export const listRiskAlerts = createServerFn({ method: "GET" })
   .inputValidator((raw: unknown) =>
     z
       .object({
-        status: z.enum(["open", "investigating", "resolved", "dismissed"]).optional(),
+        status: z.enum(["open","reviewing","resolved","ignored"]).optional(),
       })
       .partial()
       .parse(raw ?? {}),
@@ -251,7 +251,7 @@ export const updateRiskAlertStatus = createServerFn({ method: "POST" })
     z
       .object({
         alertId: z.string().uuid(),
-        status: z.enum(["open", "investigating", "resolved", "dismissed"]),
+        status: z.enum(["open","reviewing","resolved","ignored"]),
       })
       .parse(raw),
   )
