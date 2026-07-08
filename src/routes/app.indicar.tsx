@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowUp, Copy, PartyPopper } from "lucide-react";
-import { AppLayout, PlayerCard } from "@/components/player/AppLayout";
+import { ArrowUp, Copy, PartyPopper, X, CheckCircle2, AlertTriangle } from "lucide-react";
+import { AppLayout, PlayerCard, GradientButton } from "@/components/player/AppLayout";
 import { PLAYER_MOCK } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -41,10 +42,37 @@ function IndicarPage() {
 
   const affiliateBalance = data.affiliateBalance;
   const totalReceived = data.totalReceived;
+  const withdrawMin = PLAYER_MOCK.withdrawMin;
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   const copyLink = async () => {
     const ok = await copyToClipboard(PLAYER_MOCK.referralUrl);
     toast[ok ? "success" : "error"](ok ? "Link copiado com sucesso!" : "Falha ao copiar");
+  };
+
+  const handleWithdrawClick = () => {
+    if (affiliateBalance < withdrawMin) {
+      toast.error(
+        `Saldo insuficiente. Mínimo para saque: ${formatCurrency(withdrawMin)}.`,
+      );
+      return;
+    }
+    setConfirmOpen(true);
+  };
+
+  const confirmWithdraw = async () => {
+    setProcessing(true);
+    try {
+      await new Promise((r) => setTimeout(r, 700));
+      toast.success("Solicitação de saque enviada com sucesso!");
+      setConfirmOpen(false);
+    } catch {
+      toast.error("Não foi possível processar o saque. Tente novamente.");
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const tiers = ["N1", "N2", "N3", "TOTAL"] as const;
@@ -77,7 +105,12 @@ function IndicarPage() {
             <div className="mt-1 text-xs text-white/80">em comissões</div>
           </div>
         </div>
-        <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-white/20 py-3 text-sm font-bold text-white backdrop-blur-sm transition-colors hover:bg-white/25 active:scale-[0.99]">
+        <button
+          onClick={handleWithdrawClick}
+          type="button"
+          aria-label="Sacar comissão de afiliado"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-white/20 py-3 text-sm font-bold text-white backdrop-blur-sm transition-colors hover:bg-white/25 active:scale-[0.99]"
+        >
           <ArrowUp className="h-4 w-4" /> Sacar Comissão
         </button>
       </div>
@@ -107,7 +140,96 @@ function IndicarPage() {
           );
         })}
       </div>
+
+      <ConfirmWithdrawModal
+        open={confirmOpen}
+        onClose={() => (processing ? null : setConfirmOpen(false))}
+        onConfirm={confirmWithdraw}
+        amount={affiliateBalance}
+        minAmount={withdrawMin}
+        processing={processing}
+      />
     </AppLayout>
+  );
+}
+
+function ConfirmWithdrawModal({
+  open,
+  onClose,
+  onConfirm,
+  amount,
+  minAmount,
+  processing,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  amount: number;
+  minAmount: number;
+  processing: boolean;
+}) {
+  const insufficient = amount < minAmount;
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-withdraw-title"
+        >
+          <motion.div
+            initial={{ scale: 0.95, y: 10 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="relative w-full max-w-sm rounded-3xl border border-white/10 bg-[#160828] p-6 text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={onClose}
+              disabled={processing}
+              aria-label="Fechar"
+              className="absolute right-4 top-4 text-white/60 hover:text-white disabled:opacity-40"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            {insufficient ? (
+              <AlertTriangle className="mx-auto h-12 w-12 text-amber-400" />
+            ) : (
+              <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-400" />
+            )}
+            <h3 id="confirm-withdraw-title" className="mt-3 text-lg font-bold text-white">
+              Confirmar saque
+            </h3>
+            <p className="mt-1 text-sm text-white/70">
+              {insufficient
+                ? `Você precisa de no mínimo ${formatCurrency(minAmount)} para solicitar o saque.`
+                : `Você deseja sacar ${formatCurrency(amount)} da sua comissão de afiliado?`}
+            </p>
+            <div className="mt-5 flex flex-col gap-2">
+              <GradientButton
+                onClick={onConfirm}
+                disabled={insufficient || processing}
+                className="disabled:opacity-60"
+              >
+                {processing ? "Processando..." : "Confirmar Saque"}
+              </GradientButton>
+              <button
+                onClick={onClose}
+                disabled={processing}
+                className="w-full rounded-full border border-white/15 py-3 text-sm font-semibold text-white/80 hover:bg-white/5 disabled:opacity-40"
+              >
+                Cancelar
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
