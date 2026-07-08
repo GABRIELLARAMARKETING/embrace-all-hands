@@ -173,6 +173,10 @@ function IndicarPage() {
         })}
       </div>
 
+      <WithdrawalHistory items={withdrawals} />
+
+
+
       <ConfirmWithdrawModal
         open={confirmOpen}
         onClose={() => (processing ? null : setConfirmOpen(false))}
