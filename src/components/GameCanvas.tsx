@@ -332,22 +332,12 @@ function GameLogic({
 
           if (sector === "danger") {
             if (isFever) continue;
-            dangerHitFrames.current += 1;
-            if (dangerHitFrames.current < CONSTANTS.DANGER_CONFIRM_FRAMES) {
-              // Not enough consecutive contacts — treat as a graze so a
-              // single drag-induced touch doesn't end the run.
-              landedY = ringTopY + CONSTANTS.BALL_RADIUS + CONSTANTS.COLLISION_EPSILON;
-              velocity.current = CONSTANTS.BOUNCE_VELOCITY;
-              lastBounceRing.current = i;
-              collisionCooldownUntil.current =
-                state.clock.elapsedTime + CONSTANTS.COLLISION_COOLDOWN;
-              break;
-            }
             cameraShake.current = 0.6;
             finishedRef.current = true;
             loseGame();
             return;
           }
+
 
 
           const impactSpeed = Math.abs(velocity.current);
