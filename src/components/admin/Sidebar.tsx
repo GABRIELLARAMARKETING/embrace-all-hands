@@ -104,22 +104,18 @@ export function Sidebar({ onNavigate }: Props) {
       </nav>
 
       <div className="border-t border-[color:var(--admin-line)] p-3">
-        <Link
-          to="/gerente/login"
-          onClick={() => {
-            if (typeof window !== "undefined") {
-              window.localStorage.removeItem("gerente-helix:auth");
-            }
-            onNavigate?.();
-          }}
-          className="flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-sm font-medium text-[color:var(--admin-text-2)] transition-colors hover:bg-[color:var(--admin-red)]/10 hover:text-[color:var(--admin-red)]"
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-[10px] px-3 py-2.5 text-sm font-medium text-[color:var(--admin-text-2)] transition-colors hover:bg-[color:var(--admin-red)]/10 hover:text-[color:var(--admin-red)]"
         >
           <span className="grid h-8 w-8 place-items-center rounded-md bg-white/[0.03]">
             <LogOut size={18} />
           </span>
           Sair
-        </Link>
+        </button>
       </div>
+
     </aside>
   );
 }
