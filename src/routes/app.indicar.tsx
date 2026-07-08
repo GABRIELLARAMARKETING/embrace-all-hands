@@ -105,7 +105,12 @@ function IndicarPage() {
             <div className="mt-1 text-xs text-white/80">em comissões</div>
           </div>
         </div>
-        <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-white/20 py-3 text-sm font-bold text-white backdrop-blur-sm transition-colors hover:bg-white/25 active:scale-[0.99]">
+        <button
+          onClick={handleWithdrawClick}
+          type="button"
+          aria-label="Sacar comissão de afiliado"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-white/20 py-3 text-sm font-bold text-white backdrop-blur-sm transition-colors hover:bg-white/25 active:scale-[0.99]"
+        >
           <ArrowUp className="h-4 w-4" /> Sacar Comissão
         </button>
       </div>
