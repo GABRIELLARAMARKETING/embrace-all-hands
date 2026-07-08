@@ -41,6 +41,7 @@ export const Route = createFileRoute("/app/indicar")({
 
 function IndicarPage() {
   const { data } = useSuspenseQuery(referralStatsQuery);
+  const { data: withdrawals = [] } = useSuspenseQuery(withdrawalsQuery);
   const setReferralStats = usePlayerStore((s) => s.setReferralStats);
   const queryClient = useQueryClient();
   const submitWithdrawal = useServerFn(requestAffiliateWithdrawal);
