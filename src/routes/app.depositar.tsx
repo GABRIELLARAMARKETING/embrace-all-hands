@@ -52,22 +52,24 @@ function DepositarPage() {
 
   return (
     <AppLayout title="Depositar via PIX">
-      <GameLogo />
+      <div className="relative pt-14">
+        <GameLogo />
 
-      <PlayerCard className="mt-4 p-4">
-        <div className="flex items-center gap-3">
-          <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-400">
-            <DollarSign className="h-6 w-6" />
+        <PlayerCard className="p-4 pt-8">
+          <div className="flex items-center gap-3">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-400">
+              <DollarSign className="h-6 w-6" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[11px] font-bold tracking-widest text-white/60">SALDO ATUAL</div>
+              <div className="text-2xl font-black text-emerald-400">{formatCurrency(balance)}</div>
+            </div>
+            <div className="shrink-0 text-right text-xs text-white/50 leading-tight">
+              disponível<br />na conta
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-[11px] font-bold tracking-widest text-white/60">SALDO ATUAL</div>
-            <div className="text-2xl font-black text-emerald-400">{formatCurrency(balance)}</div>
-          </div>
-          <div className="shrink-0 text-right text-xs text-white/50 leading-tight">
-            disponível<br />na conta
-          </div>
-        </div>
-      </PlayerCard>
+        </PlayerCard>
+      </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <PlayerCard className="mt-4 p-4">
