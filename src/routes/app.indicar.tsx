@@ -11,12 +11,17 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { copyToClipboard } from "@/utils/clipboard";
 import { getReferralStats } from "@/lib/referral.functions";
-import { requestAffiliateWithdrawal } from "@/lib/withdrawals.functions";
+import { requestAffiliateWithdrawal, listAffiliateWithdrawals, type WithdrawalHistoryItem } from "@/lib/withdrawals.functions";
 import helixLogo from "@/assets/helix-multi-logo.png";
 
 const referralStatsQuery = queryOptions({
   queryKey: ["referral-stats"],
   queryFn: () => getReferralStats(),
+});
+
+const withdrawalsQuery = queryOptions({
+  queryKey: ["affiliate-withdrawals"],
+  queryFn: () => listAffiliateWithdrawals(),
 });
 
 export const Route = createFileRoute("/app/indicar")({
