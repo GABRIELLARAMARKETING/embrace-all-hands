@@ -9,13 +9,13 @@ interface AppLayoutProps {
   children: ReactNode;
 }
 
-const NAV = [
+const NAV: ReadonlyArray<{ to: string; label: string; icon: typeof Wallet; center?: boolean }> = [
   { to: "/app/depositar", label: "Depositar", icon: Wallet },
   { to: "/app/sacar", label: "Sacar", icon: ArrowUpFromLine },
   { to: "/app/jogar", label: "Jogar", icon: RotateCw, center: true },
   { to: "/app/indicar", label: "Indicar", icon: Users },
   { to: "/app/perfil", label: "Perfil", icon: User },
-] as const;
+];
 
 export function AppLayout({ title, children }: AppLayoutProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
