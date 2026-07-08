@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { RefreshCw, Search } from "lucide-react";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { TopHeader } from "@/components/admin/TopHeader";
 import { StatCard } from "@/components/admin/StatCard";
 import { AdminCard } from "@/components/admin/AdminCard";
@@ -9,10 +10,9 @@ import { AdminButton } from "@/components/admin/AdminButton";
 import { AdminTable } from "@/components/admin/AdminTable";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { Badge } from "@/components/admin/Badge";
-import { useAdminStore } from "@/store/useAdminStore";
+import { listManagerReferrals } from "@/lib/manager.functions";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
-import type { ReferralLevel, ReferralUser } from "@/data/mockAdminData";
 
 export const Route = createFileRoute("/gerente/indicados")({
   head: () => ({
@@ -24,109 +24,80 @@ export const Route = createFileRoute("/gerente/indicados")({
   component: IndicadosPage,
 });
 
-const levelMeta: Record<
-  ReferralLevel,
-  { title: string; badge: string; description: string }
-> = {
-  1: {
-    title: "Nível 1 — Indicados diretos",
-    badge: "50% (padrão)",
-    description: "indicados diretos — 50% (padrão)",
-  },
-  2: {
-    title: "Nível 2",
-    badge: "5% (padrão)",
-    description: "indicados dos indicados — 5% (padrão)",
-  },
-  3: {
-    title: "Nível 3",
-    badge: "1% (padrão)",
-    description: "terceira camada — 1% (padrão)",
-  },
+type Level = 1 | 2 | 3;
+type Row = {
+  id: string;
+  name: string;
+  status: string;
+  level: number;
+  totalDeposited: number;
+  totalCommissionGenerated: number;
+  firstDepositAt: string | null;
+  createdAt: string;
+};
+
+const levelMeta: Record<Level, { title: string; badge: string }> = {
+  1: { title: "Nível 1 — Indicados diretos", badge: "N1" },
+  2: { title: "Nível 2", badge: "N2" },
+  3: { title: "Nível 3", badge: "N3" },
 };
 
 function IndicadosPage() {
-  const referrals = useAdminStore((s) => s.referrals);
-  const refresh = useAdminStore((s) => s.refreshMetrics);
+  const fn = useServerFn(listManagerReferrals);
+  const { data, isLoading, refetch, isFetching } = useQuery({
+    queryKey: ["gerente", "referrals"],
+    queryFn: () => fn({ data: {} }),
+    staleTime: 30_000,
+  });
+
+  const summary = data?.summary;
 
   return (
     <>
-      <TopHeader
-        title="Indicados"
-        subtitle="Usuários da sua rede por nível (1, 2 e 3)"
-      />
+      <TopHeader title="Indicados" subtitle="Usuários da sua rede por nível (1, 2 e 3)" />
       <div className="space-y-6 p-4 sm:p-5">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label="Total recebido de comissão"
-            value={formatCurrency(0)}
+            value={isLoading ? "…" : formatCurrency(summary?.totalCommissionReceived ?? 0)}
             description="sua rede (todos os níveis)"
           />
-          <StatCard
-            label="Comissão nível 1"
-            value={formatCurrency(0)}
-            description="indicados diretos — 50% (padrão)"
-          />
-          <StatCard
-            label="Comissão nível 2"
-            value={formatCurrency(0)}
-            description="indicados dos indicados — 5% (padrão)"
-          />
-          <StatCard
-            label="Comissão nível 3"
-            value={formatCurrency(0)}
-            description="terceira camada — 1% (padrão)"
-          />
+          <StatCard label="Comissão nível 1" value={isLoading ? "…" : formatCurrency(summary?.level1Commission ?? 0)} description="indicados diretos" />
+          <StatCard label="Comissão nível 2" value={isLoading ? "…" : formatCurrency(summary?.level2Commission ?? 0)} description="segunda camada" />
+          <StatCard label="Comissão nível 3" value={isLoading ? "…" : formatCurrency(summary?.level3Commission ?? 0)} description="terceira camada" />
         </div>
 
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Indicados</h2>
           <AdminButton
             variant="secondary"
-            leftIcon={<RefreshCw size={16} />}
-            onClick={() => {
-              refresh();
-              toast.success("Lista atualizada");
-            }}
+            leftIcon={<RefreshCw size={16} className={isFetching ? "animate-spin" : ""} />}
+            onClick={() => refetch()}
           >
             Atualizar
           </AdminButton>
         </div>
-        <p className="-mt-4 text-sm text-[color:var(--admin-text-2)]">
-          Usuários que entraram pela sua rede de indicação (nível 1 = diretos, nível 2 e 3 =
-          indicados dos seus indicados).
-        </p>
 
-        {([1, 2, 3] as ReferralLevel[]).map((level) => (
-          <LevelBlock key={level} level={level} referrals={referrals} />
+        {([1, 2, 3] as Level[]).map((level) => (
+          <LevelBlock
+            key={level}
+            level={level}
+            rows={(data?.[`level${level}` as "level1" | "level2" | "level3"] ?? []) as Row[]}
+          />
         ))}
       </div>
     </>
   );
 }
 
-function LevelBlock({
-  level,
-  referrals,
-}: {
-  level: ReferralLevel;
-  referrals: ReferralUser[];
-}) {
+function LevelBlock({ level, rows }: { level: Level; rows: Row[] }) {
   const [query, setQuery] = useState("");
   const meta = levelMeta[level];
-
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return referrals.filter((r) => {
-      if (r.level !== level) return false;
-      if (!q) return true;
-      return (
-        r.name.toLowerCase().includes(q) ||
-        r.email.toLowerCase().includes(q) ||
-        r.phone.toLowerCase().includes(q)
-      );
-    });
-  }, [referrals, level, query]);
+    if (!q) return rows;
+    return rows.filter((r) => r.name.toLowerCase().includes(q));
+  }, [rows, query]);
 
   return (
     <AdminCard>
@@ -142,14 +113,11 @@ function LevelBlock({
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value.slice(0, 80))}
-            placeholder="Buscar nome, e-mail ou telefone..."
+            placeholder="Buscar nome..."
             className="w-full bg-transparent text-sm text-white outline-none placeholder:text-[color:var(--admin-text-3)]"
-            aria-label={`Buscar em ${meta.title}`}
           />
         </div>
-        <span className="text-sm text-[color:var(--admin-text-3)]">
-          {filtered.length} usuários
-        </span>
+        <span className="text-sm text-[color:var(--admin-text-3)]">{filtered.length} usuários</span>
       </div>
 
       <AdminTable
@@ -157,36 +125,13 @@ function LevelBlock({
         columns={[
           { key: "n", header: "#", render: (_r, i) => i + 1, width: "48px" },
           { key: "name", header: "Nome", render: (r) => <span className="text-white">{r.name}</span> },
-          { key: "email", header: "E-mail", render: (r) => r.email },
-          { key: "phone", header: "Telefone", render: (r) => r.phone },
-          {
-            key: "createdAt",
-            header: "Data cadastro",
-            render: (r) => formatDate(r.createdAt),
-          },
-          {
-            key: "total",
-            header: "Total Depositado",
-            render: (r) => formatCurrency(r.totalDeposited),
-          },
+          { key: "created", header: "Cadastro", render: (r) => formatDate(r.createdAt) },
+          { key: "dep", header: "Depositado", render: (r) => formatCurrency(r.totalDeposited) },
+          { key: "com", header: "Comissão", render: (r) => formatCurrency(r.totalCommissionGenerated) },
           {
             key: "has",
-            header: "Com depósito",
-            render: (r) =>
-              r.hasDeposit ? (
-                <Badge tone="green">Sim</Badge>
-              ) : (
-                <Badge tone="neutral">Não</Badge>
-              ),
-          },
-          {
-            key: "actions",
-            header: "Ações",
-            render: () => (
-              <AdminButton size="sm" variant="ghost">
-                Ver
-              </AdminButton>
-            ),
+            header: "Depositou",
+            render: (r) => (r.totalDeposited > 0 ? <Badge tone="green">Sim</Badge> : <Badge tone="neutral">Não</Badge>),
           },
         ]}
         rows={filtered}

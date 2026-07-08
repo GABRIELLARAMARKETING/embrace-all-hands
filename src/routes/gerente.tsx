@@ -26,7 +26,7 @@ export const Route = createFileRoute("/gerente")({
       .select("role")
       .eq("user_id", userData.user.id);
     const roles = new Set((rows ?? []).map((r) => r.role));
-    if (!roles.has("admin") && !roles.has("super_admin")) {
+    if (!roles.has("admin") && !roles.has("super_admin") && !roles.has("gerente")) {
       await supabase.auth.signOut();
       throw redirect({ to: "/gerente/login", search: { denied: "1" } as never });
     }

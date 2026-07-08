@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { TopHeader } from "@/components/admin/TopHeader";
 import { AdminCard } from "@/components/admin/AdminCard";
 import { CopyButton } from "@/components/admin/CopyButton";
 import { ToggleSwitch } from "@/components/admin/ToggleSwitch";
-import { useAdminStore } from "@/store/useAdminStore";
+import { getManagerReferralLink, setInfluencerMode } from "@/lib/manager.functions";
 
 export const Route = createFileRoute("/gerente/indicar")({
   head: () => ({
@@ -17,10 +19,22 @@ export const Route = createFileRoute("/gerente/indicar")({
 });
 
 function IndicarPage() {
-  const link = useAdminStore((s) => s.referralLink);
-  const influencer = useAdminStore((s) => s.influencerMode);
-  const setInfluencer = useAdminStore((s) => s.setInfluencerMode);
+  const qc = useQueryClient();
+  const getLink = useServerFn(getManagerReferralLink);
+  const setMode = useServerFn(setInfluencerMode);
+  const { data, isLoading } = useQuery({
+    queryKey: ["gerente", "referral-link"],
+    queryFn: () => getLink(),
+    staleTime: 60_000,
+  });
+  const mut = useMutation({
+    mutationFn: (enabled: boolean) => setMode({ data: { enabled } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["gerente", "referral-link"] }),
+  });
   const [feedback, setFeedback] = useState<string | null>(null);
+
+  const link = data?.affiliateLink ?? "";
+  const influencer = !!data?.isInfluencer;
 
   return (
     <>
@@ -41,7 +55,7 @@ function IndicarPage() {
             <div className="flex flex-1 items-center rounded-[10px] border border-[color:var(--admin-border)] bg-[color:var(--admin-input)] px-3 h-11">
               <input
                 readOnly
-                value={link}
+                value={isLoading ? "Carregando…" : link}
                 className="w-full bg-transparent text-sm text-white outline-none"
                 aria-label="Link de indicação"
               />
@@ -50,8 +64,8 @@ function IndicarPage() {
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-3">
-            <MiniStat value={0} label="Indicados" />
-            <MiniStat value={0} label="Com depósito" />
+            <MiniStat value={data?.totalReferred ?? 0} label="Indicados" />
+            <MiniStat value={data?.withDeposit ?? 0} label="Com depósito" />
           </div>
         </AdminCard>
 
@@ -68,7 +82,7 @@ function IndicarPage() {
               checked={influencer}
               color="green"
               onChange={(v) => {
-                setInfluencer(v);
+                mut.mutate(v);
                 setFeedback(v ? "Ativado" : "Desativado");
                 setTimeout(() => setFeedback(null), 1500);
               }}
