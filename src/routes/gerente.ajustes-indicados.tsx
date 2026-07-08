@@ -9,7 +9,7 @@ import { AdminButton } from "@/components/admin/AdminButton";
 import { Badge } from "@/components/admin/Badge";
 import { useAdminStore } from "@/store/useAdminStore";
 
-export const Route = createFileRoute("/admin/ajustes-indicados")({
+export const Route = createFileRoute("/gerente/ajustes-indicados")({
   head: () => ({
     meta: [
       { title: "Ajustes indicados · Gerente Helix" },

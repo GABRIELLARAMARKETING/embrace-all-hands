@@ -12,7 +12,7 @@ import { notificationService } from "@/services/notificationService";
 import { webhookSchema } from "@/utils/validators";
 import { sanitizeUrl } from "@/utils/sanitize";
 
-export const Route = createFileRoute("/admin/notificacoes")({
+export const Route = createFileRoute("/gerente/notificacoes")({
   head: () => ({
     meta: [
       { title: "Notificações · Gerente Helix" },

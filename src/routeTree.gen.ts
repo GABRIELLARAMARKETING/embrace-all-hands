@@ -10,29 +10,34 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as GerenteRouteImport } from './routes/gerente'
 import { Route as GameRouteImport } from './routes/game'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as GerentePainelRouteImport } from './routes/gerente.painel'
+import { Route as GerenteNotificacoesRouteImport } from './routes/gerente.notificacoes'
+import { Route as GerenteMeusSaquesRouteImport } from './routes/gerente.meus-saques'
+import { Route as GerenteLoginRouteImport } from './routes/gerente.login'
+import { Route as GerenteIndicarRouteImport } from './routes/gerente.indicar'
+import { Route as GerenteIndicadosRouteImport } from './routes/gerente.indicados'
+import { Route as GerenteCriarDemoRouteImport } from './routes/gerente.criar-demo'
+import { Route as GerenteAjustesIndicadosRouteImport } from './routes/gerente.ajustes-indicados'
 import { Route as AppSacarRouteImport } from './routes/app.sacar'
 import { Route as AppPerfilRouteImport } from './routes/app.perfil'
 import { Route as AppJogarRouteImport } from './routes/app.jogar'
 import { Route as AppIndicarRouteImport } from './routes/app.indicar'
 import { Route as AppDepositarRouteImport } from './routes/app.depositar'
-import { Route as AdminPainelRouteImport } from './routes/admin.painel'
-import { Route as AdminNotificacoesRouteImport } from './routes/admin.notificacoes'
-import { Route as AdminMeusSaquesRouteImport } from './routes/admin.meus-saques'
-import { Route as AdminLoginRouteImport } from './routes/admin.login'
-import { Route as AdminIndicarRouteImport } from './routes/admin.indicar'
-import { Route as AdminIndicadosRouteImport } from './routes/admin.indicados'
-import { Route as AdminCriarDemoRouteImport } from './routes/admin.criar-demo'
-import { Route as AdminAjustesIndicadosRouteImport } from './routes/admin.ajustes-indicados'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GerenteRoute = GerenteRouteImport.update({
+  id: '/gerente',
+  path: '/gerente',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GameRoute = GameRouteImport.update({
@@ -50,11 +55,6 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -64,6 +64,46 @@ const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
+} as any)
+const GerentePainelRoute = GerentePainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => GerenteRoute,
+} as any)
+const GerenteNotificacoesRoute = GerenteNotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
+  getParentRoute: () => GerenteRoute,
+} as any)
+const GerenteMeusSaquesRoute = GerenteMeusSaquesRouteImport.update({
+  id: '/meus-saques',
+  path: '/meus-saques',
+  getParentRoute: () => GerenteRoute,
+} as any)
+const GerenteLoginRoute = GerenteLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => GerenteRoute,
+} as any)
+const GerenteIndicarRoute = GerenteIndicarRouteImport.update({
+  id: '/indicar',
+  path: '/indicar',
+  getParentRoute: () => GerenteRoute,
+} as any)
+const GerenteIndicadosRoute = GerenteIndicadosRouteImport.update({
+  id: '/indicados',
+  path: '/indicados',
+  getParentRoute: () => GerenteRoute,
+} as any)
+const GerenteCriarDemoRoute = GerenteCriarDemoRouteImport.update({
+  id: '/criar-demo',
+  path: '/criar-demo',
+  getParentRoute: () => GerenteRoute,
+} as any)
+const GerenteAjustesIndicadosRoute = GerenteAjustesIndicadosRouteImport.update({
+  id: '/ajustes-indicados',
+  path: '/ajustes-indicados',
+  getParentRoute: () => GerenteRoute,
 } as any)
 const AppSacarRoute = AppSacarRouteImport.update({
   id: '/sacar',
@@ -90,187 +130,147 @@ const AppDepositarRoute = AppDepositarRouteImport.update({
   path: '/depositar',
   getParentRoute: () => AppRoute,
 } as any)
-const AdminPainelRoute = AdminPainelRouteImport.update({
-  id: '/painel',
-  path: '/painel',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminNotificacoesRoute = AdminNotificacoesRouteImport.update({
-  id: '/notificacoes',
-  path: '/notificacoes',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminMeusSaquesRoute = AdminMeusSaquesRouteImport.update({
-  id: '/meus-saques',
-  path: '/meus-saques',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminIndicarRoute = AdminIndicarRouteImport.update({
-  id: '/indicar',
-  path: '/indicar',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminIndicadosRoute = AdminIndicadosRouteImport.update({
-  id: '/indicados',
-  path: '/indicados',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCriarDemoRoute = AdminCriarDemoRouteImport.update({
-  id: '/criar-demo',
-  path: '/criar-demo',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAjustesIndicadosRoute = AdminAjustesIndicadosRouteImport.update({
-  id: '/ajustes-indicados',
-  path: '/ajustes-indicados',
-  getParentRoute: () => AdminRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/game': typeof GameRoute
+  '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
-  '/admin/ajustes-indicados': typeof AdminAjustesIndicadosRoute
-  '/admin/criar-demo': typeof AdminCriarDemoRoute
-  '/admin/indicados': typeof AdminIndicadosRoute
-  '/admin/indicar': typeof AdminIndicarRoute
-  '/admin/login': typeof AdminLoginRoute
-  '/admin/meus-saques': typeof AdminMeusSaquesRoute
-  '/admin/notificacoes': typeof AdminNotificacoesRoute
-  '/admin/painel': typeof AdminPainelRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
   '/app/jogar': typeof AppJogarRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/sacar': typeof AppSacarRoute
+  '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
+  '/gerente/criar-demo': typeof GerenteCriarDemoRoute
+  '/gerente/indicados': typeof GerenteIndicadosRoute
+  '/gerente/indicar': typeof GerenteIndicarRoute
+  '/gerente/login': typeof GerenteLoginRoute
+  '/gerente/meus-saques': typeof GerenteMeusSaquesRoute
+  '/gerente/notificacoes': typeof GerenteNotificacoesRoute
+  '/gerente/painel': typeof GerentePainelRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/game': typeof GameRoute
+  '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
-  '/admin/ajustes-indicados': typeof AdminAjustesIndicadosRoute
-  '/admin/criar-demo': typeof AdminCriarDemoRoute
-  '/admin/indicados': typeof AdminIndicadosRoute
-  '/admin/indicar': typeof AdminIndicarRoute
-  '/admin/login': typeof AdminLoginRoute
-  '/admin/meus-saques': typeof AdminMeusSaquesRoute
-  '/admin/notificacoes': typeof AdminNotificacoesRoute
-  '/admin/painel': typeof AdminPainelRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
   '/app/jogar': typeof AppJogarRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/sacar': typeof AppSacarRoute
+  '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
+  '/gerente/criar-demo': typeof GerenteCriarDemoRoute
+  '/gerente/indicados': typeof GerenteIndicadosRoute
+  '/gerente/indicar': typeof GerenteIndicarRoute
+  '/gerente/login': typeof GerenteLoginRoute
+  '/gerente/meus-saques': typeof GerenteMeusSaquesRoute
+  '/gerente/notificacoes': typeof GerenteNotificacoesRoute
+  '/gerente/painel': typeof GerentePainelRoute
   '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/game': typeof GameRoute
+  '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
-  '/admin/ajustes-indicados': typeof AdminAjustesIndicadosRoute
-  '/admin/criar-demo': typeof AdminCriarDemoRoute
-  '/admin/indicados': typeof AdminIndicadosRoute
-  '/admin/indicar': typeof AdminIndicarRoute
-  '/admin/login': typeof AdminLoginRoute
-  '/admin/meus-saques': typeof AdminMeusSaquesRoute
-  '/admin/notificacoes': typeof AdminNotificacoesRoute
-  '/admin/painel': typeof AdminPainelRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
   '/app/jogar': typeof AppJogarRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/sacar': typeof AppSacarRoute
+  '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
+  '/gerente/criar-demo': typeof GerenteCriarDemoRoute
+  '/gerente/indicados': typeof GerenteIndicadosRoute
+  '/gerente/indicar': typeof GerenteIndicarRoute
+  '/gerente/login': typeof GerenteLoginRoute
+  '/gerente/meus-saques': typeof GerenteMeusSaquesRoute
+  '/gerente/notificacoes': typeof GerenteNotificacoesRoute
+  '/gerente/painel': typeof GerentePainelRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
     | '/app'
     | '/auth'
     | '/game'
+    | '/gerente'
     | '/login'
-    | '/admin/ajustes-indicados'
-    | '/admin/criar-demo'
-    | '/admin/indicados'
-    | '/admin/indicar'
-    | '/admin/login'
-    | '/admin/meus-saques'
-    | '/admin/notificacoes'
-    | '/admin/painel'
     | '/app/depositar'
     | '/app/indicar'
     | '/app/jogar'
     | '/app/perfil'
     | '/app/sacar'
+    | '/gerente/ajustes-indicados'
+    | '/gerente/criar-demo'
+    | '/gerente/indicados'
+    | '/gerente/indicar'
+    | '/gerente/login'
+    | '/gerente/meus-saques'
+    | '/gerente/notificacoes'
+    | '/gerente/painel'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/auth'
     | '/game'
+    | '/gerente'
     | '/login'
-    | '/admin/ajustes-indicados'
-    | '/admin/criar-demo'
-    | '/admin/indicados'
-    | '/admin/indicar'
-    | '/admin/login'
-    | '/admin/meus-saques'
-    | '/admin/notificacoes'
-    | '/admin/painel'
     | '/app/depositar'
     | '/app/indicar'
     | '/app/jogar'
     | '/app/perfil'
     | '/app/sacar'
+    | '/gerente/ajustes-indicados'
+    | '/gerente/criar-demo'
+    | '/gerente/indicados'
+    | '/gerente/indicar'
+    | '/gerente/login'
+    | '/gerente/meus-saques'
+    | '/gerente/notificacoes'
+    | '/gerente/painel'
     | '/app'
   id:
     | '__root__'
     | '/'
-    | '/admin'
     | '/app'
     | '/auth'
     | '/game'
+    | '/gerente'
     | '/login'
-    | '/admin/ajustes-indicados'
-    | '/admin/criar-demo'
-    | '/admin/indicados'
-    | '/admin/indicar'
-    | '/admin/login'
-    | '/admin/meus-saques'
-    | '/admin/notificacoes'
-    | '/admin/painel'
     | '/app/depositar'
     | '/app/indicar'
     | '/app/jogar'
     | '/app/perfil'
     | '/app/sacar'
+    | '/gerente/ajustes-indicados'
+    | '/gerente/criar-demo'
+    | '/gerente/indicados'
+    | '/gerente/indicar'
+    | '/gerente/login'
+    | '/gerente/meus-saques'
+    | '/gerente/notificacoes'
+    | '/gerente/painel'
     | '/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
   GameRoute: typeof GameRoute
+  GerenteRoute: typeof GerenteRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
 
@@ -281,6 +281,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gerente': {
+      id: '/gerente'
+      path: '/gerente'
+      fullPath: '/gerente'
+      preLoaderRoute: typeof GerenteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/game': {
@@ -304,13 +311,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -324,6 +324,62 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/gerente/painel': {
+      id: '/gerente/painel'
+      path: '/painel'
+      fullPath: '/gerente/painel'
+      preLoaderRoute: typeof GerentePainelRouteImport
+      parentRoute: typeof GerenteRoute
+    }
+    '/gerente/notificacoes': {
+      id: '/gerente/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/gerente/notificacoes'
+      preLoaderRoute: typeof GerenteNotificacoesRouteImport
+      parentRoute: typeof GerenteRoute
+    }
+    '/gerente/meus-saques': {
+      id: '/gerente/meus-saques'
+      path: '/meus-saques'
+      fullPath: '/gerente/meus-saques'
+      preLoaderRoute: typeof GerenteMeusSaquesRouteImport
+      parentRoute: typeof GerenteRoute
+    }
+    '/gerente/login': {
+      id: '/gerente/login'
+      path: '/login'
+      fullPath: '/gerente/login'
+      preLoaderRoute: typeof GerenteLoginRouteImport
+      parentRoute: typeof GerenteRoute
+    }
+    '/gerente/indicar': {
+      id: '/gerente/indicar'
+      path: '/indicar'
+      fullPath: '/gerente/indicar'
+      preLoaderRoute: typeof GerenteIndicarRouteImport
+      parentRoute: typeof GerenteRoute
+    }
+    '/gerente/indicados': {
+      id: '/gerente/indicados'
+      path: '/indicados'
+      fullPath: '/gerente/indicados'
+      preLoaderRoute: typeof GerenteIndicadosRouteImport
+      parentRoute: typeof GerenteRoute
+    }
+    '/gerente/criar-demo': {
+      id: '/gerente/criar-demo'
+      path: '/criar-demo'
+      fullPath: '/gerente/criar-demo'
+      preLoaderRoute: typeof GerenteCriarDemoRouteImport
+      parentRoute: typeof GerenteRoute
+    }
+    '/gerente/ajustes-indicados': {
+      id: '/gerente/ajustes-indicados'
+      path: '/ajustes-indicados'
+      fullPath: '/gerente/ajustes-indicados'
+      preLoaderRoute: typeof GerenteAjustesIndicadosRouteImport
+      parentRoute: typeof GerenteRoute
     }
     '/app/sacar': {
       id: '/app/sacar'
@@ -360,88 +416,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDepositarRouteImport
       parentRoute: typeof AppRoute
     }
-    '/admin/painel': {
-      id: '/admin/painel'
-      path: '/painel'
-      fullPath: '/admin/painel'
-      preLoaderRoute: typeof AdminPainelRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/notificacoes': {
-      id: '/admin/notificacoes'
-      path: '/notificacoes'
-      fullPath: '/admin/notificacoes'
-      preLoaderRoute: typeof AdminNotificacoesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/meus-saques': {
-      id: '/admin/meus-saques'
-      path: '/meus-saques'
-      fullPath: '/admin/meus-saques'
-      preLoaderRoute: typeof AdminMeusSaquesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/indicar': {
-      id: '/admin/indicar'
-      path: '/indicar'
-      fullPath: '/admin/indicar'
-      preLoaderRoute: typeof AdminIndicarRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/indicados': {
-      id: '/admin/indicados'
-      path: '/indicados'
-      fullPath: '/admin/indicados'
-      preLoaderRoute: typeof AdminIndicadosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/criar-demo': {
-      id: '/admin/criar-demo'
-      path: '/criar-demo'
-      fullPath: '/admin/criar-demo'
-      preLoaderRoute: typeof AdminCriarDemoRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/ajustes-indicados': {
-      id: '/admin/ajustes-indicados'
-      path: '/ajustes-indicados'
-      fullPath: '/admin/ajustes-indicados'
-      preLoaderRoute: typeof AdminAjustesIndicadosRouteImport
-      parentRoute: typeof AdminRoute
-    }
   }
 }
-
-interface AdminRouteChildren {
-  AdminAjustesIndicadosRoute: typeof AdminAjustesIndicadosRoute
-  AdminCriarDemoRoute: typeof AdminCriarDemoRoute
-  AdminIndicadosRoute: typeof AdminIndicadosRoute
-  AdminIndicarRoute: typeof AdminIndicarRoute
-  AdminLoginRoute: typeof AdminLoginRoute
-  AdminMeusSaquesRoute: typeof AdminMeusSaquesRoute
-  AdminNotificacoesRoute: typeof AdminNotificacoesRoute
-  AdminPainelRoute: typeof AdminPainelRoute
-}
-
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminAjustesIndicadosRoute: AdminAjustesIndicadosRoute,
-  AdminCriarDemoRoute: AdminCriarDemoRoute,
-  AdminIndicadosRoute: AdminIndicadosRoute,
-  AdminIndicarRoute: AdminIndicarRoute,
-  AdminLoginRoute: AdminLoginRoute,
-  AdminMeusSaquesRoute: AdminMeusSaquesRoute,
-  AdminNotificacoesRoute: AdminNotificacoesRoute,
-  AdminPainelRoute: AdminPainelRoute,
-}
-
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface AppRouteChildren {
   AppDepositarRoute: typeof AppDepositarRoute
@@ -463,12 +439,37 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface GerenteRouteChildren {
+  GerenteAjustesIndicadosRoute: typeof GerenteAjustesIndicadosRoute
+  GerenteCriarDemoRoute: typeof GerenteCriarDemoRoute
+  GerenteIndicadosRoute: typeof GerenteIndicadosRoute
+  GerenteIndicarRoute: typeof GerenteIndicarRoute
+  GerenteLoginRoute: typeof GerenteLoginRoute
+  GerenteMeusSaquesRoute: typeof GerenteMeusSaquesRoute
+  GerenteNotificacoesRoute: typeof GerenteNotificacoesRoute
+  GerentePainelRoute: typeof GerentePainelRoute
+}
+
+const GerenteRouteChildren: GerenteRouteChildren = {
+  GerenteAjustesIndicadosRoute: GerenteAjustesIndicadosRoute,
+  GerenteCriarDemoRoute: GerenteCriarDemoRoute,
+  GerenteIndicadosRoute: GerenteIndicadosRoute,
+  GerenteIndicarRoute: GerenteIndicarRoute,
+  GerenteLoginRoute: GerenteLoginRoute,
+  GerenteMeusSaquesRoute: GerenteMeusSaquesRoute,
+  GerenteNotificacoesRoute: GerenteNotificacoesRoute,
+  GerentePainelRoute: GerentePainelRoute,
+}
+
+const GerenteRouteWithChildren =
+  GerenteRoute._addFileChildren(GerenteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
   GameRoute: GameRoute,
+  GerenteRoute: GerenteRouteWithChildren,
   LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport

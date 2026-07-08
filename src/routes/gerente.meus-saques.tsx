@@ -15,7 +15,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
 import { sanitizeText } from "@/utils/sanitize";
 
-export const Route = createFileRoute("/admin/meus-saques")({
+export const Route = createFileRoute("/gerente/meus-saques")({
   head: () => ({
     meta: [
       { title: "Meus Saques · Gerente Helix" },

@@ -1,13 +1,13 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { createContext, useContext, useEffect, useState } from "react";
-import { Sidebar } from "@/components/admin/Sidebar";
-import { FloatingChatButton } from "@/components/admin/FloatingChatButton";
+import { Sidebar } from "@/components/gerente/Sidebar";
+import { FloatingChatButton } from "@/components/gerente/FloatingChatButton";
 import { AnimatePresence, motion } from "framer-motion";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/gerente")({
   beforeLoad: ({ location }) => {
-    if (location.pathname === "/admin" || location.pathname === "/admin/") {
-      throw redirect({ to: "/admin/painel" });
+    if (location.pathname === "/gerente" || location.pathname === "/gerente/") {
+      throw redirect({ to: "/gerente/painel" });
     }
   },
   component: AdminLayout,

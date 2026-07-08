@@ -5,7 +5,7 @@ import { StatCard } from "@/components/admin/StatCard";
 import { useAdminStore } from "@/store/useAdminStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 
-export const Route = createFileRoute("/admin/painel")({
+export const Route = createFileRoute("/gerente/painel")({
   head: () => ({
     meta: [
       { title: "Painel · Gerente Helix" },

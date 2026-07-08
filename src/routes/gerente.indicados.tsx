@@ -14,7 +14,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
 import type { ReferralLevel, ReferralUser } from "@/data/mockAdminData";
 
-export const Route = createFileRoute("/admin/indicados")({
+export const Route = createFileRoute("/gerente/indicados")({
   head: () => ({
     meta: [
       { title: "Indicados · Gerente Helix" },

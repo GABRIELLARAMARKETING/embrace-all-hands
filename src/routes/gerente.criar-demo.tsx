@@ -16,7 +16,7 @@ import { useAdminStore } from "@/store/useAdminStore";
 import { formatDate } from "@/utils/formatDate";
 
 
-export const Route = createFileRoute("/admin/criar-demo")({
+export const Route = createFileRoute("/gerente/criar-demo")({
   head: () => ({
     meta: [
       { title: "Criar Demo · Gerente Helix" },

@@ -6,7 +6,7 @@ import { CopyButton } from "@/components/admin/CopyButton";
 import { ToggleSwitch } from "@/components/admin/ToggleSwitch";
 import { useAdminStore } from "@/store/useAdminStore";
 
-export const Route = createFileRoute("/admin/indicar")({
+export const Route = createFileRoute("/gerente/indicar")({
   head: () => ({
     meta: [
       { title: "Indicar · Gerente Helix" },

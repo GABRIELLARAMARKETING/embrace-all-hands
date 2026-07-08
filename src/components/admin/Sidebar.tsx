@@ -19,17 +19,17 @@ interface NavItem {
 }
 
 const items: NavItem[] = [
-  { to: "/admin/painel", label: "Painel", icon: <Home size={18} /> },
-  { to: "/admin/criar-demo", label: "Criar Demo", icon: <Sparkles size={18} /> },
-  { to: "/admin/indicar", label: "Indicar", icon: <UserPlus size={18} /> },
-  { to: "/admin/indicados", label: "Indicados", icon: <Users size={18} /> },
-  { to: "/admin/meus-saques", label: "Meus Saques", icon: <Wallet size={18} /> },
+  { to: "/gerente/painel", label: "Painel", icon: <Home size={18} /> },
+  { to: "/gerente/criar-demo", label: "Criar Demo", icon: <Sparkles size={18} /> },
+  { to: "/gerente/indicar", label: "Indicar", icon: <UserPlus size={18} /> },
+  { to: "/gerente/indicados", label: "Indicados", icon: <Users size={18} /> },
+  { to: "/gerente/meus-saques", label: "Meus Saques", icon: <Wallet size={18} /> },
   {
-    to: "/admin/ajustes-indicados",
+    to: "/gerente/ajustes-indicados",
     label: "Ajustes indicados",
     icon: <Settings2 size={18} />,
   },
-  { to: "/admin/notificacoes", label: "Notificações", icon: <Bell size={18} /> },
+  { to: "/gerente/notificacoes", label: "Notificações", icon: <Bell size={18} /> },
 ];
 
 interface Props {
@@ -92,7 +92,7 @@ export function Sidebar({ onNavigate }: Props) {
 
       <div className="border-t border-[color:var(--admin-line)] p-3">
         <Link
-          to="/admin/login"
+          to="/gerente/login"
           onClick={() => {
             if (typeof window !== "undefined") {
               window.localStorage.removeItem("gerente-helix:auth");

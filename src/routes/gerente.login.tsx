@@ -4,11 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { AdminCard } from "@/components/admin/AdminCard";
-import { AdminInput } from "@/components/admin/AdminInput";
-import { AdminButton } from "@/components/admin/AdminButton";
+import { AdminCard } from "@/components/gerente/AdminCard";
+import { AdminInput } from "@/components/gerente/AdminInput";
+import { AdminButton } from "@/components/gerente/AdminButton";
 
-export const Route = createFileRoute("/admin/login")({
+export const Route = createFileRoute("/gerente/login")({
   head: () => ({
     meta: [
       { title: "Entrar · Gerente Helix" },
@@ -40,7 +40,7 @@ function LoginPage() {
       );
     }
     toast.success("Bem-vindo!");
-    navigate({ to: "/admin/painel" });
+    navigate({ to: "/gerente/painel" });
   };
 
   return (
