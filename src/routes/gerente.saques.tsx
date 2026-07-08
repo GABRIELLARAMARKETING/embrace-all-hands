@@ -8,7 +8,6 @@ import { TopHeader } from "@/components/admin/TopHeader";
 import { AdminCard } from "@/components/admin/AdminCard";
 import { AdminTable } from "@/components/admin/AdminTable";
 import { AdminButton } from "@/components/admin/AdminButton";
-import { AdminInput } from "@/components/admin/AdminInput";
 import { Badge } from "@/components/admin/Badge";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -269,4 +268,3 @@ function maskPix(key: string) {
   return key.slice(0, 3) + "•••" + key.slice(-3);
 }
 // keep AdminInput import used (no lint warn)
-export const _keepInput = AdminInput;
