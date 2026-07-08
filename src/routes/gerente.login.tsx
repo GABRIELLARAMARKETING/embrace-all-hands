@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { AdminCard } from "@/components/admin/AdminCard";
 import { AdminInput } from "@/components/admin/AdminInput";
 import { AdminButton } from "@/components/admin/AdminButton";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/gerente/login")({
   head: () => ({
@@ -15,30 +16,48 @@ export const Route = createFileRoute("/gerente/login")({
       { name: "description", content: "Acesse o painel Gerente Helix." },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    denied: s.denied === "1" ? "1" : undefined,
+  }),
   component: LoginPage,
 });
 
 const schema = z.object({
   email: z.string().trim().email("E-mail inválido").max(120),
-  password: z.string().min(4, "Senha muito curta").max(120),
+  password: z.string().min(6, "Senha muito curta").max(120),
 });
 type FormValues = z.infer<typeof schema>;
 
 function LoginPage() {
   const navigate = useNavigate();
+  const search = useSearch({ from: "/gerente/login" });
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { email: "", password: "" },
   });
 
-  const onSubmit = (values: FormValues) => {
-    // No real auth yet — just store a local flag so the UI can gate later.
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(
-        "gerente-helix:auth",
-        JSON.stringify({ email: values.email, at: Date.now() }),
-      );
+  const onSubmit = async (values: FormValues) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: values.email,
+      password: values.password,
+    });
+    if (error || !data.user) {
+      toast.error(error?.message ?? "Falha no login");
+      return;
     }
+
+    // Verifica papel antes de deixar entrar
+    const { data: rows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.user.id);
+    const roles = new Set((rows ?? []).map((r) => r.role));
+    if (!roles.has("admin") && !roles.has("super_admin")) {
+      await supabase.auth.signOut();
+      toast.error("Sem permissão para acessar o painel.");
+      return;
+    }
+
     toast.success("Bem-vindo!");
     navigate({ to: "/gerente/painel" });
   };
@@ -61,6 +80,12 @@ function LoginPage() {
           </div>
         </div>
 
+        {search.denied && (
+          <div className="mb-4 rounded-[10px] border border-[color:var(--admin-red)]/40 bg-[color:var(--admin-red)]/10 px-3 py-2 text-sm text-[color:var(--admin-red)]">
+            Sua conta não tem permissão para acessar o painel.
+          </div>
+        )}
+
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <AdminInput
             label="E-mail"
@@ -82,10 +107,6 @@ function LoginPage() {
             Entrar
           </AdminButton>
         </form>
-
-        <p className="mt-6 text-center text-xs text-[color:var(--admin-text-3)]">
-          Ambiente de desenvolvimento — autenticação real será conectada pelo backend.
-        </p>
       </AdminCard>
     </div>
   );
