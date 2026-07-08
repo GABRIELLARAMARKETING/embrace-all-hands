@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import { ArrowUp, Copy, PartyPopper, X, CheckCircle2, AlertTriangle } from "lucide-react";
@@ -10,6 +11,7 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { copyToClipboard } from "@/utils/clipboard";
 import { getReferralStats } from "@/lib/referral.functions";
+import { requestAffiliateWithdrawal } from "@/lib/withdrawals.functions";
 import helixLogo from "@/assets/helix-multi-logo.png";
 
 const referralStatsQuery = queryOptions({
