@@ -107,6 +107,8 @@ function GameLogic({
   const velocity = useRef(0);
   const lastBounceRing = useRef<number>(-1);
   const collisionCooldownUntil = useRef(0);
+  const dangerHitFrames = useRef(0);
+
   const passedSincelastBounce = useRef(0);
   const feverUntil = useRef(0);
   const spinVelocity = useRef(0);
@@ -134,6 +136,8 @@ function GameLogic({
     velocity.current = 0;
     lastBounceRing.current = -1;
     collisionCooldownUntil.current = 0;
+    dangerHitFrames.current = 0;
+
     passedSincelastBounce.current = 0;
     feverUntil.current = 0;
     setCollectedCoins(new Set());
@@ -194,6 +198,8 @@ function GameLogic({
     if (isFever !== fever) setFever(isFever);
 
     const ball = ballRef.current;
+    if (velocity.current > 0) dangerHitFrames.current = 0;
+
 
     // ---------- Physics: fixed timestep + accumulator (anti-tunneling, deterministic) ----------
     const sdt = PHYSICS.FIXED_STEP;
@@ -326,11 +332,23 @@ function GameLogic({
 
           if (sector === "danger") {
             if (isFever) continue;
+            dangerHitFrames.current += 1;
+            if (dangerHitFrames.current < CONSTANTS.DANGER_CONFIRM_FRAMES) {
+              // Not enough consecutive contacts — treat as a graze so a
+              // single drag-induced touch doesn't end the run.
+              landedY = ringTopY + CONSTANTS.BALL_RADIUS + CONSTANTS.COLLISION_EPSILON;
+              velocity.current = CONSTANTS.BOUNCE_VELOCITY;
+              lastBounceRing.current = i;
+              collisionCooldownUntil.current =
+                state.clock.elapsedTime + CONSTANTS.COLLISION_COOLDOWN;
+              break;
+            }
             cameraShake.current = 0.6;
             finishedRef.current = true;
             loseGame();
             return;
           }
+
 
           const impactSpeed = Math.abs(velocity.current);
           landedY = ringTopY + CONSTANTS.BALL_RADIUS + CONSTANTS.COLLISION_EPSILON;
