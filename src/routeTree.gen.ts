@@ -32,6 +32,8 @@ import { Route as AppPerfilRouteImport } from './routes/app.perfil'
 import { Route as AppJogarRouteImport } from './routes/app.jogar'
 import { Route as AppIndicarRouteImport } from './routes/app.indicar'
 import { Route as AppDepositarRouteImport } from './routes/app.depositar'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -148,15 +150,27 @@ const AppDepositarRoute = AppDepositarRouteImport.update({
   path: '/depositar',
   getParentRoute: () => AppRoute,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/game': typeof GameRoute
   '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
   '/app/jogar': typeof AppJogarRoute
@@ -176,11 +190,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/game': typeof GameRoute
   '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
   '/app/jogar': typeof AppJogarRoute
@@ -201,12 +217,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/game': typeof GameRoute
   '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
   '/app/jogar': typeof AppJogarRoute
@@ -234,6 +252,8 @@ export interface FileRouteTypes {
     | '/game'
     | '/gerente'
     | '/login'
+    | '/admin/dashboard'
+    | '/admin/login'
     | '/app/depositar'
     | '/app/indicar'
     | '/app/jogar'
@@ -258,6 +278,8 @@ export interface FileRouteTypes {
     | '/game'
     | '/gerente'
     | '/login'
+    | '/admin/dashboard'
+    | '/admin/login'
     | '/app/depositar'
     | '/app/indicar'
     | '/app/jogar'
@@ -283,6 +305,8 @@ export interface FileRouteTypes {
     | '/game'
     | '/gerente'
     | '/login'
+    | '/admin/dashboard'
+    | '/admin/login'
     | '/app/depositar'
     | '/app/indicar'
     | '/app/jogar'
@@ -303,7 +327,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
   GameRoute: typeof GameRoute
@@ -474,8 +498,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDepositarRouteImport
       parentRoute: typeof AppRoute
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminLoginRoute: AdminLoginRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface AppRouteChildren {
   AppDepositarRoute: typeof AppDepositarRoute
@@ -528,7 +578,7 @@ const GerenteRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
   GameRoute: GameRoute,
