@@ -1,11 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { toast } from "sonner";
-import { Copy, User, History, Shield, LogOut, Link as LinkIcon } from "lucide-react";
-import { AppLayout, PlayerCard } from "@/components/player/AppLayout";
+import { Copy, Link as LinkIcon, Lock, LogOut } from "lucide-react";
+import { AppLayout, PlayerCard, GradientButton } from "@/components/player/AppLayout";
 import { PLAYER_MOCK } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { copyToClipboard } from "@/utils/clipboard";
+import helixLogo from "@/assets/helix-multi-logo.png";
 
 export const Route = createFileRoute("/app/perfil")({
   head: () => ({
@@ -23,18 +25,61 @@ function PerfilPage() {
   const affiliateBalance = usePlayerStore((s) => s.affiliateBalance);
   const initial = PLAYER_MOCK.userName.charAt(0).toUpperCase();
 
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [saving, setSaving] = useState(false);
+
   const copyLink = async () => {
     const ok = await copyToClipboard(PLAYER_MOCK.referralUrl);
     toast[ok ? "success" : "error"](ok ? "Link copiado!" : "Falha ao copiar");
   };
 
+  const changePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!current || !next || !confirm) {
+      toast.error("Preencha todos os campos.");
+      return;
+    }
+    if (next.length < 6) {
+      toast.error("A nova senha precisa ter pelo menos 6 caracteres.");
+      return;
+    }
+    if (next !== confirm) {
+      toast.error("As senhas não coincidem.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await new Promise((r) => setTimeout(r, 600));
+      toast.success("Senha alterada com sucesso!");
+      setCurrent("");
+      setNext("");
+      setConfirm("");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const logout = () => {
+    try {
+      window.localStorage.removeItem("helix:player:v1");
+    } catch {}
+    navigate({ to: "/" });
+  };
+
   return (
     <AppLayout title="Meu Perfil">
-      <div className="mt-4 flex flex-col items-center">
-        <div className="grid h-24 w-24 place-items-center rounded-full bg-gradient-to-br from-[#EC5FA3] to-[#7c1e9c] text-4xl font-black text-white shadow-[0_0_28px_rgba(236,95,163,0.55)]">
+      <div className="flex flex-col items-center pt-2">
+        <img
+          src={helixLogo}
+          alt="Helix Multi"
+          className="h-20 w-20 drop-shadow-[0_0_20px_rgba(168,85,247,0.55)]"
+        />
+        <div className="mt-3 grid h-24 w-24 place-items-center rounded-full bg-gradient-to-br from-[#EC5FA3] to-[#A855F7] text-4xl font-black text-white shadow-[0_0_30px_rgba(236,95,163,0.55)]">
           {initial}
         </div>
-        <h2 className="mt-3 text-xl font-black">Ricardo 350</h2>
+        <h2 className="mt-3 text-xl font-black text-white">{PLAYER_MOCK.userName}</h2>
         <p className="text-sm text-white/60">{PLAYER_MOCK.userEmail}</p>
       </div>
 
@@ -44,44 +89,62 @@ function PerfilPage() {
         <StatBox value={formatCurrency(affiliateBalance)} label="AFILIADO" tone="yellow" />
       </div>
 
-      <PlayerCard className="mt-5 p-4">
-        <div className="flex items-center gap-2 text-xs font-bold tracking-widest text-white/60">
-          <LinkIcon className="h-4 w-4" /> LINK DE DIVULGAÇÃO
+      <PlayerCard className="mt-4 p-4">
+        <div className="flex items-center gap-2 text-[11px] font-bold tracking-widest text-white/60">
+          <LinkIcon className="h-4 w-4 text-[#C084FC]" /> LINK DE DIVULGAÇÃO
         </div>
-        <div className="mt-3 flex items-center gap-2 rounded-2xl bg-white/[0.05] p-2">
-          <div className="truncate flex-1 px-2 text-sm text-white/85">{PLAYER_MOCK.referralUrl}</div>
+        <div className="mt-3 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] p-2">
+          <div className="flex-1 truncate px-2 text-sm text-white/85">{PLAYER_MOCK.referralUrl}</div>
           <button
             onClick={copyLink}
-            className="flex shrink-0 items-center gap-1 rounded-full bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] px-3 py-1.5 text-xs font-bold text-white"
+            type="button"
+            className="flex shrink-0 items-center gap-1 rounded-xl bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] px-3 py-2 text-xs font-bold text-white shadow-[0_6px_20px_-8px_rgba(168,85,247,0.7)]"
           >
             <Copy className="h-3.5 w-3.5" /> Copiar
           </button>
         </div>
       </PlayerCard>
 
-      <div className="mt-4 space-y-2">
-        <ActionRow icon={User} label="Meus dados" />
-        <ActionRow icon={History} label="Histórico" />
-        <ActionRow icon={Shield} label="Segurança" />
-        <ActionRow
-          icon={LogOut}
-          label="Sair"
-          danger
-          onClick={() => {
-            try {
-              window.localStorage.removeItem("helix:player:v1");
-            } catch {}
-            navigate({ to: "/" });
-          }}
-        />
-      </div>
+      <PlayerCard className="mt-4 p-4">
+        <div className="flex items-center gap-2 text-[11px] font-bold tracking-widest text-white/60">
+          <Lock className="h-4 w-4 text-[#C084FC]" /> ALTERAR SENHA
+        </div>
+        <form onSubmit={changePassword} className="mt-3 space-y-3">
+          <PasswordInput placeholder="Senha atual" value={current} onChange={setCurrent} />
+          <PasswordInput placeholder="Nova senha" value={next} onChange={setNext} />
+          <PasswordInput placeholder="Confirmar nova senha" value={confirm} onChange={setConfirm} />
+          <GradientButton type="submit" disabled={saving} className="disabled:opacity-60">
+            {saving ? "Alterando..." : "Alterar Senha"}
+          </GradientButton>
+        </form>
+      </PlayerCard>
+
+      <button
+        onClick={logout}
+        type="button"
+        className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-red-500/30 bg-red-500/[0.06] py-4 text-sm font-bold text-red-400 transition-colors hover:bg-red-500/10"
+      >
+        <LogOut className="h-4 w-4" /> Sair da conta
+      </button>
     </AppLayout>
   );
 }
 
-function StatBox({ value, label, tone }: { value: string; label: string; tone: "green" | "purple" | "yellow" }) {
+function StatBox({
+  value,
+  label,
+  tone,
+}: {
+  value: string;
+  label: string;
+  tone: "green" | "purple" | "yellow";
+}) {
   const color =
-    tone === "green" ? "text-emerald-400" : tone === "purple" ? "text-[#C084FC]" : "text-[#FFD600]";
+    tone === "green"
+      ? "text-emerald-400"
+      : tone === "purple"
+        ? "text-[#C084FC]"
+        : "text-[#FFD600]";
   return (
     <PlayerCard className="p-3 text-center">
       <div className={`text-base font-black ${color}`}>{value}</div>
@@ -90,30 +153,22 @@ function StatBox({ value, label, tone }: { value: string; label: string; tone: "
   );
 }
 
-function ActionRow({
-  icon: Icon,
-  label,
-  danger,
-  onClick,
+function PasswordInput({
+  placeholder,
+  value,
+  onChange,
 }: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  danger?: boolean;
-  onClick?: () => void;
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
 }) {
   return (
-    <button
-      onClick={onClick}
-      className="flex w-full items-center gap-3 rounded-2xl border border-white/5 bg-[#1a0a30]/70 px-4 py-3 text-left transition-colors hover:bg-white/[0.05]"
-    >
-      <span
-        className={`grid h-9 w-9 place-items-center rounded-xl ${
-          danger ? "bg-red-500/15 text-red-400" : "bg-white/[0.05] text-[#C084FC]"
-        }`}
-      >
-        <Icon className="h-4 w-4" />
-      </span>
-      <span className={`flex-1 text-sm font-semibold ${danger ? "text-red-300" : "text-white"}`}>{label}</span>
-    </button>
+    <input
+      type="password"
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-[#A855F7]/60 focus:outline-none"
+    />
   );
 }
