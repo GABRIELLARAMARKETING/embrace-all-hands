@@ -1,54 +1,76 @@
-# Plano: App do jogador (rotas `/app/*`)
+# Painel Admin Helix — Plano
 
-Vou criar as 5 telas internas mobile-first inspiradas nas capturas, sem tocar no jogo (`/game`) nem no painel gerente (`/admin/*`). É protótipo visual: dados mockados, sem pagamento/saque real.
+## 1. Stack detectada (não é a sugerida)
 
-## Stack (mantendo o que já existe)
-- TanStack Router (é o padrão do projeto — equivalente a react-router-dom pedido).
-- Tailwind v4 já configurado, shadcn/ui, framer-motion, lucide-react, zustand, react-hook-form + zod, sonner (toast) — todos já instalados.
+O projeto **não** usa Next.js/Prisma/NextAuth. Ele usa:
 
-## Rotas (`src/routes/`)
-```
-app.tsx              → layout com Header + <Outlet/> + BottomNav
-app.jogar.tsx        → Tela 1 (Jogar)
-app.depositar.tsx    → Tela 2 (Depositar via PIX)
-app.sacar.tsx        → Tela 3 (Solicitar Saque)
-app.indicar.tsx      → Telas 4+5 (Indicar + rede N1/N2/N3/Total)
-app.perfil.tsx       → Tela Perfil
-```
-`/app` redireciona para `/app/jogar`. O jogo continua em `/game`, painel em `/admin/*`.
+- **TanStack Start** (file-based routing em `src/routes/`), React 19, Vite 7
+- **Tailwind v4 + shadcn/ui** (já configurados)
+- **Lovable Cloud (Supabase)** — Postgres + Auth + RLS + Realtime
+- **Server functions** via `createServerFn` (`@tanstack/react-start`), não API Routes
+- **TanStack Query** para cache/mutations
+- **Zustand** para estado de UI/mock (já existe `useAdminStore`)
+- **Zod + React Hook Form**, Recharts disponível via shadcn
 
-## Design tokens
-Adiciono em `src/styles.css` uma classe `.player-theme` no layout com variáveis:
-`--player-bg` (#0B0416 → #1A0730 gradient), `--player-card` (#28133F/70), `--player-card-alt` (#111633),
-`--player-neon-purple` (#A855F7), `--player-neon-pink` (#EC5FA3), `--player-green` (#00D084),
-`--player-yellow` (#FFD600). Cards com backdrop-blur e borda `border-white/5`. Botões degradê `from-[#A855F7] to-[#EC5FA3]`. Isolado do jogo e do admin.
+Vou **adaptar** o escopo a essa stack (mantendo o mesmo resultado funcional). Prisma/NextAuth não entram.
 
-## Componentes (`src/components/player/`)
-`AppLayout`, `AppHeader`, `BottomNav`, `BalanceCard`, `GradientButton`, `ValueChip`, `PlayMapCarousel`, `DepositForm`, `WithdrawForm`, `ReferralCard`, `ReferralStatsGrid`, `PixQrModal`, `WithdrawSuccessModal`, `SectionLabel`, `MapThumb` (placeholder puro CSS/gradiente por mapa).
+## 2. Estrutura atual relevante
 
-## Estado e dados
-- `src/data/playerMockData.ts` — todos os valores pedidos (userName, onlineUsers, balance 2390, referralCode DMDU4E20, playOptions, depositOptions, mapOptions).
-- `src/store/usePlayerStore.ts` (zustand) — `balance`, `affiliateBalance`, `selectedMap`, `selectedPlayValue`, ações `setBalance`, `selectMap`, etc. Persistência em localStorage.
-- `src/utils/formatCurrency.ts` já existe (reuso). Adiciono `src/utils/cpfMask.ts`.
-- `src/utils/playerValidators.ts` — schemas Zod:
-  - depósito: valor ≥ 20
-  - saque: valor ≥ 20 e ≤ saldo, pixKey obrigatório, cpf 11 dígitos
-  - jogar: valor > 0
+- Rotas de painel já renomeadas para `/gerente/*` (painel, indicar, indicados, meus-saques, ajustes-indicados, criar-demo, notificações, login).
+- Componentes admin em `src/components/admin/*` (AdminCard, AdminTable, StatCard, Badge, etc.) — reaproveitáveis.
+- Área do jogador em `/app/*` com perfil, saque, indicação já conectados ao backend (`profiles`, `affiliate_withdrawals`, `game_sessions`).
+- Tabelas Supabase existentes: `profiles`, `affiliate_withdrawals`, `game_sessions`, `live_matches`, `game_themes`, `user_theme_inventory`, `user_theme_preferences`.
+- Sem tabela de roles ainda, sem audit log, sem alerts, sem transactions genéricas.
 
-## Telas — resumo funcional
-- **Jogar**: card topo com avatar gradiente rosa/roxo, "MultiHelixBr / Escolha seu mapa e jogue", badge "● 311 online". Chips de valor (seleção única), input personalizado, card "RECOMPENSA MÍNIMA" (valor × 0 até definir cálculo — mostra R$ 0,00 inicialmente e atualiza p/ ex. `valor × 0` → uso `valor * 0.5` como preview, texto amarelo grande). Carrossel horizontal `overflow-x-auto snap-x` com thumbs (gradientes distintos por mapa), item selecionado com borda roxa neon e `scale-105`. Botão "▶ JOGAR — R$ X,XX" desabilitado sem valor; ao clicar navega para `/game`.
-- **Depositar**: saldo grande em verde, chips com selos (MÍNIMO/+CHANCES/POPULAR/BÔNUS +100%), input R$, linha "Tenho um cupom" (expande input simples), botão "Gerar QR Code PIX" → modal com QR placeholder (SVG pattern), botão "Copiar código PIX" (copia string mock, toast).
-- **Sacar**: saldo, 3 inputs (valor, PIX, CPF com máscara), aviso "⏱ Saques processados em até 24h úteis." em card com borda âmbar translúcida, botão "Solicitar Saque" → modal sucesso.
-- **Indicar**: card informativo (50% comissão), card gradiente com 2 colunas (saldo afiliado + total recebido) e botão "↑ Sacar Comissão", card "Seu link exclusivo" com URL + "Copiar" (toast), grid 2×2 N1/N2/N3/TOTAL.
-- **Perfil**: avatar (letra do nome em círculo gradiente), nome, email mock, 3 stat cards (saldo/partidas/afiliado), card link divulgação, botões "Meus dados", "Histórico", "Segurança", "Sair" (limpa flag e volta p/ `/`).
+## 3. Gaps entre o pedido e o que existe
 
-## Bottom nav
-Fixa (`fixed bottom-0`, `pb-[env(safe-area-inset-bottom)]`), 5 itens. Item central "Jogar" é um círculo maior elevado (`-translate-y-4`), gradiente roxo→rosa, com anel de brilho (`shadow-[0_0_30px_rgba(168,85,247,0.6)]`). Ativa detectada via `useRouterState`. Espaçamento inferior no `AppLayout` (`pb-28`) para conteúdo não sumir.
+Faltam para virar "admin panel de verdade":
 
-## Segurança
-Zod em todos os forms, `sanitize` já disponível, sem `dangerouslySetInnerHTML`, valores numéricos validados, sem chamadas externas.
+- **RBAC real**: `app_role` enum + `user_roles` + `has_role()` (padrão Lovable) — hoje o `/gerente/login` só grava flag em localStorage.
+- **Novas tabelas**: `manager_profiles`, `affiliate_links`, `commissions`, `transactions`, `audit_logs`, `risk_alerts`, `platform_settings`, `login_logs`.
+- **Server functions** (`src/lib/*.functions.ts`) para cada domínio, sempre com `requireSupabaseAuth` + checagem `has_role`.
+- **Novas rotas** sob `/gerente/*` (dashboard já existe como `painel`, faltam: usuários, gerentes, afiliados, saques admin, comissões, financeiro, relatórios, audit-logs, alertas, configurações, perfil admin).
+- **Gate de rota**: mover `/gerente/*` para `_authenticated/` + checagem de role no `beforeLoad`.
 
-## Fora do escopo
-Backend, pagamento real, saque real, autenticação. `/app/*` é público (protótipo).
+## 4. Escopo é grande demais para uma entrega — proposta de fases
 
-Depois de aprovado, entrego tudo em um único ciclo e valido o build.
+Entregar tudo de uma vez vira código superficial. Sugiro fatiar assim (cada fase é 1 iteração completa: schema + policies + server fns + UI + testes manuais):
+
+**Fase 1 — Fundação (sem UI nova)**
+- Enum `app_role` (super_admin, admin, gerente, afiliado), tabela `user_roles`, função `has_role()`, RLS.
+- Mover `/gerente/*` para `_authenticated/gerente/*` + gate por role.
+- Substituir login mock por Supabase Auth.
+- Tabela `audit_logs` + helper `logAudit()` para uso nas próximas fases.
+
+**Fase 2 — Saques (admin)**
+- Estender `affiliate_withdrawals` com status expandido, `reviewed_by`, `reviewed_at`, `rejection_reason`, `paid_at`, `ip`, `user_agent`, `notes`.
+- Server fns: listar, aprovar, recusar, marcar pago — tudo em transação, com audit log.
+- Tela `/gerente/saques` (fila + detalhe + modais de confirmação).
+
+**Fase 3 — Gerentes & Afiliados**
+- `manager_profiles`, vínculo afiliado→gerente em `profiles`.
+- Telas de listagem, detalhe, ativar/bloquear/trocar gerente.
+
+**Fase 4 — Comissões & Financeiro**
+- `commissions`, `transactions`, view de saldo sacável.
+- Telas de listagem + filtros + export CSV.
+
+**Fase 5 — Dashboard, Alertas, Logs, Configurações, Relatórios**
+- Gráficos Recharts, `risk_alerts`, `platform_settings`, viewer de `audit_logs`, export.
+
+## 5. Riscos técnicos
+
+- **Roles em `profiles` = falha de segurança conhecida** — precisa ser tabela separada (regra Lovable).
+- Sem gate de rota atual, qualquer usuário logado acessaria `/gerente/*`.
+- `affiliate_withdrawals` já tem policies — alterar schema exige revisar RLS e não quebrar `/app/sacar`.
+- Migrations Supabase são aprovadas 1 a 1 pelo usuário; cada fase = 1 ou 2 migrations.
+- Recharts + tabelas grandes exigem paginação server-side desde o começo (não fazer client-side).
+
+## 6. Decisões que preciso de você antes de começar a Fase 1
+
+1. **Confirma adaptar para a stack atual** (TanStack Start + Lovable Cloud) em vez de Next.js/Prisma?
+2. **Quem é o primeiro super_admin?** Me diga o e-mail da conta que já existe no Auth (ou crio uma nova) — sem isso o painel trava você fora depois do gate.
+3. **Começar pela Fase 1 (fundação + gate + auth real) e Fase 2 (saques admin)?** São as duas mais críticas — resto vem em seguida.
+4. **Manter os componentes visuais atuais** (`AdminCard`, `AdminTable`, sidebar neon) ou refazer com shadcn puro?
+
+Depois que você responder, eu executo Fase 1 já com a migration, o gate e a auth real, sem tocar no que já funciona em `/app/*`.
