@@ -43,6 +43,7 @@ function PerfilPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: profile } = useSuspenseQuery(myProfileQuery);
+  const { data: withdrawals = [] } = useSuspenseQuery(withdrawalsQuery);
   // Mirror server values into the local store when setters exist
   const store = usePlayerStore.getState() as unknown as Record<string, unknown>;
   useEffect(() => {
