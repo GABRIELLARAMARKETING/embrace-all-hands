@@ -37,6 +37,8 @@ export const Route = createFileRoute("/app/indicar")({
 function IndicarPage() {
   const { data } = useSuspenseQuery(referralStatsQuery);
   const setReferralStats = usePlayerStore((s) => s.setReferralStats);
+  const queryClient = useQueryClient();
+  const submitWithdrawal = useServerFn(requestAffiliateWithdrawal);
 
   useEffect(() => {
     setReferralStats(data.stats);
@@ -67,11 +69,13 @@ function IndicarPage() {
   const confirmWithdraw = async () => {
     setProcessing(true);
     try {
-      await new Promise((r) => setTimeout(r, 700));
-      toast.success("Solicitação de saque enviada com sucesso!");
+      await submitWithdrawal({ data: { amount: affiliateBalance } });
+      toast.success("Solicitação de saque registrada com sucesso!");
       setConfirmOpen(false);
-    } catch {
-      toast.error("Não foi possível processar o saque. Tente novamente.");
+      await queryClient.invalidateQueries({ queryKey: ["referral-stats"] });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erro ao solicitar saque.";
+      toast.error(message);
     } finally {
       setProcessing(false);
     }
