@@ -20,13 +20,13 @@ const referralStatsQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/app/indicar")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Indicar Amigos — MultiHelixBr" },
       { name: "description", content: "Ganhe comissão indicando amigos." },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(referralStatsQuery),
   errorComponent: ({ error }) => (
     <div className="p-6 text-sm text-red-400">Erro ao carregar: {error.message}</div>
   ),
