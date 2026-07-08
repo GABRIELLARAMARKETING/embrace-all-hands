@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Copy, Link as LinkIcon, Lock, LogOut } from "lucide-react";
 import { AppLayout, PlayerCard, GradientButton } from "@/components/player/AppLayout";
@@ -7,17 +8,30 @@ import { PLAYER_MOCK } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { copyToClipboard } from "@/utils/clipboard";
+import { supabase } from "@/integrations/supabase/client";
+import { getMyProfile } from "@/lib/profile.functions";
 import helixLogo from "@/assets/helix-multi-logo.png";
 
+const myProfileQuery = queryOptions({
+  queryKey: ["my-profile"],
+  queryFn: () => getMyProfile(),
+});
+
 export const Route = createFileRoute("/app/perfil")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Meu Perfil — MultiHelixBr" },
       { name: "description", content: "Perfil do jogador." },
     ],
   }),
+  errorComponent: ({ error }) => (
+    <div className="p-6 text-sm text-red-400">Erro ao carregar perfil: {error.message}</div>
+  ),
+  notFoundComponent: () => <div className="p-6 text-sm text-white/70">Não encontrado.</div>,
   component: PerfilPage,
 });
+
 
 function PerfilPage() {
   const navigate = useNavigate();
