@@ -169,7 +169,6 @@ function GameLogo() {
     </div>
   );
 }
-}
 
 function PixQrModal({ open, onClose, amount }: { open: boolean; onClose: () => void; amount: number }) {
   return (
