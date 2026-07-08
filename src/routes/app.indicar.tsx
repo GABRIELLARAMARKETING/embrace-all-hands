@@ -42,10 +42,37 @@ function IndicarPage() {
 
   const affiliateBalance = data.affiliateBalance;
   const totalReceived = data.totalReceived;
+  const withdrawMin = PLAYER_MOCK.withdrawMin;
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   const copyLink = async () => {
     const ok = await copyToClipboard(PLAYER_MOCK.referralUrl);
     toast[ok ? "success" : "error"](ok ? "Link copiado com sucesso!" : "Falha ao copiar");
+  };
+
+  const handleWithdrawClick = () => {
+    if (affiliateBalance < withdrawMin) {
+      toast.error(
+        `Saldo insuficiente. Mínimo para saque: ${formatCurrency(withdrawMin)}.`,
+      );
+      return;
+    }
+    setConfirmOpen(true);
+  };
+
+  const confirmWithdraw = async () => {
+    setProcessing(true);
+    try {
+      await new Promise((r) => setTimeout(r, 700));
+      toast.success("Solicitação de saque enviada com sucesso!");
+      setConfirmOpen(false);
+    } catch {
+      toast.error("Não foi possível processar o saque. Tente novamente.");
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const tiers = ["N1", "N2", "N3", "TOTAL"] as const;
