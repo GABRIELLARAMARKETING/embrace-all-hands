@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { createContext, useContext, useEffect, useState } from "react";
-import { Sidebar } from "@/components/gerente/Sidebar";
-import { FloatingChatButton } from "@/components/gerente/FloatingChatButton";
+import { Sidebar } from "@/components/admin/Sidebar";
+import { FloatingChatButton } from "@/components/admin/FloatingChatButton";
 import { AnimatePresence, motion } from "framer-motion";
 
 export const Route = createFileRoute("/gerente")({
