@@ -32,13 +32,22 @@ export const Route = createFileRoute("/app/indicar")({
 });
 
 function IndicarPage() {
-  const affiliateBalance = usePlayerStore((s) => s.affiliateBalance);
-  const totalReceived = usePlayerStore((s) => s.totalReceived);
+  const { data } = useSuspenseQuery(referralStatsQuery);
+  const setReferralStats = usePlayerStore((s) => s.setReferralStats);
+
+  useEffect(() => {
+    setReferralStats(data.stats);
+  }, [data.stats, setReferralStats]);
+
+  const affiliateBalance = data.affiliateBalance;
+  const totalReceived = data.totalReceived;
 
   const copyLink = async () => {
     const ok = await copyToClipboard(PLAYER_MOCK.referralUrl);
     toast[ok ? "success" : "error"](ok ? "Link copiado com sucesso!" : "Falha ao copiar");
   };
+
+  const tiers = ["N1", "N2", "N3", "TOTAL"] as const;
 
   return (
     <AppLayout title="Indicar Amigos">
@@ -85,23 +94,41 @@ function IndicarPage() {
       </PlayerCard>
 
       <div className="mt-4 grid grid-cols-2 gap-3">
-        <StatCard tier="N1" subtitle="diretos" />
-        <StatCard tier="N2" subtitle="2º nível" />
-        <StatCard tier="N3" subtitle="3º nível" />
-        <StatCard tier="TOTAL" subtitle="rede" />
+        {tiers.map((tier) => {
+          const s = data.stats[tier];
+          return (
+            <StatCard
+              key={tier}
+              tier={tier}
+              subtitle={s.subtitle}
+              count={s.count}
+              deposits={s.deposits}
+            />
+          );
+        })}
       </div>
     </AppLayout>
   );
 }
 
-function StatCard({ tier, subtitle }: { tier: string; subtitle: string }) {
+function StatCard({
+  tier,
+  subtitle,
+  count,
+  deposits,
+}: {
+  tier: string;
+  subtitle: string;
+  count: number;
+  deposits: number;
+}) {
   return (
     <PlayerCard className="p-4 text-center">
       <div className="text-lg font-black text-[#C084FC]">{tier}</div>
       <div className="text-xs text-white/60">{subtitle}</div>
-      <div className="mt-3 text-lg font-black text-white">0</div>
+      <div className="mt-3 text-lg font-black text-white">{count}</div>
       <div className="text-[10px] font-bold tracking-widest text-white/50">INDICADOS</div>
-      <div className="mt-3 text-lg font-black text-white">R$ 0,00</div>
+      <div className="mt-3 text-lg font-black text-white">{formatCurrency(deposits)}</div>
       <div className="text-[10px] font-bold tracking-widest text-white/50">TOTAL EM DEPÓSITOS</div>
     </PlayerCard>
   );
