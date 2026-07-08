@@ -75,6 +75,7 @@ function GamePage() {
 
       <PhysicsDebugOverlay />
       <CoinPopLayer />
+      <MoneyProgressBar />
 
       <PauseMenu open={gameState === "paused"} />
       <GameOverModal open={gameState === "gameOver"} />
