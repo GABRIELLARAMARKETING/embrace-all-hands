@@ -51,7 +51,7 @@ export function Sidebar({ onNavigate }: Props) {
             <span className="text-[color:var(--admin-neon)]">Helix</span>
           </p>
           <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-[color:var(--admin-text-3)]">
-            Painel Admin
+            Painel Gerente
           </p>
         </div>
       </div>
