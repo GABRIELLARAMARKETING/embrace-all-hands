@@ -8,7 +8,7 @@ import { AdminCard } from "@/components/admin/AdminCard";
 import { AdminInput } from "@/components/admin/AdminInput";
 import { AdminButton } from "@/components/admin/AdminButton";
 
-export const Route = createFileRoute("/admin/login")({
+export const Route = createFileRoute("/gerente/login")({
   head: () => ({
     meta: [
       { title: "Entrar · Gerente Helix" },

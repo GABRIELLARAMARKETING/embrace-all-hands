@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/admin/Sidebar";
 import { FloatingChatButton } from "@/components/admin/FloatingChatButton";
 import { AnimatePresence, motion } from "framer-motion";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/gerente")({
   beforeLoad: ({ location }) => {
     if (location.pathname === "/admin" || location.pathname === "/admin/") {
       throw redirect({ to: "/admin/painel" });
