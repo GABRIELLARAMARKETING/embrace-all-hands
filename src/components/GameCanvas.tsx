@@ -198,6 +198,8 @@ function GameLogic({
     if (isFever !== fever) setFever(isFever);
 
     const ball = ballRef.current;
+    if (velocity.current > 0) dangerHitFrames.current = 0;
+
 
     // ---------- Physics: fixed timestep + accumulator (anti-tunneling, deterministic) ----------
     const sdt = PHYSICS.FIXED_STEP;
