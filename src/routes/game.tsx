@@ -12,6 +12,7 @@ import { SkinShop } from "@/components/SkinShop";
 import { useGameStore } from "@/store/useGameStore";
 import { PhysicsDebugOverlay } from "@/components/PhysicsDebugOverlay";
 import { CoinPopLayer } from "@/components/CoinPopLayer";
+import { MoneyProgressBar } from "@/components/MoneyProgressBar";
 import { useGameSession } from "@/hooks/useGameSession";
 import { useThemePreload } from "@/hooks/useThemePreload";
 
