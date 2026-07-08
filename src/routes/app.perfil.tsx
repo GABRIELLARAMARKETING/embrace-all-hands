@@ -35,14 +35,48 @@ export const Route = createFileRoute("/app/perfil")({
 
 function PerfilPage() {
   const navigate = useNavigate();
-  const balance = usePlayerStore((s) => s.balance);
-  const affiliateBalance = usePlayerStore((s) => s.affiliateBalance);
-  const initial = PLAYER_MOCK.userName.charAt(0).toUpperCase();
+  const queryClient = useQueryClient();
+  const { data: profile } = useSuspenseQuery(myProfileQuery);
+  const setBalance = usePlayerStore((s) => s.setBalance);
+  const setAffiliateBalance = usePlayerStore((s) => s.setAffiliateBalance);
+
+  useEffect(() => {
+    setBalance?.(profile.balance);
+    setAffiliateBalance?.(profile.affiliateBalance);
+  }, [profile.balance, profile.affiliateBalance, setBalance, setAffiliateBalance]);
+
+  // Realtime: refresh when profile row or game_sessions change
+  useEffect(() => {
+    const channel = supabase
+      .channel(`profile-${profile.userId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "profiles", filter: `id=eq.${profile.userId}` },
+        () => queryClient.invalidateQueries({ queryKey: ["my-profile"] }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "game_sessions", filter: `user_id=eq.${profile.userId}` },
+        () => queryClient.invalidateQueries({ queryKey: ["my-profile"] }),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile.userId, queryClient]);
+
+  const balance = profile.balance;
+  const affiliateBalance = profile.affiliateBalance;
+  const matchesPlayed = profile.matchesPlayed;
+  const displayName = profile.displayName;
+  const email = profile.email;
+  const initial = (displayName || "?").charAt(0).toUpperCase();
 
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
   const [saving, setSaving] = useState(false);
+
 
   const copyLink = async () => {
     const ok = await copyToClipboard(PLAYER_MOCK.referralUrl);
