@@ -3,11 +3,32 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { FloatingChatButton } from "@/components/admin/FloatingChatButton";
 import { AnimatePresence, motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/gerente")({
-  beforeLoad: ({ location }) => {
+  ssr: false,
+  beforeLoad: async ({ location }) => {
+    // Login page é público
+    if (location.pathname === "/gerente/login") return;
+
     if (location.pathname === "/gerente" || location.pathname === "/gerente/") {
       throw redirect({ to: "/gerente/painel" });
+    }
+
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) {
+      throw redirect({ to: "/gerente/login" });
+    }
+
+    // RBAC: precisa ser admin ou super_admin
+    const { data: rows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userData.user.id);
+    const roles = new Set((rows ?? []).map((r) => r.role));
+    if (!roles.has("admin") && !roles.has("super_admin")) {
+      await supabase.auth.signOut();
+      throw redirect({ to: "/gerente/login", search: { denied: "1" } as never });
     }
   },
   component: AdminLayout,
