@@ -335,7 +335,7 @@ export const listAuditLogs = createServerFn({ method: "GET" })
 export type PlatformSettingRow = {
   id: string;
   key: string;
-  value: unknown;
+  value: any;
   type: string;
   description: string | null;
   is_critical: boolean;
@@ -402,7 +402,7 @@ export type ReportExportRow = {
   type: string;
   status: string;
   file_url: string | null;
-  filters: unknown;
+  filters: any;
   created_at: string;
 };
 
