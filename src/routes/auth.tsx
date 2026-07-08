@@ -48,12 +48,16 @@ function SignupPage() {
 
     setLoading(true);
     try {
+      const ref =
+        typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search).get("ref")?.trim().toUpperCase() || undefined
+          : undefined;
       const { error } = await supabase.auth.signUp({
         email: phoneToEmail(phone),
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { display_name: name.trim(), phone: digits },
+          data: { display_name: name.trim(), phone: digits, ref },
         },
       });
       if (error) throw error;
