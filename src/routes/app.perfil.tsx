@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Copy, Link as LinkIcon, Lock, LogOut } from "lucide-react";
+import { Copy, History, Link as LinkIcon, Lock, LogOut } from "lucide-react";
+import { listAffiliateWithdrawals, type WithdrawalHistoryItem } from "@/lib/withdrawals.functions";
 import { AppLayout, PlayerCard, GradientButton } from "@/components/player/AppLayout";
 import { PLAYER_MOCK } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
@@ -15,6 +16,11 @@ import helixLogo from "@/assets/helix-multi-logo.png";
 const myProfileQuery = queryOptions({
   queryKey: ["my-profile"],
   queryFn: () => getMyProfile(),
+});
+
+const withdrawalsQuery = queryOptions({
+  queryKey: ["affiliate-withdrawals"],
+  queryFn: () => listAffiliateWithdrawals(),
 });
 
 export const Route = createFileRoute("/app/perfil")({
@@ -37,6 +43,7 @@ function PerfilPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: profile } = useSuspenseQuery(myProfileQuery);
+  const { data: withdrawals = [] } = useSuspenseQuery(withdrawalsQuery);
   // Mirror server values into the local store when setters exist
   const store = usePlayerStore.getState() as unknown as Record<string, unknown>;
   useEffect(() => {
@@ -60,6 +67,11 @@ function PerfilPage() {
         "postgres_changes",
         { event: "*", schema: "public", table: "game_sessions", filter: `user_id=eq.${profile.userId}` },
         () => queryClient.invalidateQueries({ queryKey: ["my-profile"] }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "affiliate_withdrawals", filter: `user_id=eq.${profile.userId}` },
+        () => queryClient.invalidateQueries({ queryKey: ["affiliate-withdrawals"] }),
       )
       .subscribe();
     return () => {
@@ -156,6 +168,9 @@ function PerfilPage() {
         </div>
       </PlayerCard>
 
+      <WithdrawalHistory items={withdrawals} />
+
+
       <PlayerCard className="mt-4 p-4">
         <div className="flex items-center gap-2 text-[11px] font-bold tracking-widest text-white/60">
           <Lock className="h-4 w-4 text-[#C084FC]" /> ALTERAR SENHA
@@ -221,5 +236,60 @@ function PasswordInput({
       onChange={(e) => onChange(e.target.value)}
       className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-[#A855F7]/60 focus:outline-none"
     />
+  );
+}
+
+function withdrawalStatusMeta(status: string) {
+  const s = status.toLowerCase();
+  if (s === "approved" || s === "paid" || s === "completed")
+    return { label: "Aprovado", cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" };
+  if (s === "rejected" || s === "failed" || s === "canceled")
+    return { label: "Recusado", cls: "bg-red-500/15 text-red-300 border-red-500/30" };
+  return { label: "Pendente", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" };
+}
+
+function WithdrawalHistory({ items }: { items: WithdrawalHistoryItem[] }) {
+  return (
+    <PlayerCard className="mt-4 p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-[11px] font-bold tracking-widest text-white/60">
+          <History className="h-4 w-4 text-[#C084FC]" /> HISTÓRICO DE RETIRADAS
+        </div>
+        <div className="text-[10px] font-bold tracking-widest text-white/40">
+          {items.length} {items.length === 1 ? "registro" : "registros"}
+        </div>
+      </div>
+      {items.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-white/10 py-6 text-center text-xs text-white/50">
+          Você ainda não solicitou nenhum saque.
+        </div>
+      ) : (
+        <ul className="divide-y divide-white/5">
+          {items.map((w) => {
+            const meta = withdrawalStatusMeta(w.status);
+            const date = new Date(w.created_at).toLocaleString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            return (
+              <li key={w.id} className="flex items-center justify-between py-3">
+                <div>
+                  <div className="text-sm font-bold text-white">{formatCurrency(w.amount)}</div>
+                  <div className="text-[11px] text-white/50">{date}</div>
+                </div>
+                <span
+                  className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${meta.cls}`}
+                >
+                  {meta.label}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </PlayerCard>
   );
 }
