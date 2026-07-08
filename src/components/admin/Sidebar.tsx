@@ -43,6 +43,14 @@ interface Props {
 
 export function Sidebar({ onNavigate }: Props) {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    onNavigate?.();
+    navigate({ to: "/gerente/login" });
+  };
+
 
   return (
     <aside className="flex h-full w-full flex-col border-r border-[color:var(--admin-line)] bg-[color:var(--admin-sidebar)]">
