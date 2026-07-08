@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ArrowUp, Copy, PartyPopper } from "lucide-react";
 import { AppLayout, PlayerCard } from "@/components/player/AppLayout";
@@ -6,7 +8,13 @@ import { PLAYER_MOCK } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { copyToClipboard } from "@/utils/clipboard";
+import { getReferralStats } from "@/lib/referral.functions";
 import helixLogo from "@/assets/helix-multi-logo.png";
+
+const referralStatsQuery = queryOptions({
+  queryKey: ["referral-stats"],
+  queryFn: () => getReferralStats(),
+});
 
 export const Route = createFileRoute("/app/indicar")({
   head: () => ({
@@ -15,17 +23,31 @@ export const Route = createFileRoute("/app/indicar")({
       { name: "description", content: "Ganhe comissão indicando amigos." },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(referralStatsQuery),
+  errorComponent: ({ error }) => (
+    <div className="p-6 text-sm text-red-400">Erro ao carregar: {error.message}</div>
+  ),
+  notFoundComponent: () => <div className="p-6 text-sm text-white/70">Não encontrado.</div>,
   component: IndicarPage,
 });
 
 function IndicarPage() {
-  const affiliateBalance = usePlayerStore((s) => s.affiliateBalance);
-  const totalReceived = usePlayerStore((s) => s.totalReceived);
+  const { data } = useSuspenseQuery(referralStatsQuery);
+  const setReferralStats = usePlayerStore((s) => s.setReferralStats);
+
+  useEffect(() => {
+    setReferralStats(data.stats);
+  }, [data.stats, setReferralStats]);
+
+  const affiliateBalance = data.affiliateBalance;
+  const totalReceived = data.totalReceived;
 
   const copyLink = async () => {
     const ok = await copyToClipboard(PLAYER_MOCK.referralUrl);
     toast[ok ? "success" : "error"](ok ? "Link copiado com sucesso!" : "Falha ao copiar");
   };
+
+  const tiers = ["N1", "N2", "N3", "TOTAL"] as const;
 
   return (
     <AppLayout title="Indicar Amigos">
@@ -72,23 +94,41 @@ function IndicarPage() {
       </PlayerCard>
 
       <div className="mt-4 grid grid-cols-2 gap-3">
-        <StatCard tier="N1" subtitle="diretos" />
-        <StatCard tier="N2" subtitle="2º nível" />
-        <StatCard tier="N3" subtitle="3º nível" />
-        <StatCard tier="TOTAL" subtitle="rede" />
+        {tiers.map((tier) => {
+          const s = data.stats[tier];
+          return (
+            <StatCard
+              key={tier}
+              tier={tier}
+              subtitle={s.subtitle}
+              count={s.count}
+              deposits={s.deposits}
+            />
+          );
+        })}
       </div>
     </AppLayout>
   );
 }
 
-function StatCard({ tier, subtitle }: { tier: string; subtitle: string }) {
+function StatCard({
+  tier,
+  subtitle,
+  count,
+  deposits,
+}: {
+  tier: string;
+  subtitle: string;
+  count: number;
+  deposits: number;
+}) {
   return (
     <PlayerCard className="p-4 text-center">
       <div className="text-lg font-black text-[#C084FC]">{tier}</div>
       <div className="text-xs text-white/60">{subtitle}</div>
-      <div className="mt-3 text-lg font-black text-white">0</div>
+      <div className="mt-3 text-lg font-black text-white">{count}</div>
       <div className="text-[10px] font-bold tracking-widest text-white/50">INDICADOS</div>
-      <div className="mt-3 text-lg font-black text-white">R$ 0,00</div>
+      <div className="mt-3 text-lg font-black text-white">{formatCurrency(deposits)}</div>
       <div className="text-[10px] font-bold tracking-widest text-white/50">TOTAL EM DEPÓSITOS</div>
     </PlayerCard>
   );

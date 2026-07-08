@@ -21,6 +21,12 @@ export const PLAYER_MOCK = {
   playOptions: [5, 10, 20, 30, 50, 100] as const,
   pixMockCode:
     "00020126360014BR.GOV.BCB.PIX0114+55119999999995204000053039865405120.005802BR5910HelixMulti6009SaoPaulo62070503***6304ABCD",
+  referralStats: {
+    N1: { count: 0, deposits: 0, subtitle: "diretos" },
+    N2: { count: 0, deposits: 0, subtitle: "2º nível" },
+    N3: { count: 0, deposits: 0, subtitle: "3º nível" },
+    TOTAL: { count: 0, deposits: 0, subtitle: "rede" },
+  } as Record<"N1" | "N2" | "N3" | "TOTAL", { count: number; deposits: number; subtitle: string }>,
 };
 
 export const MAP_OPTIONS: MapOption[] = [
