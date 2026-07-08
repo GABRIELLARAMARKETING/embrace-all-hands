@@ -55,23 +55,20 @@ export function MoneyProgressBar() {
       </div>
 
       {completed && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center px-6 pb-8 sm:pb-10">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex w-full flex-col items-center justify-center px-6 pb-8 sm:pb-10">
           <button
             type="button"
             onClick={() => {
               window.dispatchEvent(new CustomEvent("redeem-reward", { detail: { value: GOAL } }));
             }}
-            className="pointer-events-auto flex w-auto items-center justify-center gap-2.5 rounded-full bg-gradient-to-b from-[#FFD24A] via-[#FFB627] to-[#F59E0B] px-14 py-6 text-[19px] font-black tracking-tight text-black shadow-[0_16px_36px_-6px_rgba(245,158,11,0.65),inset_0_-5px_0_rgba(0,0,0,0.2),inset_0_2px_0_rgba(255,255,255,0.45)] transition active:translate-y-[1px] active:scale-[0.99]"
-            style={{ textShadow: "0 1px 0 rgba(255,255,255,0.15)" }}
+            className="pointer-events-auto flex h-[78px] w-[86%] max-w-[360px] items-center justify-center gap-[10px] whitespace-nowrap rounded-full border-none bg-gradient-to-r from-[#FFC400] to-[#FFAB00] text-[22px] font-black tracking-[-0.3px] text-[#050505] shadow-[0_14px_28px_rgba(0,0,0,0.22)] outline-none transition-transform duration-150 active:scale-[0.98]"
           >
-            <span className="text-2xl leading-none">🏆</span>
-            <span className="font-black">Resgatar R$20,00</span>
-
-
+            <span className="text-[20px] leading-none">🏆</span>
+            <span>RESGATAR R$ 20,00</span>
           </button>
-          <span className="mt-3 text-[13px] font-semibold italic text-amber-300/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.25)]">
+          <p className="mt-[10px] text-center text-[14px] font-semibold text-[#FFD43B]">
             Continue jogando para ganhar mais!
-          </span>
+          </p>
         </div>
 
       )}
