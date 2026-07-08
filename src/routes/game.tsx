@@ -11,6 +11,7 @@ import { ThemeSelector } from "@/components/ThemeSelector";
 import { SkinShop } from "@/components/SkinShop";
 import { useGameStore } from "@/store/useGameStore";
 import { PhysicsDebugOverlay } from "@/components/PhysicsDebugOverlay";
+import { CoinPopLayer } from "@/components/CoinPopLayer";
 import { useGameSession } from "@/hooks/useGameSession";
 import { useThemePreload } from "@/hooks/useThemePreload";
 
@@ -72,6 +73,7 @@ function GamePage() {
       )}
 
       <PhysicsDebugOverlay />
+      <CoinPopLayer />
 
       <PauseMenu open={gameState === "paused"} />
       <GameOverModal open={gameState === "gameOver"} />
