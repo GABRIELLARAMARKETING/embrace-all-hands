@@ -168,6 +168,9 @@ function PerfilPage() {
         </div>
       </PlayerCard>
 
+      <WithdrawalHistory items={withdrawals} />
+
+
       <PlayerCard className="mt-4 p-4">
         <div className="flex items-center gap-2 text-[11px] font-bold tracking-widest text-white/60">
           <Lock className="h-4 w-4 text-[#C084FC]" /> ALTERAR SENHA
