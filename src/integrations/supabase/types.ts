@@ -16,34 +16,100 @@ export type Database = {
     Tables: {
       affiliate_withdrawals: {
         Row: {
+          admin_notes: string | null
           amount: number
           created_at: string
           id: string
           note: string | null
+          paid_at: string | null
           pix_key: string | null
-          status: string
+          rejection_reason: string | null
+          request_ip: string | null
+          request_user_agent: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["withdrawal_status"]
           updated_at: string
           user_id: string
         }
         Insert: {
+          admin_notes?: string | null
           amount: number
           created_at?: string
           id?: string
           note?: string | null
+          paid_at?: string | null
           pix_key?: string | null
-          status?: string
+          rejection_reason?: string | null
+          request_ip?: string | null
+          request_user_agent?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["withdrawal_status"]
           updated_at?: string
           user_id: string
         }
         Update: {
+          admin_notes?: string | null
           amount?: number
           created_at?: string
           id?: string
           note?: string | null
+          paid_at?: string | null
           pix_key?: string | null
-          status?: string
+          rejection_reason?: string | null
+          request_ip?: string | null
+          request_user_agent?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["withdrawal_status"]
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          ip: string | null
+          new_value: Json | null
+          old_value: Json | null
+          reason: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          ip?: string | null
+          new_value?: Json | null
+          old_value?: Json | null
+          reason?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          ip?: string | null
+          new_value?: Json | null
+          old_value?: Json | null
+          reason?: string | null
+          user_agent?: string | null
         }
         Relationships: []
       }
@@ -225,6 +291,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_theme_inventory: {
         Row: {
           id: string
@@ -322,10 +409,25 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "super_admin" | "admin" | "gerente" | "afiliado"
+      withdrawal_status:
+        | "pending"
+        | "in_review"
+        | "approved"
+        | "paid"
+        | "rejected"
+        | "cancelled"
+        | "failed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -452,6 +554,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["super_admin", "admin", "gerente", "afiliado"],
+      withdrawal_status: [
+        "pending",
+        "in_review",
+        "approved",
+        "paid",
+        "rejected",
+        "cancelled",
+        "failed",
+      ],
+    },
   },
 } as const
