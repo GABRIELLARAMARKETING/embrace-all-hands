@@ -32,8 +32,17 @@ import { Route as AppPerfilRouteImport } from './routes/app.perfil'
 import { Route as AppJogarRouteImport } from './routes/app.jogar'
 import { Route as AppIndicarRouteImport } from './routes/app.indicar'
 import { Route as AppDepositarRouteImport } from './routes/app.depositar'
+import { Route as AdminWithdrawalsRouteImport } from './routes/admin.withdrawals'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminRiskAlertsRouteImport } from './routes/admin.risk-alerts'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminManagersRouteImport } from './routes/admin.managers'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
+import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
+import { Route as AdminAffiliatesRouteImport } from './routes/admin.affiliates'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -150,14 +159,59 @@ const AppDepositarRoute = AppDepositarRouteImport.update({
   path: '/depositar',
   getParentRoute: () => AppRoute,
 } as any)
+const AdminWithdrawalsRoute = AdminWithdrawalsRouteImport.update({
+  id: '/withdrawals',
+  path: '/withdrawals',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRiskAlertsRoute = AdminRiskAlertsRouteImport.update({
+  id: '/risk-alerts',
+  path: '/risk-alerts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminManagersRoute = AdminManagersRouteImport.update({
+  id: '/managers',
+  path: '/managers',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminFinanceRoute = AdminFinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCommissionsRoute = AdminCommissionsRouteImport.update({
+  id: '/commissions',
+  path: '/commissions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuditLogsRoute = AdminAuditLogsRouteImport.update({
+  id: '/audit-logs',
+  path: '/audit-logs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAffiliatesRoute = AdminAffiliatesRouteImport.update({
+  id: '/affiliates',
+  path: '/affiliates',
   getParentRoute: () => AdminRoute,
 } as any)
 
@@ -169,8 +223,17 @@ export interface FileRoutesByFullPath {
   '/game': typeof GameRoute
   '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
+  '/admin/affiliates': typeof AdminAffiliatesRoute
+  '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/finance': typeof AdminFinanceRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/managers': typeof AdminManagersRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/risk-alerts': typeof AdminRiskAlertsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
   '/app/jogar': typeof AppJogarRoute
@@ -195,8 +258,17 @@ export interface FileRoutesByTo {
   '/game': typeof GameRoute
   '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
+  '/admin/affiliates': typeof AdminAffiliatesRoute
+  '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/finance': typeof AdminFinanceRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/managers': typeof AdminManagersRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/risk-alerts': typeof AdminRiskAlertsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
   '/app/jogar': typeof AppJogarRoute
@@ -223,8 +295,17 @@ export interface FileRoutesById {
   '/game': typeof GameRoute
   '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
+  '/admin/affiliates': typeof AdminAffiliatesRoute
+  '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/finance': typeof AdminFinanceRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/managers': typeof AdminManagersRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/risk-alerts': typeof AdminRiskAlertsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
   '/app/jogar': typeof AppJogarRoute
@@ -252,8 +333,17 @@ export interface FileRouteTypes {
     | '/game'
     | '/gerente'
     | '/login'
+    | '/admin/affiliates'
+    | '/admin/audit-logs'
+    | '/admin/commissions'
     | '/admin/dashboard'
+    | '/admin/finance'
     | '/admin/login'
+    | '/admin/managers'
+    | '/admin/reports'
+    | '/admin/risk-alerts'
+    | '/admin/settings'
+    | '/admin/withdrawals'
     | '/app/depositar'
     | '/app/indicar'
     | '/app/jogar'
@@ -278,8 +368,17 @@ export interface FileRouteTypes {
     | '/game'
     | '/gerente'
     | '/login'
+    | '/admin/affiliates'
+    | '/admin/audit-logs'
+    | '/admin/commissions'
     | '/admin/dashboard'
+    | '/admin/finance'
     | '/admin/login'
+    | '/admin/managers'
+    | '/admin/reports'
+    | '/admin/risk-alerts'
+    | '/admin/settings'
+    | '/admin/withdrawals'
     | '/app/depositar'
     | '/app/indicar'
     | '/app/jogar'
@@ -305,8 +404,17 @@ export interface FileRouteTypes {
     | '/game'
     | '/gerente'
     | '/login'
+    | '/admin/affiliates'
+    | '/admin/audit-logs'
+    | '/admin/commissions'
     | '/admin/dashboard'
+    | '/admin/finance'
     | '/admin/login'
+    | '/admin/managers'
+    | '/admin/reports'
+    | '/admin/risk-alerts'
+    | '/admin/settings'
+    | '/admin/withdrawals'
     | '/app/depositar'
     | '/app/indicar'
     | '/app/jogar'
@@ -498,11 +606,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDepositarRouteImport
       parentRoute: typeof AppRoute
     }
+    '/admin/withdrawals': {
+      id: '/admin/withdrawals'
+      path: '/withdrawals'
+      fullPath: '/admin/withdrawals'
+      preLoaderRoute: typeof AdminWithdrawalsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/risk-alerts': {
+      id: '/admin/risk-alerts'
+      path: '/risk-alerts'
+      fullPath: '/admin/risk-alerts'
+      preLoaderRoute: typeof AdminRiskAlertsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/managers': {
+      id: '/admin/managers'
+      path: '/managers'
+      fullPath: '/admin/managers'
+      preLoaderRoute: typeof AdminManagersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/finance': {
+      id: '/admin/finance'
+      path: '/finance'
+      fullPath: '/admin/finance'
+      preLoaderRoute: typeof AdminFinanceRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/dashboard': {
@@ -512,17 +662,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/commissions': {
+      id: '/admin/commissions'
+      path: '/commissions'
+      fullPath: '/admin/commissions'
+      preLoaderRoute: typeof AdminCommissionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/audit-logs': {
+      id: '/admin/audit-logs'
+      path: '/audit-logs'
+      fullPath: '/admin/audit-logs'
+      preLoaderRoute: typeof AdminAuditLogsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/affiliates': {
+      id: '/admin/affiliates'
+      path: '/affiliates'
+      fullPath: '/admin/affiliates'
+      preLoaderRoute: typeof AdminAffiliatesRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminAffiliatesRoute: typeof AdminAffiliatesRoute
+  AdminAuditLogsRoute: typeof AdminAuditLogsRoute
+  AdminCommissionsRoute: typeof AdminCommissionsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminFinanceRoute: typeof AdminFinanceRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminManagersRoute: typeof AdminManagersRoute
+  AdminReportsRoute: typeof AdminReportsRoute
+  AdminRiskAlertsRoute: typeof AdminRiskAlertsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminWithdrawalsRoute: typeof AdminWithdrawalsRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAffiliatesRoute: AdminAffiliatesRoute,
+  AdminAuditLogsRoute: AdminAuditLogsRoute,
+  AdminCommissionsRoute: AdminCommissionsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminFinanceRoute: AdminFinanceRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminManagersRoute: AdminManagersRoute,
+  AdminReportsRoute: AdminReportsRoute,
+  AdminRiskAlertsRoute: AdminRiskAlertsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminWithdrawalsRoute: AdminWithdrawalsRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
