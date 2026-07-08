@@ -14,7 +14,7 @@ function Page() {
         <p className="text-sm text-white/50">Módulo em construção.</p>
       </div>
       <div className="rounded-xl border border-white/10 bg-white/[0.02] p-8 text-center text-sm text-white/50">
-        Conteúdo do módulo <b class="text-white/80">settings</b> será implementado nas próximas etapas.
+        Conteúdo do módulo <b className="text-white/80">settings</b> será implementado nas próximas etapas.
       </div>
     </div>
   );
