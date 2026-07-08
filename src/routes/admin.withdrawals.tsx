@@ -10,6 +10,7 @@ import {
 } from "@/lib/withdrawals.functions";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
+import { useAdminRealtime } from "@/hooks/use-admin-realtime";
 
 const withdrawalsQuery = (status?: string) =>
   queryOptions({
