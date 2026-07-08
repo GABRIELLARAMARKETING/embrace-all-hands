@@ -12,6 +12,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { depositSchema, type DepositFormValues } from "@/utils/playerValidators";
 import { copyToClipboard } from "@/utils/clipboard";
 import { cn } from "@/lib/utils";
+import helixLogo from "@/assets/helix-multi-logo.png";
 
 export const Route = createFileRoute("/app/depositar")({
   head: () => ({
