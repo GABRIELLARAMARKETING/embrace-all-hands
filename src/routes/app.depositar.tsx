@@ -74,16 +74,17 @@ function DepositarPage() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <PlayerCard className="mt-4 p-4">
           <div className="text-[11px] font-bold tracking-widest text-[#C084FC]">VALOR RÁPIDO</div>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-3 grid grid-cols-5 gap-2">
             {PLAYER_MOCK.depositOptions.map((v) => {
               const badge = DEPOSIT_BADGES[v];
               const active = amount === v;
+              const isBonus = badge?.tone === "bonus";
               return (
                 <div key={v} className="relative pt-3">
                   {badge && (
                     <span
                       className={cn(
-                        "absolute -top-0 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-black tracking-wide",
+                        "absolute -top-0 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full px-1.5 py-0.5 text-[8px] font-black tracking-wide shadow",
                         BADGE_COLORS[badge.tone],
                       )}
                     >
@@ -94,18 +95,25 @@ function DepositarPage() {
                     type="button"
                     onClick={() => setValue("amount", v, { shouldValidate: true })}
                     className={cn(
-                      "rounded-full px-4 py-2 text-sm font-bold transition-all",
-                      active
-                        ? "bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] text-white shadow-[0_0_18px_rgba(168,85,247,0.55)]"
-                        : "bg-white/[0.05] text-white/80",
+                      "flex w-full flex-col items-center justify-center rounded-full px-2 py-2 text-sm font-black transition-all",
+                      isBonus
+                        ? "border-2 border-[#FFD600] bg-[#1a0b2e] text-white shadow-[0_0_14px_rgba(255,214,0,0.35)]"
+                        : active
+                          ? "bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] text-white shadow-[0_0_18px_rgba(168,85,247,0.55)]"
+                          : "bg-white/[0.05] text-white/80",
+                      active && isBonus && "ring-2 ring-[#EC5FA3]/60",
                     )}
                   >
-                    R${v}
+                    <span>R${v}</span>
+                    {isBonus && (
+                      <span className="text-[9px] font-black text-[#00D084]">+100%</span>
+                    )}
                   </button>
                 </div>
               );
             })}
           </div>
+
 
           <div className="mt-4 flex items-center gap-2 rounded-2xl bg-white/[0.05] px-4 py-3">
             <span className="text-sm font-semibold text-white/60">R$</span>
