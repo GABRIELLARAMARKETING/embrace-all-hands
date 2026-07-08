@@ -10,6 +10,7 @@ import {
 } from "@/lib/withdrawals.functions";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
+import { useAdminRealtime } from "@/hooks/use-admin-realtime";
 
 const withdrawalsQuery = (status?: string) =>
   queryOptions({
@@ -45,6 +46,12 @@ function Page() {
   const approve = useServerFn(approveWithdrawal);
   const reject = useServerFn(rejectWithdrawal);
   const pay = useServerFn(markWithdrawalPaid);
+
+  useAdminRealtime({
+    table: "affiliate_withdrawals",
+    invalidateKeys: [["admin", "withdrawals"], ["admin", "dashboard-summary"]],
+    toastOnInsert: () => "Novo saque solicitado",
+  });
 
   const { data = [], isFetching } = useQuery({
     ...withdrawalsQuery(filter),

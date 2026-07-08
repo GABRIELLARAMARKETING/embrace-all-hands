@@ -5,6 +5,7 @@ import { useState } from "react";
 import { listRiskAlerts, updateRiskAlertStatus } from "@/lib/admin-extras.functions";
 import { formatDate } from "@/utils/formatDate";
 import { toast } from "sonner";
+import { useAdminRealtime } from "@/hooks/use-admin-realtime";
 
 type Status = "open" | "reviewing" | "resolved" | "ignored";
 
@@ -45,6 +46,12 @@ function Page() {
       qc.invalidateQueries({ queryKey: ["admin", "dashboard-summary"] });
     },
     onError: (e: Error) => toast.error(e.message),
+  });
+
+  useAdminRealtime({
+    table: "risk_alerts",
+    invalidateKeys: [["admin", "risk-alerts"], ["admin", "dashboard-summary"]],
+    toastOnInsert: (row) => `Novo alerta: ${(row.title as string) ?? "risco detectado"}`,
   });
 
   return (
