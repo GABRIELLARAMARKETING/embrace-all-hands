@@ -51,7 +51,8 @@ export const listTransactions = createServerFn({ method: "GET" })
       .select("id, user_id, type, amount, balance_before, balance_after, description, reference_id, created_at")
       .order("created_at", { ascending: false })
       .limit(data.limit ?? 200);
-    if (data.type) q = q.eq("type", data.type);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (data.type) q = q.eq("type", data.type as any);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
