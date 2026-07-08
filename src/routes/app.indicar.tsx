@@ -29,17 +29,18 @@ function IndicarPage() {
 
   return (
     <AppLayout title="Indicar Amigos">
-      <Logo />
-
-      <PlayerCard className="mt-4 p-5">
-        <div className="flex items-start gap-3">
-          <PartyPopper className="h-5 w-5 shrink-0 text-[#FFD600]" />
-          <p className="text-sm text-white/85">
-            Ganhe <span className="font-bold text-[#C084FC]">{PLAYER_MOCK.commissionPercent}%</span> de comissão
-            para cada amigo que fizer o primeiro depósito!
-          </p>
-        </div>
-      </PlayerCard>
+      <div className="relative pt-14">
+        <Logo />
+        <PlayerCard className="p-5 pt-8">
+          <div className="flex items-start gap-3">
+            <PartyPopper className="h-5 w-5 shrink-0 text-[#FFD600]" />
+            <p className="text-sm text-white/85 text-center flex-1">
+              Ganhe <span className="font-bold text-[#C084FC]">{PLAYER_MOCK.commissionPercent}%</span> de comissão
+              para cada amigo que fizer o primeiro depósito!
+            </p>
+          </div>
+        </PlayerCard>
+      </div>
 
       <div className="mt-4 rounded-3xl bg-gradient-to-br from-[#A855F7] to-[#EC5FA3] p-5 shadow-[0_10px_30px_-10px_rgba(236,95,163,0.6)]">
         <div className="flex items-start justify-between gap-4">
