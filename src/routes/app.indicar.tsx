@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ArrowUp, Copy, PartyPopper } from "lucide-react";
 import { AppLayout, PlayerCard } from "@/components/player/AppLayout";
@@ -6,7 +8,13 @@ import { PLAYER_MOCK } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { copyToClipboard } from "@/utils/clipboard";
+import { getReferralStats } from "@/lib/referral.functions";
 import helixLogo from "@/assets/helix-multi-logo.png";
+
+const referralStatsQuery = queryOptions({
+  queryKey: ["referral-stats"],
+  queryFn: () => getReferralStats(),
+});
 
 export const Route = createFileRoute("/app/indicar")({
   head: () => ({
@@ -15,6 +23,11 @@ export const Route = createFileRoute("/app/indicar")({
       { name: "description", content: "Ganhe comissão indicando amigos." },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(referralStatsQuery),
+  errorComponent: ({ error }) => (
+    <div className="p-6 text-sm text-red-400">Erro ao carregar: {error.message}</div>
+  ),
+  notFoundComponent: () => <div className="p-6 text-sm text-white/70">Não encontrado.</div>,
   component: IndicarPage,
 });
 
