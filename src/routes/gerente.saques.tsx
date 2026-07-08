@@ -148,12 +148,8 @@ function SaquesAdminPage() {
           <AdminTable
             rows={rows}
             getRowKey={(r) => r.id}
-            emptyState={
-              <EmptyState
-                title="Nenhum saque"
-                description="Nenhuma solicitação encontrada para este filtro."
-              />
-            }
+            emptyState={<EmptyState message="Nenhuma solicitação encontrada para este filtro." />}
+
             columns={[
               {
                 key: "user",
