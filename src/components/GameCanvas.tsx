@@ -272,9 +272,9 @@ function GameLogic({
               );
               cameraShake.current = Math.max(cameraShake.current, 0.45);
               addScore(1);
-              // Moeda fictícia sobe na tela a cada degrau quebrado.
+              // Moeda fictícia sobe na tela a cada degrau quebrado (+R$ 1,00).
               import("@/components/CoinPopLayer").then((m) =>
-                m.spawnCoinPop(0.05 + Math.random() * 0.45),
+                m.spawnCoinPop(1),
               );
               window.setTimeout(() => {
                 breakingRingsRef.current.delete(k);
