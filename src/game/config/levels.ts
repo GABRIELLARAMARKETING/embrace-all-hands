@@ -34,10 +34,10 @@ export const LEVELS: Level[] = Array.from({ length: 20 }, (_, i) => {
         : id === 20
           ? "Torre Suprema"
           : `Nível ${id}`,
-    platformCount: Math.round(32 + progress * 38), // 32 → 70
-    obstacleRate: Math.min(0.72, 0.3 + progress * 0.45), // 0.30 → 0.72
-    gapSize: Math.max(1, 2 - Math.floor(progress * 1.5)), // 2 → 1
-    gravityMult: 1.35 + progress * 0.85, // 1.35 → 2.2
+    platformCount: Math.round(36 + progress * 44), // 36 → 80 (torre mais longa)
+    obstacleRate: Math.min(0.32, 0.12 + progress * 0.22), // perigo suave
+    gapSize: Math.max(1, 2 - Math.floor(progress * 1.5)), // 2 → 1 (passagem apertada)
+    gravityMult: 1.6 + progress * 1.1, // 1.6 → 2.7 (queda muito mais rápida)
     coinRate: 0.28 + progress * 0.15,
     theme: THEME_ROTATION[i % THEME_ROTATION.length],
   };
