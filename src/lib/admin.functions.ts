@@ -228,7 +228,8 @@ export const updateAffiliate = createServerFn({ method: "POST" })
 
     const { error } = await supabaseAdmin
       .from("profiles")
-      .update(patch)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .update(patch as any)
       .eq("id", data.affiliateId);
     if (error) throw new Error(error.message);
 
