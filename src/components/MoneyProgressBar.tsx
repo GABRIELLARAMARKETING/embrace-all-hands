@@ -36,7 +36,7 @@ export function MoneyProgressBar() {
   return (
     <>
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 px-4 pt-4 sm:px-6 sm:pt-5">
-        <div className="mx-auto w-full max-w-md rounded-2xl bg-black/45 px-4 py-3 backdrop-blur-md ring-1 ring-white/10 shadow-lg">
+        <div className="mx-auto w-full max-w-md px-4 py-3">
           <div className="flex items-baseline justify-center gap-2 text-sm font-black tracking-tight">
             <span className="text-sky-400 drop-shadow">{formatCurrency(money)}</span>
             <span className="text-white/50">/</span>
