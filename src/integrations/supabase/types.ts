@@ -113,6 +113,48 @@ export type Database = {
         }
         Relationships: []
       }
+      commissions: {
+        Row: {
+          affiliate_id: string
+          amount: number
+          available_at: string | null
+          base_amount: number
+          created_at: string
+          id: string
+          manager_id: string | null
+          percentage: number
+          source_user_id: string | null
+          status: Database["public"]["Enums"]["commission_status"]
+          updated_at: string
+        }
+        Insert: {
+          affiliate_id: string
+          amount: number
+          available_at?: string | null
+          base_amount: number
+          created_at?: string
+          id?: string
+          manager_id?: string | null
+          percentage: number
+          source_user_id?: string | null
+          status?: Database["public"]["Enums"]["commission_status"]
+          updated_at?: string
+        }
+        Update: {
+          affiliate_id?: string
+          amount?: number
+          available_at?: string | null
+          base_amount?: number
+          created_at?: string
+          id?: string
+          manager_id?: string | null
+          percentage?: number
+          source_user_id?: string | null
+          status?: Database["public"]["Enums"]["commission_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       game_sessions: {
         Row: {
           created_at: string
@@ -255,6 +297,75 @@ export type Database = {
           },
         ]
       }
+      login_logs: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          ip: string | null
+          reason: string | null
+          success: boolean
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip?: string | null
+          reason?: string | null
+          success?: boolean
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip?: string | null
+          reason?: string | null
+          success?: boolean
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      platform_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_critical: boolean
+          key: string
+          type: string
+          updated_at: string
+          updated_by_id: string | null
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_critical?: boolean
+          key: string
+          type?: string
+          updated_at?: string
+          updated_by_id?: string | null
+          value: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_critical?: boolean
+          key?: string
+          type?: string
+          updated_at?: string
+          updated_by_id?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           affiliate_balance: number
@@ -304,6 +415,122 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      report_exports: {
+        Row: {
+          created_at: string
+          file_url: string | null
+          filters: Json | null
+          id: string
+          requested_by_id: string | null
+          status: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          file_url?: string | null
+          filters?: Json | null
+          id?: string
+          requested_by_id?: string | null
+          status?: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          file_url?: string | null
+          filters?: Json | null
+          id?: string
+          requested_by_id?: string | null
+          status?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      risk_alerts: {
+        Row: {
+          assigned_to_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          severity: Database["public"]["Enums"]["risk_severity"]
+          status: Database["public"]["Enums"]["risk_alert_status"]
+          title: string
+          type: string
+          updated_at: string
+          user_id: string | null
+          withdrawal_id: string | null
+        }
+        Insert: {
+          assigned_to_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          severity?: Database["public"]["Enums"]["risk_severity"]
+          status?: Database["public"]["Enums"]["risk_alert_status"]
+          title: string
+          type: string
+          updated_at?: string
+          user_id?: string | null
+          withdrawal_id?: string | null
+        }
+        Update: {
+          assigned_to_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          severity?: Database["public"]["Enums"]["risk_severity"]
+          status?: Database["public"]["Enums"]["risk_alert_status"]
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string | null
+          withdrawal_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_alerts_withdrawal_id_fkey"
+            columns: ["withdrawal_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_withdrawals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          amount: number
+          balance_after: number | null
+          balance_before: number | null
+          created_at: string
+          description: string | null
+          id: string
+          reference_id: string | null
+          type: Database["public"]["Enums"]["transaction_type"]
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after?: number | null
+          balance_before?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          type: Database["public"]["Enums"]["transaction_type"]
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number | null
+          balance_before?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          type?: Database["public"]["Enums"]["transaction_type"]
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -434,6 +661,24 @@ export type Database = {
     }
     Enums: {
       app_role: "super_admin" | "admin" | "gerente" | "afiliado"
+      commission_status:
+        | "pending"
+        | "approved"
+        | "canceled"
+        | "available"
+        | "disputed"
+      risk_alert_status: "open" | "reviewing" | "resolved" | "ignored"
+      risk_severity: "low" | "medium" | "high" | "critical"
+      transaction_type:
+        | "commission_created"
+        | "commission_approved"
+        | "commission_canceled"
+        | "withdrawal_requested"
+        | "withdrawal_approved"
+        | "withdrawal_paid"
+        | "withdrawal_rejected"
+        | "manual_adjustment_positive"
+        | "manual_adjustment_negative"
       withdrawal_status:
         | "pending"
         | "in_review"
@@ -570,6 +815,26 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["super_admin", "admin", "gerente", "afiliado"],
+      commission_status: [
+        "pending",
+        "approved",
+        "canceled",
+        "available",
+        "disputed",
+      ],
+      risk_alert_status: ["open", "reviewing", "resolved", "ignored"],
+      risk_severity: ["low", "medium", "high", "critical"],
+      transaction_type: [
+        "commission_created",
+        "commission_approved",
+        "commission_canceled",
+        "withdrawal_requested",
+        "withdrawal_approved",
+        "withdrawal_paid",
+        "withdrawal_rejected",
+        "manual_adjustment_positive",
+        "manual_adjustment_negative",
+      ],
       withdrawal_status: [
         "pending",
         "in_review",
