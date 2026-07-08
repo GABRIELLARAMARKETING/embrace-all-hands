@@ -41,7 +41,7 @@ function LoginPage() {
     let mounted = true;
     supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
-      if (data.session) navigate({ to: "/game", replace: true });
+      if (data.session) navigate({ to: "/app/jogar", replace: true });
       else setCheckingSession(false);
     });
     return () => {
@@ -67,7 +67,7 @@ function LoginPage() {
       if (error) throw error;
       setSuccess(true);
       toast.success("Login realizado!");
-      setTimeout(() => navigate({ to: "/game", replace: true }), 500);
+      setTimeout(() => navigate({ to: "/app/jogar", replace: true }), 500);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Falha no login";
       toast.error(msg.includes("Invalid") ? "Telefone ou senha inválidos" : msg);
@@ -241,7 +241,7 @@ function LoginPage() {
 
           <button
             type="button"
-            onClick={() => navigate({ to: "/game" })}
+            onClick={() => navigate({ to: "/app/jogar" })}
             className="mt-4 flex w-full items-center justify-center gap-1 text-sm text-violet-100/50 hover:text-violet-200"
           >
             <ChevronLeft size={16} /> Voltar ao início
