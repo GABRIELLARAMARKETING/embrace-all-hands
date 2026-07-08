@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      affiliate_withdrawals: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          note: string | null
+          pix_key: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          pix_key?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          pix_key?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       game_sessions: {
         Row: {
           created_at: string
@@ -158,30 +191,36 @@ export type Database = {
       }
       profiles: {
         Row: {
+          affiliate_balance: number
           avatar_url: string | null
           coins: number
           created_at: string
           display_name: string | null
           id: string
           level: number
+          total_received: number
           updated_at: string
         }
         Insert: {
+          affiliate_balance?: number
           avatar_url?: string | null
           coins?: number
           created_at?: string
           display_name?: string | null
           id: string
           level?: number
+          total_received?: number
           updated_at?: string
         }
         Update: {
+          affiliate_balance?: number
           avatar_url?: string | null
           coins?: number
           created_at?: string
           display_name?: string | null
           id?: string
           level?: number
+          total_received?: number
           updated_at?: string
         }
         Relationships: []

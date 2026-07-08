@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import { ArrowUp, Copy, PartyPopper, X, CheckCircle2, AlertTriangle } from "lucide-react";
@@ -10,6 +11,7 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { copyToClipboard } from "@/utils/clipboard";
 import { getReferralStats } from "@/lib/referral.functions";
+import { requestAffiliateWithdrawal } from "@/lib/withdrawals.functions";
 import helixLogo from "@/assets/helix-multi-logo.png";
 
 const referralStatsQuery = queryOptions({
@@ -18,13 +20,13 @@ const referralStatsQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/app/indicar")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Indicar Amigos — MultiHelixBr" },
       { name: "description", content: "Ganhe comissão indicando amigos." },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(referralStatsQuery),
   errorComponent: ({ error }) => (
     <div className="p-6 text-sm text-red-400">Erro ao carregar: {error.message}</div>
   ),
@@ -35,6 +37,8 @@ export const Route = createFileRoute("/app/indicar")({
 function IndicarPage() {
   const { data } = useSuspenseQuery(referralStatsQuery);
   const setReferralStats = usePlayerStore((s) => s.setReferralStats);
+  const queryClient = useQueryClient();
+  const submitWithdrawal = useServerFn(requestAffiliateWithdrawal);
 
   useEffect(() => {
     setReferralStats(data.stats);
@@ -65,11 +69,13 @@ function IndicarPage() {
   const confirmWithdraw = async () => {
     setProcessing(true);
     try {
-      await new Promise((r) => setTimeout(r, 700));
-      toast.success("Solicitação de saque enviada com sucesso!");
+      await submitWithdrawal({ data: { amount: affiliateBalance } });
+      toast.success("Solicitação de saque registrada com sucesso!");
       setConfirmOpen(false);
-    } catch {
-      toast.error("Não foi possível processar o saque. Tente novamente.");
+      await queryClient.invalidateQueries({ queryKey: ["referral-stats"] });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erro ao solicitar saque.";
+      toast.error(message);
     } finally {
       setProcessing(false);
     }
