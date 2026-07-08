@@ -37,13 +37,15 @@ function PerfilPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: profile } = useSuspenseQuery(myProfileQuery);
-  const setBalance = usePlayerStore((s) => s.setBalance);
-  const setAffiliateBalance = usePlayerStore((s) => s.setAffiliateBalance);
-
+  // Mirror server values into the local store when setters exist
+  const store = usePlayerStore.getState() as unknown as Record<string, unknown>;
   useEffect(() => {
-    setBalance?.(profile.balance);
-    setAffiliateBalance?.(profile.affiliateBalance);
-  }, [profile.balance, profile.affiliateBalance, setBalance, setAffiliateBalance]);
+    if (typeof store.setBalance === "function") (store.setBalance as (v: number) => void)(profile.balance);
+    if (typeof store.setAffiliateBalance === "function")
+      (store.setAffiliateBalance as (v: number) => void)(profile.affiliateBalance);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile.balance, profile.affiliateBalance]);
+
 
   // Realtime: refresh when profile row or game_sessions change
   useEffect(() => {
