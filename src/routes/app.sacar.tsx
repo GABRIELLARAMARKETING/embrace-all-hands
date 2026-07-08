@@ -44,9 +44,9 @@ function SacarPage() {
 
   return (
     <AppLayout title="Solicitar Saque">
-      <Logo />
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <PlayerCard className="mt-4 p-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="relative pt-12">
+        <Logo />
+        <PlayerCard className="p-5 pt-10">
           <div className="flex items-center gap-2 text-sm">
             <Coins className="h-4 w-4 text-[#FFD600]" />
             <span className="text-white/70">Saldo disponível:</span>
@@ -59,7 +59,7 @@ function SacarPage() {
                 type="number"
                 step="0.01"
                 inputMode="decimal"
-                placeholder="Mínimo R$ 20,00"
+                placeholder="Mínimo R$20,00"
                 {...register("amount", { valueAsNumber: true })}
                 className="w-full bg-transparent text-white outline-none placeholder:text-white/40"
               />
@@ -90,15 +90,15 @@ function SacarPage() {
             </Field>
           </div>
 
-          <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#EC5FA3]/30 bg-[#EC5FA3]/5 px-4 py-3 text-xs text-white/80">
+          <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#7a2a3f]/60 bg-[#3a1420]/60 px-4 py-3 text-xs text-white/80">
             <Clock className="h-4 w-4 text-[#EC5FA3]" />
             Saques processados em até 24h úteis.
           </div>
-        </PlayerCard>
 
-        <GradientButton type="submit" className="mt-4">
-          Solicitar Saque
-        </GradientButton>
+          <GradientButton type="submit" className="mt-5">
+            Solicitar Saque
+          </GradientButton>
+        </PlayerCard>
       </form>
 
       <SuccessModal open={done} onClose={() => setDone(false)} />
