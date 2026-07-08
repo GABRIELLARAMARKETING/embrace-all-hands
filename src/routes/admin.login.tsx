@@ -56,7 +56,7 @@ function LoginPage() {
               <span className="text-[color:var(--admin-neon)]">Helix</span>
             </p>
             <p className="text-xs uppercase tracking-[0.16em] text-[color:var(--admin-text-3)]">
-              Painel Admin
+              Painel Gerente
             </p>
           </div>
         </div>
