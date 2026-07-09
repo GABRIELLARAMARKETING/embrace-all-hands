@@ -47,27 +47,40 @@ const statusMeta: Record<
   failed: { label: "Falhou", tone: "red" },
 };
 
+const PAGE_SIZE = 20;
+
 function SaquesGerentePage() {
   const qc = useQueryClient();
   const list = useServerFn(listNetworkWithdrawals);
   const [status, setStatus] = useState<StatusFilter>("all");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
+
+  // reset página ao mudar filtros
+  const filterKey = `${status}|${search.trim()}`;
+  useMemo(() => {
+    setPage(0);
+    return filterKey;
+  }, [filterKey]);
 
   const query = useQuery({
-    queryKey: ["gerente", "network-withdrawals", status, search],
+    queryKey: ["gerente", "network-withdrawals", status, search, page],
     queryFn: () =>
       list({
         data: {
           ...(status === "all" ? {} : { status }),
           ...(search.trim() ? { search: search.trim() } : {}),
+          limit: PAGE_SIZE,
+          offset: page * PAGE_SIZE,
         },
       }),
   });
 
-  const rows = query.data ?? [];
-
-  const counts = useMemo(() => {
-    const c = { pending: 0, approved: 0, paid: 0, total: rows.length };
+  const rows = query.data?.rows ?? [];
+  const total = query.data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const pageCounts = useMemo(() => {
+    const c = { pending: 0, approved: 0, paid: 0 };
     for (const r of rows) {
       if (r.status === "pending" || r.status === "in_review") c.pending++;
       else if (r.status === "approved") c.approved++;
@@ -92,8 +105,9 @@ function SaquesGerentePage() {
       <TopHeader
         title="Saques da rede"
         subtitle="Solicitações de saque dos afiliados vinculados a você"
-        context={`${counts.total} registro(s) · ${counts.pending} pendente(s) · ${counts.approved} aprovado(s) · ${counts.paid} pago(s)`}
+        context={`${total} registro(s) · página ${page + 1}/${totalPages} · ${pageCounts.pending} pend. · ${pageCounts.approved} aprov. · ${pageCounts.paid} pago(s)`}
       />
+
       <div className="space-y-4 p-4 sm:p-5">
         <AdminCard>
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -209,6 +223,34 @@ function SaquesGerentePage() {
             ]}
           />
         </AdminCard>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+          <p className="text-xs text-[color:var(--admin-text-3)]">
+            {total === 0
+              ? "Nenhum registro"
+              : `Mostrando ${page * PAGE_SIZE + 1}–${Math.min(total, (page + 1) * PAGE_SIZE)} de ${total}`}
+          </p>
+          <div className="flex items-center gap-2">
+            <AdminButton
+              variant="ghost"
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={page === 0 || query.isFetching}
+            >
+              Anterior
+            </AdminButton>
+            <span className="text-xs text-[color:var(--admin-text-2)]">
+              {page + 1} / {totalPages}
+            </span>
+            <AdminButton
+              variant="ghost"
+              onClick={() => setPage((p) => (p + 1 < totalPages ? p + 1 : p))}
+              disabled={page + 1 >= totalPages || query.isFetching}
+            >
+              Próxima
+            </AdminButton>
+          </div>
+        </div>
+
 
         {query.isError && (
           <AdminCard className="border-[color:var(--admin-red)]/40 bg-[color:var(--admin-red)]/8">
