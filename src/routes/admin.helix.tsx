@@ -53,7 +53,7 @@ function Page() {
   const mutation = useMutation({
     mutationFn: saveFn,
     onSuccess: (payload) => {
-      toast.success("Configuração salva");
+      toast.success("Dificuldade publicada — jogadores receberão em até 15s");
       qc.setQueryData(["admin", "helix-difficulty"], payload);
       qc.invalidateQueries({ queryKey: ["helix", "difficulty"] });
     },
