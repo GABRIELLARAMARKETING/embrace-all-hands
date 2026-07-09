@@ -348,14 +348,16 @@ function GameLogic({
           lastBounceRing.current = i;
           collisionCooldownUntil.current =
             state.clock.elapsedTime + CONSTANTS.COLLISION_COOLDOWN;
+          const hxBall = helixRuntime.get().settings.ballSpeed;
           velocity.current = Math.min(
-            CONSTANTS.MAX_BOUNCE_VELOCITY,
+            CONSTANTS.MAX_BOUNCE_VELOCITY * hxBall,
             Math.max(
-              CONSTANTS.BOUNCE_VELOCITY,
+              CONSTANTS.BOUNCE_VELOCITY * hxBall,
               impactSpeed * CONSTANTS.BOUNCE_RESTITUTION *
                 (1 - CONSTANTS.IMPACT_FRICTION),
             ),
           );
+
           spinVelocity.current = Math.min(
             28,
             (impactSpeed / CONSTANTS.BALL_RADIUS) *
