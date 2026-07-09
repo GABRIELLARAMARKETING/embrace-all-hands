@@ -215,3 +215,114 @@ export const reconcilePendingDeposits = createServerFn({ method: "POST" })
     }
     return { checked: results.length, results };
   });
+
+/* ============================ ADMIN: LIST DIGGION DEPOSITS ============================ */
+
+export type AdminDigginDepositRow = {
+  id: string;
+  user_id: string;
+  user_name: string | null;
+  amount: number;
+  status: string;
+  external_id: string | null;
+  provider: string;
+  created_at: string;
+  paid_at: string | null;
+  credited_at: string | null;
+  expires_at: string | null;
+  last_error: string | null;
+};
+
+export const listDiggionDeposits = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        status: z.string().optional(),
+        search: z.string().optional(),
+        limit: z.number().int().min(1).max(500).optional(),
+      })
+      .parse(data ?? {}),
+  )
+  .handler(async ({ data, context }): Promise<{ rows: AdminDigginDepositRow[] }> => {
+    const { data: adm } = await context.supabase.rpc("is_admin", { _user_id: context.userId });
+    if (!adm) throw new Error("Sem permissão");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    let q = supabaseAdmin
+      .from("deposits")
+      .select("id, user_id, amount, status, external_id, provider, created_at, paid_at, credited_at, expires_at, last_error")
+      .eq("provider", "diggion")
+      .order("created_at", { ascending: false })
+      .limit(data.limit ?? 100);
+
+    if (data.status && data.status !== "all") q = q.eq("status", data.status as any);
+    if (data.search) {
+      const s = data.search.trim();
+      if (s) q = q.or(`external_id.ilike.%${s}%,id.ilike.%${s}%`);
+    }
+
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+
+    const userIds = Array.from(new Set((rows ?? []).map((r) => r.user_id)));
+    const nameMap = new Map<string, string | null>();
+    if (userIds.length) {
+      const { data: profs } = await supabaseAdmin
+        .from("profiles")
+        .select("id, display_name")
+        .in("id", userIds as any);
+      for (const p of profs ?? []) nameMap.set(p.id, p.display_name);
+    }
+
+    return {
+      rows: (rows ?? []).map((r: any) => ({
+        ...r,
+        amount: Number(r.amount),
+        user_name: nameMap.get(r.user_id) ?? null,
+      })),
+    };
+  });
+
+/* ============================ ADMIN: RECONCILE ONE ============================ */
+
+export const reconcileDepositById = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z.object({ depositId: z.string().uuid() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: adm } = await context.supabase.rpc("is_admin", { _user_id: context.userId });
+    if (!adm) throw new Error("Sem permissão");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { DiggionPayService } = await import("./diggion.server");
+
+    const { data: d, error } = await supabaseAdmin
+      .from("deposits")
+      .select("id, external_id, amount, status")
+      .eq("id", data.depositId)
+      .eq("provider", "diggion")
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!d) throw new Error("Depósito não encontrado");
+    if (!d.external_id) return { ok: false, result: "sem_external_id" };
+
+    const tx = await DiggionPayService.getTransaction(d.external_id);
+    const normalized = DiggionPayService.normalizeStatus(tx.status);
+
+    if (normalized === "paid") {
+      const { data: cred } = await supabaseAdmin.rpc("credit_deposit_atomic", {
+        _deposit_id: d.id,
+        _expected_amount: (tx.amount ?? Number(d.amount) * 100) / 100,
+        _provider_tx_id: tx.hash,
+      });
+      return { ok: true, result: (cred as any)?.reason ?? "credited", provider_status: tx.status };
+    }
+    if (["expired", "canceled", "refunded", "chargeback"].includes(normalized)) {
+      await supabaseAdmin.from("deposits").update({ status: normalized as any }).eq("id", d.id);
+      return { ok: true, result: normalized, provider_status: tx.status };
+    }
+    return { ok: true, result: "ainda_pendente", provider_status: tx.status };
+  });

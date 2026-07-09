@@ -41,6 +41,7 @@ import { Route as AdminManagersRouteImport } from './routes/admin.managers'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminHelixRouteImport } from './routes/admin.helix'
 import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
+import { Route as AdminDepositsRouteImport } from './routes/admin.deposits'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
 import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
@@ -207,6 +208,11 @@ const AdminFinanceRoute = AdminFinanceRouteImport.update({
   path: '/finance',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDepositsRoute = AdminDepositsRouteImport.update({
+  id: '/deposits',
+  path: '/deposits',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -246,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/deposits': typeof AdminDepositsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/login': typeof AdminLoginRoute
@@ -284,6 +291,7 @@ export interface FileRoutesByTo {
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/deposits': typeof AdminDepositsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/login': typeof AdminLoginRoute
@@ -324,6 +332,7 @@ export interface FileRoutesById {
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/deposits': typeof AdminDepositsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/login': typeof AdminLoginRoute
@@ -365,6 +374,7 @@ export interface FileRouteTypes {
     | '/admin/audit-logs'
     | '/admin/commissions'
     | '/admin/dashboard'
+    | '/admin/deposits'
     | '/admin/finance'
     | '/admin/helix'
     | '/admin/login'
@@ -403,6 +413,7 @@ export interface FileRouteTypes {
     | '/admin/audit-logs'
     | '/admin/commissions'
     | '/admin/dashboard'
+    | '/admin/deposits'
     | '/admin/finance'
     | '/admin/helix'
     | '/admin/login'
@@ -442,6 +453,7 @@ export interface FileRouteTypes {
     | '/admin/audit-logs'
     | '/admin/commissions'
     | '/admin/dashboard'
+    | '/admin/deposits'
     | '/admin/finance'
     | '/admin/helix'
     | '/admin/login'
@@ -707,6 +719,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFinanceRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/deposits': {
+      id: '/admin/deposits'
+      path: '/deposits'
+      fullPath: '/admin/deposits'
+      preLoaderRoute: typeof AdminDepositsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/dashboard': {
       id: '/admin/dashboard'
       path: '/dashboard'
@@ -750,6 +769,7 @@ interface AdminRouteChildren {
   AdminAuditLogsRoute: typeof AdminAuditLogsRoute
   AdminCommissionsRoute: typeof AdminCommissionsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminDepositsRoute: typeof AdminDepositsRoute
   AdminFinanceRoute: typeof AdminFinanceRoute
   AdminHelixRoute: typeof AdminHelixRoute
   AdminLoginRoute: typeof AdminLoginRoute
@@ -766,6 +786,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditLogsRoute: AdminAuditLogsRoute,
   AdminCommissionsRoute: AdminCommissionsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminDepositsRoute: AdminDepositsRoute,
   AdminFinanceRoute: AdminFinanceRoute,
   AdminHelixRoute: AdminHelixRoute,
   AdminLoginRoute: AdminLoginRoute,
