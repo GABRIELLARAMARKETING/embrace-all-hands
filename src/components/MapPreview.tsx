@@ -19,7 +19,7 @@ export function MapPreview({ preview, intensity = 1 }: Props) {
         <img
           src={preview.previewImage}
           alt=""
-          className="h-full w-full object-cover"
+          className="h-full w-full object-contain"
           style={{ opacity: 0.4 + intensity * 0.6 }}
           draggable={false}
         />
