@@ -303,7 +303,12 @@ function KycModal({
       });
     },
     onError: (e: any) => {
-      toast.error(e?.message ?? "Falha ao gerar depósito");
+      let msg = e?.message ?? "Falha ao gerar depósito";
+      try {
+        const parsed = JSON.parse(msg);
+        if (Array.isArray(parsed) && parsed[0]?.message) msg = parsed[0].message;
+      } catch {}
+      toast.error(msg);
     },
   });
 
