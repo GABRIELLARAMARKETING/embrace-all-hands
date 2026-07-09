@@ -16,7 +16,7 @@ import { depositSchema, type DepositFormValues } from "@/utils/playerValidators"
 import { maskCpf, cpfDigits } from "@/utils/cpfMask";
 import { copyToClipboard } from "@/utils/clipboard";
 import { cn } from "@/lib/utils";
-import helixLogo from "@/assets/helix-multi-logo.png";
+const helixLogo = "/images/helixfast-logo.png";
 import { createDiggionDeposit, getDepositStatus } from "@/lib/deposits.functions";
 
 export const Route = createFileRoute("/app/depositar")({

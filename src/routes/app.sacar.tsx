@@ -9,7 +9,7 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { makeWithdrawSchema, type WithdrawFormValues } from "@/utils/playerValidators";
 import { maskCpf } from "@/utils/cpfMask";
-import helixLogo from "@/assets/helix-multi-logo.png";
+const helixLogo = "/images/helixfast-logo.png";
 
 export const Route = createFileRoute("/app/sacar")({
   head: () => ({
