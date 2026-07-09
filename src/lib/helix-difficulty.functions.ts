@@ -102,7 +102,7 @@ export const setHelixDifficulty = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin.from("platform_settings").upsert(
       {
         key: PLATFORM_KEY,
-        value: payload as unknown as Record<string, unknown>,
+        value: payload as never,
         type: "json",
         description: "Dificuldade ativa do jogo Helix",
         is_critical: false,
@@ -118,7 +118,7 @@ export const setHelixDifficulty = createServerFn({ method: "POST" })
       action: "helix_difficulty.update",
       entity_type: "platform_setting",
       entity_id: PLATFORM_KEY,
-      new_value: payload as unknown as Record<string, unknown>,
+      new_value: payload as never,
     });
 
     return payload;
