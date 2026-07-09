@@ -53,7 +53,7 @@ function Page() {
   const mutation = useMutation({
     mutationFn: saveFn,
     onSuccess: (payload) => {
-      toast.success("Configuração salva");
+      toast.success("Dificuldade publicada — jogadores receberão em até 15s");
       qc.setQueryData(["admin", "helix-difficulty"], payload);
       qc.invalidateQueries({ queryKey: ["helix", "difficulty"] });
     },
@@ -164,7 +164,7 @@ function Page() {
           disabled={mutation.isPending}
           className="rounded-lg border border-cyan-400/40 bg-cyan-500/15 px-5 py-2 text-sm font-medium text-cyan-100 transition hover:bg-cyan-500/25 disabled:opacity-60"
         >
-          {mutation.isPending ? "Salvando..." : "Salvar Configuração"}
+          {mutation.isPending ? "Publicando..." : "Salvar e Publicar"}
         </button>
         <button
           type="button"
