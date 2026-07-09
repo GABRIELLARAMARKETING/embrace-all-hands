@@ -171,11 +171,19 @@ function PerfilPage() {
       </div>
 
       <PlayerCard className="mt-4 p-4">
-        <div className="flex items-center gap-2 text-[11px] font-bold tracking-widest text-white/60">
-          <LinkIcon className="h-4 w-4 text-[#C084FC]" /> LINK DE DIVULGAÇÃO
+        <div className="flex items-center justify-between gap-2 text-[11px] font-bold tracking-widest text-white/60">
+          <div className="flex items-center gap-2">
+            <LinkIcon className="h-4 w-4 text-[#C084FC]" /> LINK DE DIVULGAÇÃO
+          </div>
+          {affiliateCode && (
+            <span className="rounded-full border border-white/15 bg-white/[0.06] px-2 py-0.5 font-mono text-[10px] text-white/80">
+              {affiliateCode}
+            </span>
+          )}
         </div>
         <div className="mt-3 flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] p-2">
-          <div className="flex-1 truncate px-2 text-sm text-white/85">{PLAYER_MOCK.referralUrl}</div>
+          <div className="flex-1 truncate px-2 text-sm text-white/85">{referralUrl}</div>
+
           <button
             onClick={copyLink}
             type="button"
