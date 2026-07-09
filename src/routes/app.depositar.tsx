@@ -47,6 +47,7 @@ type KycValues = z.infer<typeof kycSchema>;
 function DepositarPage() {
   const balance = usePlayerStore((s) => s.balance);
   const [showCoupon, setShowCoupon] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [kycOpen, setKycOpen] = useState(false);
   const [pending, setPending] = useState<null | {
     depositId: string;
@@ -69,7 +70,7 @@ function DepositarPage() {
   });
   const amount = watch("amount");
 
-  const onSubmit = () => setKycOpen(true);
+  const onSubmit = () => setConfirmOpen(true);
 
   return (
     <AppLayout title="Depositar via PIX">
