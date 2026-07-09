@@ -156,15 +156,24 @@ function IndicarPage() {
       </div>
 
       <PlayerCard className="mt-4 p-5">
-        <div className="text-xs text-white/60">Seu link exclusivo</div>
-        <div className="mt-2 truncate text-sm font-bold text-white">{PLAYER_MOCK.referralUrl}</div>
+        <div className="flex items-center justify-between">
+          <div className="text-xs text-white/60">Seu link exclusivo</div>
+          {affiliateCode && (
+            <span className="rounded-full border border-white/15 bg-white/[0.06] px-2 py-0.5 font-mono text-[11px] text-white/80">
+              {affiliateCode}
+            </span>
+          )}
+        </div>
+        <div className="mt-2 truncate text-sm font-bold text-white">{referralUrl}</div>
         <button
           onClick={copyLink}
-          className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
+          disabled={!referralUrl}
+          className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 disabled:opacity-40"
         >
           <Copy className="h-4 w-4" /> Copiar
         </button>
       </PlayerCard>
+
 
       <div className="mt-4 grid grid-cols-2 gap-3">
         {tiers.map((tier) => {
