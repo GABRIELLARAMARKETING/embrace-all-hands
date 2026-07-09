@@ -13,7 +13,9 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { getAdminDashboardSummary } from "@/lib/admin.functions";
+import { useAdminRealtime } from "@/hooks/use-admin-realtime";
 import { formatCurrency } from "@/utils/formatCurrency";
+
 
 const summaryQuery = () =>
   queryOptions({
