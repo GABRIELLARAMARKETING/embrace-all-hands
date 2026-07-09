@@ -254,14 +254,14 @@ describe("Diggion deposit flow – valores oficiais", () => {
   });
 
   it("não confunde depósitos simultâneos de valores diferentes", async () => {
-    const deposits = await Promise.all([
-      createDeposit("user-5", 5),
-      createDeposit("user-10", 10),
-      createDeposit("user-20", 20),
-      createDeposit("user-30", 30),
-      createDeposit("user-50", 50),
-      createDeposit("user-100", 100),
-    ]);
+    const deposits = [
+      await createDeposit("user-5", 5),
+      await createDeposit("user-10", 10),
+      await createDeposit("user-20", 20),
+      await createDeposit("user-30", 30),
+      await createDeposit("user-50", 50),
+      await createDeposit("user-100", 100),
+    ];
 
     for (const deposit of deposits.reverse()) {
       await simulateWebhook(deposit.providerTxId);
