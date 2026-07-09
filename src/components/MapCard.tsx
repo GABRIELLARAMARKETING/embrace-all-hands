@@ -58,11 +58,11 @@ export function MapCard({ theme, role, offset, onClick }: Props) {
         style={{
           width: s.w,
           height: s.h,
-          border: `2px solid ${isCenter ? glow : "rgba(168,85,247,0.35)"}`,
           boxShadow: isCenter
-            ? `0 20px 60px -10px ${glow}, 0 0 0 1px rgba(255,255,255,0.06) inset, 0 0 40px ${glow}55`
+            ? `0 20px 60px -10px ${glow}55`
             : "0 10px 30px -12px rgba(0,0,0,0.6)",
         }}
+
       >
         <MapPreview preview={theme.preview_config} intensity={isCenter ? 1 : 0.7} />
         {!isCenter && <div className="absolute inset-0 bg-black/25" />}
