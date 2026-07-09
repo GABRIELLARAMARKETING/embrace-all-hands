@@ -87,17 +87,32 @@ function GameLogic({
   const themeId = level.theme in THEMES ? level.theme : selectedTheme;
 
   const generated = useMemo(
-    () =>
-      generateLevel(
+    () => {
+      const hx = helixRuntime.get().settings;
+      // Progressão da dificuldade aplicada como fator geral sobre densidade/frequência.
+      const progression = hx.difficultyProgressionRate;
+      const obstacleRate = Math.min(
+        1,
+        Math.max(0, level.obstacleRate * hx.obstacleDensity * hx.obstacleFrequency * progression) /
+          Math.max(0.0001, 0.35),
+      );
+      // gapSize é inteiro: multiplica e arredonda mantendo mínimo 1.
+      const gap = Math.max(1, Math.round(level.gapSize * hx.gapSize));
+      const gravityMult = level.gravityMult * hx.gravity;
+      return generateLevel(
         level.id,
         level.platformCount,
-        level.obstacleRate,
-        level.gapSize,
-        level.gravityMult,
+        Math.min(0.9, level.obstacleRate * hx.obstacleDensity * (0.6 + 0.4 * hx.obstacleFrequency) * (0.7 + 0.3 * progression)),
+        gap,
+        gravityMult,
         level.coinRate,
-      ),
+      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      void obstacleRate;
+    },
     [level],
   );
+
 
   const ballRef = useRef<THREE.Mesh>(null);
   const towerGroup = useRef<THREE.Group>(null);
