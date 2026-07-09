@@ -554,7 +554,7 @@ function DetailsModal({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fetchDetails: any;
 }) {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<AdminUserDetails>({
     queryKey: ["admin", "users", "details", userId],
     queryFn: () => fetchDetails({ data: { id: userId } }),
     staleTime: 0,
