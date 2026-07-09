@@ -8,6 +8,7 @@ import {
   UserCog,
   Wallet,
   DollarSign,
+  Landmark,
   Percent,
   FileBarChart,
   ShieldAlert,
