@@ -33,6 +33,7 @@ import { Route as AppJogarRouteImport } from './routes/app.jogar'
 import { Route as AppIndicarRouteImport } from './routes/app.indicar'
 import { Route as AppDepositarRouteImport } from './routes/app.depositar'
 import { Route as AdminWithdrawalsRouteImport } from './routes/admin.withdrawals'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRiskAlertsRouteImport } from './routes/admin.risk-alerts'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
@@ -168,6 +169,11 @@ const AdminWithdrawalsRoute = AdminWithdrawalsRouteImport.update({
   path: '/withdrawals',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -261,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
@@ -300,6 +307,7 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
@@ -341,6 +349,7 @@ export interface FileRoutesById {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
@@ -383,6 +392,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
+    | '/admin/users'
     | '/admin/withdrawals'
     | '/app/depositar'
     | '/app/indicar'
@@ -422,6 +432,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
+    | '/admin/users'
     | '/admin/withdrawals'
     | '/app/depositar'
     | '/app/indicar'
@@ -462,6 +473,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
+    | '/admin/users'
     | '/admin/withdrawals'
     | '/app/depositar'
     | '/app/indicar'
@@ -663,6 +675,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWithdrawalsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -778,6 +797,7 @@ interface AdminRouteChildren {
   AdminReportsRoute: typeof AdminReportsRoute
   AdminRiskAlertsRoute: typeof AdminRiskAlertsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   AdminWithdrawalsRoute: typeof AdminWithdrawalsRoute
 }
 
@@ -795,6 +815,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminReportsRoute: AdminReportsRoute,
   AdminRiskAlertsRoute: AdminRiskAlertsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminUsersRoute: AdminUsersRoute,
   AdminWithdrawalsRoute: AdminWithdrawalsRoute,
 }
 
