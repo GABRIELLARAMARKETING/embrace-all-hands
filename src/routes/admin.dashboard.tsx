@@ -57,6 +57,18 @@ function AdminDashboard() {
     queryFn: () => fetchSummary(),
   });
 
+  useAdminRealtime({
+    table: "deposits",
+    invalidateKeys: [["admin", "dashboard-summary"], ["admin", "transactions"]],
+    toastOnInsert: (row) =>
+      row.status === "paid" ? `Nova venda: R$ ${Number(row.amount).toFixed(2)}` : null,
+  });
+  useAdminRealtime({
+    table: "wallet_transactions",
+    invalidateKeys: [["admin", "dashboard-summary"], ["admin", "transactions"]],
+  });
+
+
   const cards = [
     { label: "Total de usuários", value: data?.totalUsers ?? 0, icon: Users, tone: "cyan" },
     { label: "Gerentes ativos", value: data?.activeManagers ?? 0, icon: UserCog, tone: "violet" },
