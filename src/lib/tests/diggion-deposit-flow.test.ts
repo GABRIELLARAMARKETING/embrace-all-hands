@@ -227,6 +227,7 @@ describe("Diggion deposit flow – R$5 e R$10", () => {
 
     // 2. webhook credita o valor exato
     const { dep, credited, expectedAmount } = await simulateWebhook(providerTxId);
+    expect(dep).toBeTruthy();
     expect(dep!.id).toBe(depositId);
     expect(expectedAmount).toBe(amount);
     expect((credited as any).ok).toBe(true);
