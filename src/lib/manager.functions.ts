@@ -481,3 +481,68 @@ export const createDemoAccounts = createServerFn({ method: "POST" })
       })),
     };
   });
+
+/* ============ NETWORK WITHDRAWALS (read-only for manager) ============ */
+export const listNetworkWithdrawals = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z
+      .object({
+        status: z
+          .enum(["pending", "in_review", "approved", "paid", "rejected", "cancelled", "failed"])
+          .optional(),
+        search: z.string().trim().max(120).optional(),
+      })
+      .partial()
+      .parse(raw ?? {}),
+  )
+  .handler(async ({ context, data }) => {
+    await ensureManagerOrAdmin(context);
+    const { supabase, userId } = context;
+
+    // Usuários da rede deste gerente
+    const { data: netProfiles, error: profErr } = await supabase
+      .from("profiles")
+      .select("id, display_name")
+      .eq("manager_id", userId);
+    if (profErr) throw new Error(profErr.message);
+
+    const idToName: Record<string, string | null> = {};
+    const ids: string[] = [];
+    (netProfiles ?? []).forEach((p: any) => {
+      idToName[p.id] = p.display_name;
+      ids.push(p.id);
+    });
+    if (ids.length === 0) return [];
+
+    let q = supabase
+      .from("affiliate_withdrawals")
+      .select("id, user_id, amount, status, pix_key, created_at, paid_at, rejection_reason")
+      .in("user_id", ids)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (data.status) q = q.eq("status", data.status);
+
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+
+    const search = (data.search ?? "").toLowerCase();
+    return (rows ?? [])
+      .map((r: any) => ({
+        id: r.id as string,
+        userId: r.user_id as string,
+        userDisplayName: idToName[r.user_id] ?? null,
+        amount: Number(r.amount || 0),
+        status: r.status as string,
+        pixKey: maskPix(r.pix_key),
+        createdAt: r.created_at as string,
+        paidAt: r.paid_at as string | null,
+        rejectionReason: r.rejection_reason as string | null,
+      }))
+      .filter((r) =>
+        !search
+          ? true
+          : (r.userDisplayName ?? "").toLowerCase().includes(search) ||
+            r.userId.toLowerCase().includes(search),
+      );
+  });

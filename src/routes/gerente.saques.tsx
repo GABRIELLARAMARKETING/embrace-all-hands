@@ -1,38 +1,43 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
-import { Check, X, DollarSign, RefreshCw } from "lucide-react";
+import { RefreshCw, Search } from "lucide-react";
 import { TopHeader } from "@/components/admin/TopHeader";
 import { AdminCard } from "@/components/admin/AdminCard";
 import { AdminTable } from "@/components/admin/AdminTable";
 import { AdminButton } from "@/components/admin/AdminButton";
+import { AdminInput } from "@/components/admin/AdminInput";
 import { Badge } from "@/components/admin/Badge";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
-import {
-  listAllWithdrawals,
-  approveWithdrawal,
-  rejectWithdrawal,
-  markWithdrawalPaid,
-  type AdminWithdrawalRow,
-} from "@/lib/withdrawals.functions";
+import { listNetworkWithdrawals } from "@/lib/manager.functions";
 
 export const Route = createFileRoute("/gerente/saques")({
   head: () => ({
     meta: [
-      { title: "Saques · Painel Gerente" },
-      { name: "description", content: "Aprovar, recusar e pagar saques da plataforma." },
+      { title: "Saques da Rede · Painel Gerente" },
+      { name: "description", content: "Acompanhe os saques dos afiliados da sua rede." },
     ],
   }),
-  component: SaquesAdminPage,
+  component: SaquesGerentePage,
 });
 
-type StatusFilter = "all" | "pending" | "in_review" | "approved" | "paid" | "rejected" | "cancelled" | "failed";
+type StatusFilter =
+  | "all"
+  | "pending"
+  | "in_review"
+  | "approved"
+  | "paid"
+  | "rejected"
+  | "cancelled"
+  | "failed";
 
-const statusMeta: Record<string, { label: string; tone: "green" | "neutral" | "blue" | "purple" | "red" }> = {
+const statusMeta: Record<
+  string,
+  { label: string; tone: "green" | "neutral" | "blue" | "purple" | "red" }
+> = {
   pending: { label: "Pendente", tone: "purple" },
   in_review: { label: "Em análise", tone: "blue" },
   approved: { label: "Aprovado", tone: "green" },
@@ -42,53 +47,27 @@ const statusMeta: Record<string, { label: string; tone: "green" | "neutral" | "b
   failed: { label: "Falhou", tone: "red" },
 };
 
-function SaquesAdminPage() {
+function SaquesGerentePage() {
   const qc = useQueryClient();
-  const list = useServerFn(listAllWithdrawals);
-  const approveFn = useServerFn(approveWithdrawal);
-  const rejectFn = useServerFn(rejectWithdrawal);
-  const payFn = useServerFn(markWithdrawalPaid);
+  const list = useServerFn(listNetworkWithdrawals);
   const [status, setStatus] = useState<StatusFilter>("all");
+  const [search, setSearch] = useState("");
 
   const query = useQuery({
-    queryKey: ["admin", "withdrawals", status],
-    queryFn: () => list({ data: status === "all" ? {} : { status } }),
+    queryKey: ["gerente", "network-withdrawals", status, search],
+    queryFn: () =>
+      list({
+        data: {
+          ...(status === "all" ? {} : { status }),
+          ...(search.trim() ? { search: search.trim() } : {}),
+        },
+      }),
   });
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: ["admin", "withdrawals"] });
-
-  const approve = useMutation({
-    mutationFn: (id: string) => approveFn({ data: { withdrawalId: id } }),
-    onSuccess: () => {
-      toast.success("Saque aprovado.");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  const pay = useMutation({
-    mutationFn: (id: string) => payFn({ data: { withdrawalId: id } }),
-    onSuccess: () => {
-      toast.success("Marcado como pago.");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  const reject = useMutation({
-    mutationFn: (vars: { id: string; reason: string }) =>
-      rejectFn({ data: { withdrawalId: vars.id, reason: vars.reason } }),
-    onSuccess: () => {
-      toast.success("Saque recusado e saldo devolvido.");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  const rows: AdminWithdrawalRow[] = query.data ?? [];
+  const rows = query.data ?? [];
 
   const counts = useMemo(() => {
-    const c = { pending: 0, approved: 0, paid: 0 };
+    const c = { pending: 0, approved: 0, paid: 0, total: rows.length };
     for (const r of rows) {
       if (r.status === "pending" || r.status === "in_review") c.pending++;
       else if (r.status === "approved") c.approved++;
@@ -105,12 +84,15 @@ function SaquesAdminPage() {
     { key: "rejected", label: "Recusados" },
   ];
 
+  const refresh = () =>
+    qc.invalidateQueries({ queryKey: ["gerente", "network-withdrawals"] });
+
   return (
     <>
       <TopHeader
-        title="Saques"
-        subtitle="Gestão administrativa de solicitações de saque"
-        context={`${counts.pending} pendente(s) · ${counts.approved} aprovado(s) aguardando pagamento`}
+        title="Saques da rede"
+        subtitle="Solicitações de saque dos afiliados vinculados a você"
+        context={`${counts.total} registro(s) · ${counts.pending} pendente(s) · ${counts.approved} aprovado(s) · ${counts.paid} pago(s)`}
       />
       <div className="space-y-4 p-4 sm:p-5">
         <AdminCard>
@@ -132,14 +114,28 @@ function SaquesAdminPage() {
                 </button>
               ))}
             </div>
-            <AdminButton
-              variant="ghost"
-              onClick={() => invalidate()}
-              disabled={query.isFetching}
-            >
-              <RefreshCw size={14} className={query.isFetching ? "animate-spin" : ""} />
-              Atualizar
-            </AdminButton>
+            <div className="flex flex-1 items-center gap-2 sm:flex-none">
+              <div className="relative flex-1 sm:w-64">
+                <Search
+                  size={14}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--admin-text-3)]"
+                />
+                <AdminInput
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar por nome ou ID"
+                  className="pl-8"
+                />
+              </div>
+              <AdminButton
+                variant="ghost"
+                onClick={refresh}
+                disabled={query.isFetching}
+              >
+                <RefreshCw size={14} className={query.isFetching ? "animate-spin" : ""} />
+                Atualizar
+              </AdminButton>
+            </div>
           </div>
         </AdminCard>
 
@@ -147,19 +143,20 @@ function SaquesAdminPage() {
           <AdminTable
             rows={rows}
             getRowKey={(r) => r.id}
-            emptyState={<EmptyState message="Nenhuma solicitação encontrada para este filtro." />}
-
+            emptyState={
+              <EmptyState message="Nenhum saque encontrado para os filtros aplicados." />
+            }
             columns={[
               {
                 key: "user",
-                header: "Usuário",
+                header: "Afiliado",
                 render: (r) => (
                   <div className="min-w-0">
                     <p className="truncate text-sm text-white">
-                      {r.user_display_name ?? "—"}
+                      {r.userDisplayName ?? "—"}
                     </p>
                     <p className="truncate font-mono text-[11px] text-[color:var(--admin-text-3)]">
-                      {r.user_id.slice(0, 8)}
+                      {r.userId.slice(0, 8)}
                     </p>
                   </div>
                 ),
@@ -169,7 +166,7 @@ function SaquesAdminPage() {
                 header: "Valor",
                 render: (r) => (
                   <span className="font-semibold text-white">
-                    {formatCurrency(r.amount / 100)}
+                    {formatCurrency(r.amount)}
                   </span>
                 ),
               },
@@ -178,7 +175,7 @@ function SaquesAdminPage() {
                 header: "PIX",
                 render: (r) => (
                   <span className="font-mono text-xs text-[color:var(--admin-text-2)]">
-                    {r.pix_key ? maskPix(r.pix_key) : "—"}
+                    {r.pixKey || "—"}
                   </span>
                 ),
               },
@@ -186,7 +183,8 @@ function SaquesAdminPage() {
                 key: "status",
                 header: "Status",
                 render: (r) => {
-                  const m = statusMeta[r.status] ?? { label: r.status, tone: "neutral" as const };
+                  const m =
+                    statusMeta[r.status] ?? { label: r.status, tone: "neutral" as const };
                   return <Badge tone={m.tone}>{m.label}</Badge>;
                 },
               },
@@ -195,56 +193,17 @@ function SaquesAdminPage() {
                 header: "Solicitado em",
                 render: (r) => (
                   <span className="text-xs text-[color:var(--admin-text-2)]">
-                    {formatDate(r.created_at)}
+                    {formatDate(r.createdAt)}
                   </span>
                 ),
               },
               {
-                key: "actions",
-                header: "Ações",
+                key: "paid",
+                header: "Pago em",
                 render: (r) => (
-                  <div className="flex flex-wrap gap-1.5">
-                    {(r.status === "pending" || r.status === "in_review") && (
-                      <>
-                        <AdminButton
-                          size="sm"
-                          onClick={() => {
-                            if (confirm(`Aprovar saque de ${formatCurrency(r.amount / 100)}?`))
-                              approve.mutate(r.id);
-                          }}
-                          loading={approve.isPending && approve.variables === r.id}
-                        >
-                          <Check size={12} />
-                          Aprovar
-                        </AdminButton>
-                        <AdminButton
-                          size="sm"
-                          variant="danger"
-                          onClick={() => {
-                            const reason = prompt("Motivo da recusa (mínimo 3 caracteres):");
-                            if (reason && reason.trim().length >= 3)
-                              reject.mutate({ id: r.id, reason: reason.trim() });
-                          }}
-                        >
-                          <X size={12} />
-                          Recusar
-                        </AdminButton>
-                      </>
-                    )}
-                    {r.status === "approved" && (
-                      <AdminButton
-                        size="sm"
-                        onClick={() => {
-                          if (confirm("Confirma que o pagamento foi realizado?"))
-                            pay.mutate(r.id);
-                        }}
-                        loading={pay.isPending && pay.variables === r.id}
-                      >
-                        <DollarSign size={12} />
-                        Marcar pago
-                      </AdminButton>
-                    )}
-                  </div>
+                  <span className="text-xs text-[color:var(--admin-text-2)]">
+                    {r.paidAt ? formatDate(r.paidAt) : "—"}
+                  </span>
                 ),
               },
             ]}
@@ -262,9 +221,3 @@ function SaquesAdminPage() {
     </>
   );
 }
-
-function maskPix(key: string) {
-  if (key.length <= 6) return "***";
-  return key.slice(0, 3) + "•••" + key.slice(-3);
-}
-// keep AdminInput import used (no lint warn)
