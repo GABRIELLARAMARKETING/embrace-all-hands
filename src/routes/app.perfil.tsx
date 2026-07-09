@@ -219,6 +219,7 @@ function PerfilPage() {
         </div>
       </PlayerCard>
 
+      <DepositHistory items={deposits} />
       <WithdrawalHistory items={withdrawals} />
 
 
