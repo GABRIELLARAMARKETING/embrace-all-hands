@@ -135,16 +135,6 @@ function DepositarPage() {
             })}
           </div>
 
-          <div className="mt-4 flex items-center gap-2 rounded-2xl bg-white/[0.05] px-4 py-3">
-            <span className="text-sm font-semibold text-white/60">R$</span>
-            <input
-              type="number"
-              inputMode="numeric"
-              step="1"
-              {...register("amount", { valueAsNumber: true })}
-              className="w-full bg-transparent text-lg font-bold text-white outline-none"
-            />
-          </div>
           {errors.amount && (
             <p className="mt-2 text-xs text-red-400">{errors.amount.message}</p>
           )}
