@@ -8,6 +8,8 @@ import {
   validateProgressData,
 } from "@/utils/storage";
 import { setSoundEnabled, SFX } from "@/utils/sound";
+import { helixRuntime } from "@/game/config/difficulty";
+
 
 export type GameState = "menu" | "playing" | "paused" | "gameOver" | "victory";
 
