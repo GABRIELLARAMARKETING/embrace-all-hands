@@ -33,6 +33,7 @@ import { Route as AppJogarRouteImport } from './routes/app.jogar'
 import { Route as AppIndicarRouteImport } from './routes/app.indicar'
 import { Route as AppDepositarRouteImport } from './routes/app.depositar'
 import { Route as AdminWithdrawalsRouteImport } from './routes/admin.withdrawals'
+import { Route as AdminWebhooksRouteImport } from './routes/admin.webhooks'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRiskAlertsRouteImport } from './routes/admin.risk-alerts'
@@ -169,6 +170,11 @@ const AdminWithdrawalsRoute = AdminWithdrawalsRouteImport.update({
   path: '/withdrawals',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminWebhooksRoute = AdminWebhooksRouteImport.update({
+  id: '/webhooks',
+  path: '/webhooks',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -268,6 +274,7 @@ export interface FileRoutesByFullPath {
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
@@ -308,6 +315,7 @@ export interface FileRoutesByTo {
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
@@ -350,6 +358,7 @@ export interface FileRoutesById {
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
@@ -393,6 +402,7 @@ export interface FileRouteTypes {
     | '/admin/risk-alerts'
     | '/admin/settings'
     | '/admin/users'
+    | '/admin/webhooks'
     | '/admin/withdrawals'
     | '/app/depositar'
     | '/app/indicar'
@@ -433,6 +443,7 @@ export interface FileRouteTypes {
     | '/admin/risk-alerts'
     | '/admin/settings'
     | '/admin/users'
+    | '/admin/webhooks'
     | '/admin/withdrawals'
     | '/app/depositar'
     | '/app/indicar'
@@ -474,6 +485,7 @@ export interface FileRouteTypes {
     | '/admin/risk-alerts'
     | '/admin/settings'
     | '/admin/users'
+    | '/admin/webhooks'
     | '/admin/withdrawals'
     | '/app/depositar'
     | '/app/indicar'
@@ -675,6 +687,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWithdrawalsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/webhooks': {
+      id: '/admin/webhooks'
+      path: '/webhooks'
+      fullPath: '/admin/webhooks'
+      preLoaderRoute: typeof AdminWebhooksRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -798,6 +817,7 @@ interface AdminRouteChildren {
   AdminRiskAlertsRoute: typeof AdminRiskAlertsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminWebhooksRoute: typeof AdminWebhooksRoute
   AdminWithdrawalsRoute: typeof AdminWithdrawalsRoute
 }
 
@@ -816,6 +836,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminRiskAlertsRoute: AdminRiskAlertsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminWebhooksRoute: AdminWebhooksRoute,
   AdminWithdrawalsRoute: AdminWithdrawalsRoute,
 }
 
