@@ -243,36 +243,78 @@ export type Database = {
       deposits: {
         Row: {
           amount: number
+          checkout_url: string | null
           confirmed_at: string | null
+          copy_paste_code: string | null
           created_at: string
+          credited_at: string | null
+          currency: string
+          expires_at: string | null
           external_id: string | null
           id: string
+          idempotency_key: string | null
+          last_error: string | null
+          paid_at: string | null
           payment_method: string | null
+          provider: string
+          qr_code: string | null
+          qr_code_base64: string | null
+          request_payload: Json | null
+          response_payload: Json | null
           status: Database["public"]["Enums"]["deposit_status"]
           updated_at: string
           user_id: string
+          webhook_payload: Json | null
         }
         Insert: {
           amount: number
+          checkout_url?: string | null
           confirmed_at?: string | null
+          copy_paste_code?: string | null
           created_at?: string
+          credited_at?: string | null
+          currency?: string
+          expires_at?: string | null
           external_id?: string | null
           id?: string
+          idempotency_key?: string | null
+          last_error?: string | null
+          paid_at?: string | null
           payment_method?: string | null
+          provider?: string
+          qr_code?: string | null
+          qr_code_base64?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
           status?: Database["public"]["Enums"]["deposit_status"]
           updated_at?: string
           user_id: string
+          webhook_payload?: Json | null
         }
         Update: {
           amount?: number
+          checkout_url?: string | null
           confirmed_at?: string | null
+          copy_paste_code?: string | null
           created_at?: string
+          credited_at?: string | null
+          currency?: string
+          expires_at?: string | null
           external_id?: string | null
           id?: string
+          idempotency_key?: string | null
+          last_error?: string | null
+          paid_at?: string | null
           payment_method?: string | null
+          provider?: string
+          qr_code?: string | null
+          qr_code_base64?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
           status?: Database["public"]["Enums"]["deposit_status"]
           updated_at?: string
           user_id?: string
+          webhook_payload?: Json | null
         }
         Relationships: []
       }
@@ -484,6 +526,45 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_webhook_logs: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          headers: Json | null
+          id: string
+          payload: Json | null
+          processed: boolean
+          processing_error: string | null
+          provider: string
+          provider_transaction_id: string | null
+          signature_valid: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          headers?: Json | null
+          id?: string
+          payload?: Json | null
+          processed?: boolean
+          processing_error?: string | null
+          provider: string
+          provider_transaction_id?: string | null
+          signature_valid?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          headers?: Json | null
+          id?: string
+          payload?: Json | null
+          processed?: boolean
+          processing_error?: string | null
+          provider?: string
+          provider_transaction_id?: string | null
+          signature_valid?: boolean | null
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           created_at: string
@@ -525,14 +606,19 @@ export type Database = {
           affiliate_balance: number
           affiliate_code: string | null
           avatar_url: string | null
+          balance: number
           coins: number
+          cpf: string | null
           created_at: string
           display_name: string | null
+          email: string | null
+          full_name: string | null
           id: string
           is_demo: boolean
           is_influencer: boolean
           level: number
           manager_id: string | null
+          phone: string | null
           referred_by_id: string | null
           status: string
           total_received: number
@@ -542,14 +628,19 @@ export type Database = {
           affiliate_balance?: number
           affiliate_code?: string | null
           avatar_url?: string | null
+          balance?: number
           coins?: number
+          cpf?: string | null
           created_at?: string
           display_name?: string | null
+          email?: string | null
+          full_name?: string | null
           id: string
           is_demo?: boolean
           is_influencer?: boolean
           level?: number
           manager_id?: string | null
+          phone?: string | null
           referred_by_id?: string | null
           status?: string
           total_received?: number
@@ -559,14 +650,19 @@ export type Database = {
           affiliate_balance?: number
           affiliate_code?: string | null
           avatar_url?: string | null
+          balance?: number
           coins?: number
+          cpf?: string | null
           created_at?: string
           display_name?: string | null
+          email?: string | null
+          full_name?: string | null
           id?: string
           is_demo?: boolean
           is_influencer?: boolean
           level?: number
           manager_id?: string | null
+          phone?: string | null
           referred_by_id?: string | null
           status?: string
           total_received?: number
@@ -840,6 +936,53 @@ export type Database = {
           },
         ]
       }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          created_at: string
+          deposit_id: string | null
+          description: string | null
+          id: string
+          status: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          created_at?: string
+          deposit_id?: string | null
+          description?: string | null
+          id?: string
+          status?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          balance_before?: number
+          created_at?: string
+          deposit_id?: string | null
+          description?: string | null
+          id?: string
+          status?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_deposit_id_fkey"
+            columns: ["deposit_id"]
+            isOneToOne: false
+            referencedRelation: "deposits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       live_matches_public: {
@@ -876,6 +1019,14 @@ export type Database = {
       }
     }
     Functions: {
+      credit_deposit_atomic: {
+        Args: {
+          _deposit_id: string
+          _expected_amount: number
+          _provider_tx_id: string
+        }
+        Returns: Json
+      }
       generate_affiliate_code: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -905,6 +1056,8 @@ export type Database = {
         | "rejected"
         | "canceled"
         | "failed"
+        | "waiting_payment"
+        | "expired"
       risk_alert_status: "open" | "reviewing" | "resolved" | "ignored"
       risk_severity: "low" | "medium" | "high" | "critical"
       transaction_type:
@@ -1067,6 +1220,8 @@ export const Constants = {
         "rejected",
         "canceled",
         "failed",
+        "waiting_payment",
+        "expired",
       ],
       risk_alert_status: ["open", "reviewing", "resolved", "ignored"],
       risk_severity: ["low", "medium", "high", "critical"],

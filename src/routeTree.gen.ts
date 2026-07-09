@@ -43,6 +43,7 @@ import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
 import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
 import { Route as AdminAffiliatesRouteImport } from './routes/admin.affiliates'
+import { Route as ApiPublicWebhooksDiggionSecretRouteImport } from './routes/api/public/webhooks.diggion.$secret'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -214,6 +215,12 @@ const AdminAffiliatesRoute = AdminAffiliatesRouteImport.update({
   path: '/affiliates',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicWebhooksDiggionSecretRoute =
+  ApiPublicWebhooksDiggionSecretRouteImport.update({
+    id: '/api/public/webhooks/diggion/$secret',
+    path: '/api/public/webhooks/diggion/$secret',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -250,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/app/': typeof AppIndexRoute
+  '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -285,6 +293,7 @@ export interface FileRoutesByTo {
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/app': typeof AppIndexRoute
+  '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -322,6 +331,7 @@ export interface FileRoutesById {
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/app/': typeof AppIndexRoute
+  '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -360,6 +370,7 @@ export interface FileRouteTypes {
     | '/gerente/painel'
     | '/gerente/saques'
     | '/app/'
+    | '/api/public/webhooks/diggion/$secret'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -395,6 +406,7 @@ export interface FileRouteTypes {
     | '/gerente/painel'
     | '/gerente/saques'
     | '/app'
+    | '/api/public/webhooks/diggion/$secret'
   id:
     | '__root__'
     | '/'
@@ -431,6 +443,7 @@ export interface FileRouteTypes {
     | '/gerente/painel'
     | '/gerente/saques'
     | '/app/'
+    | '/api/public/webhooks/diggion/$secret'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -441,6 +454,7 @@ export interface RootRouteChildren {
   GameRoute: typeof GameRoute
   GerenteRoute: typeof GerenteRouteWithChildren
   LoginRoute: typeof LoginRoute
+  ApiPublicWebhooksDiggionSecretRoute: typeof ApiPublicWebhooksDiggionSecretRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -683,6 +697,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAffiliatesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/webhooks/diggion/$secret': {
+      id: '/api/public/webhooks/diggion/$secret'
+      path: '/api/public/webhooks/diggion/$secret'
+      fullPath: '/api/public/webhooks/diggion/$secret'
+      preLoaderRoute: typeof ApiPublicWebhooksDiggionSecretRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -773,17 +794,8 @@ const rootRouteChildren: RootRouteChildren = {
   GameRoute: GameRoute,
   GerenteRoute: GerenteRouteWithChildren,
   LoginRoute: LoginRoute,
+  ApiPublicWebhooksDiggionSecretRoute: ApiPublicWebhooksDiggionSecretRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
