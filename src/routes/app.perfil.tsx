@@ -25,6 +25,12 @@ const withdrawalsQuery = queryOptions({
   queryFn: () => listAffiliateWithdrawals(),
 });
 
+const referralStatsQuery = queryOptions({
+  queryKey: ["referral-stats"],
+  queryFn: () => getReferralStats(),
+});
+
+
 export const Route = createFileRoute("/app/perfil")({
   ssr: false,
   head: () => ({
