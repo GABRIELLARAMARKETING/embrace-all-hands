@@ -492,6 +492,8 @@ export const listNetworkWithdrawals = createServerFn({ method: "GET" })
           .enum(["pending", "in_review", "approved", "paid", "rejected", "cancelled", "failed"])
           .optional(),
         search: z.string().trim().max(120).optional(),
+        limit: z.number().int().min(1).max(100).optional(),
+        offset: z.number().int().min(0).optional(),
       })
       .partial()
       .parse(raw ?? {}),
@@ -499,6 +501,9 @@ export const listNetworkWithdrawals = createServerFn({ method: "GET" })
   .handler(async ({ context, data }) => {
     await ensureManagerOrAdmin(context);
     const { supabase, userId } = context;
+
+    const limit = data.limit ?? 20;
+    const offset = data.offset ?? 0;
 
     // Usuários da rede deste gerente
     const { data: netProfiles, error: profErr } = await supabase
@@ -513,22 +518,41 @@ export const listNetworkWithdrawals = createServerFn({ method: "GET" })
       idToName[p.id] = p.display_name;
       ids.push(p.id);
     });
-    if (ids.length === 0) return [];
+    if (ids.length === 0) return { rows: [], total: 0, limit, offset };
+
+    const search = (data.search ?? "").toLowerCase().trim();
+
+    // Se houver busca, restringe os IDs pelo nome (a busca por ID cai no filtro final)
+    let filteredIds = ids;
+    if (search) {
+      filteredIds = ids.filter(
+        (id) =>
+          (idToName[id] ?? "").toLowerCase().includes(search) ||
+          id.toLowerCase().includes(search),
+      );
+      if (filteredIds.length === 0) return { rows: [], total: 0, limit, offset };
+    }
+
+    let countQ = supabase
+      .from("affiliate_withdrawals")
+      .select("id", { count: "exact", head: true })
+      .in("user_id", filteredIds);
+    if (data.status) countQ = countQ.eq("status", data.status);
+    const { count } = await countQ;
 
     let q = supabase
       .from("affiliate_withdrawals")
       .select("id, user_id, amount, status, pix_key, created_at, paid_at, rejection_reason")
-      .in("user_id", ids)
+      .in("user_id", filteredIds)
       .order("created_at", { ascending: false })
-      .limit(200);
+      .range(offset, offset + limit - 1);
     if (data.status) q = q.eq("status", data.status);
 
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
 
-    const search = (data.search ?? "").toLowerCase();
-    return (rows ?? [])
-      .map((r: any) => ({
+    return {
+      rows: (rows ?? []).map((r: any) => ({
         id: r.id as string,
         userId: r.user_id as string,
         userDisplayName: idToName[r.user_id] ?? null,
@@ -538,11 +562,9 @@ export const listNetworkWithdrawals = createServerFn({ method: "GET" })
         createdAt: r.created_at as string,
         paidAt: r.paid_at as string | null,
         rejectionReason: r.rejection_reason as string | null,
-      }))
-      .filter((r) =>
-        !search
-          ? true
-          : (r.userDisplayName ?? "").toLowerCase().includes(search) ||
-            r.userId.toLowerCase().includes(search),
-      );
+      })),
+      total: count ?? 0,
+      limit,
+      offset,
+    };
   });
