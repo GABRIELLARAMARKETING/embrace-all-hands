@@ -203,7 +203,13 @@ export const listAdminWebhooks = createServerFn({ method: "GET" })
         deposit_status: dep?.status ?? null,
         balance_before: wt?.balance_before ?? null,
         balance_after: wt?.balance_after ?? null,
-        raw_payload: payload,
+        raw_payload_json: (() => {
+          try {
+            return JSON.stringify(payload ?? null, null, 2);
+          } catch {
+            return "null";
+          }
+        })(),
       };
     });
 
