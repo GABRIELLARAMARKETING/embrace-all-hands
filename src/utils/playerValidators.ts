@@ -1,11 +1,16 @@
 import { z } from "zod";
 import { cpfDigits } from "./cpfMask";
+import { PLAYER_MOCK } from "@/data/playerMockData";
+
+const ALLOWED_DEPOSIT_AMOUNTS = PLAYER_MOCK.depositOptions as readonly number[];
 
 export const depositSchema = z.object({
   amount: z
-    .number({ invalid_type_error: "Informe o valor" })
-    .min(20, "Depósito mínimo R$ 20,00")
-    .max(100000, "Valor muito alto"),
+    .number({ invalid_type_error: "Selecione um valor" })
+    .refine(
+      (v) => ALLOWED_DEPOSIT_AMOUNTS.includes(v),
+      "Selecione um dos valores disponíveis",
+    ),
   coupon: z.string().trim().max(30).optional(),
 });
 export type DepositFormValues = z.infer<typeof depositSchema>;
