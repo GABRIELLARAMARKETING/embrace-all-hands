@@ -60,6 +60,7 @@ function PerfilPage() {
   const { data: profile } = useSuspenseQuery(myProfileQuery);
   const { data: withdrawals = [] } = useSuspenseQuery(withdrawalsQuery);
   const { data: referral } = useSuspenseQuery(referralStatsQuery);
+  const { data: deposits = [] } = useSuspenseQuery(myDepositsQuery);
 
   // Mirror server values into the local store when setters exist
   const store = usePlayerStore.getState() as unknown as Record<string, unknown>;
