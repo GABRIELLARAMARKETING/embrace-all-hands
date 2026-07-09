@@ -31,6 +31,12 @@ const referralStatsQuery = queryOptions({
   queryFn: () => getReferralStats(),
 });
 
+const myDepositsQuery = queryOptions({
+  queryKey: ["my-deposits"],
+  queryFn: () => listMyRecentDeposits({ data: { limit: 8 } }),
+  staleTime: 15_000,
+});
+
 
 export const Route = createFileRoute("/app/perfil")({
   ssr: false,
