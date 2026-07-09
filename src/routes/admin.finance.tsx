@@ -2,8 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { useState } from "react";
 import { listTransactions } from "@/lib/admin-extras.functions";
+import { useAdminRealtime } from "@/hooks/use-admin-realtime";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
+
 
 const txQuery = (type?: string) =>
   queryOptions({
