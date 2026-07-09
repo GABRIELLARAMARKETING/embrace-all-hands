@@ -45,15 +45,16 @@ export function ThemeCarousel({ themes, index, onChange }: Props) {
 
   if (total === 0) return null;
   const current = themes[index];
-  const visibleRange = [-2, -1, 0, 1, 2] as const;
+  const single = total === 1;
+  const visibleRange = single ? ([0] as const) : ([-2, -1, 0, 1, 2] as const);
   const glow = current.ui_config.textGlow ?? current.preview_config.cardGlow;
 
   return (
     <div className="w-full">
       <div
         className={`relative mx-auto w-full max-w-[720px] overflow-hidden ${isMobile ? "h-[260px]" : "h-[340px]"}`}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
+        onTouchStart={single ? undefined : onTouchStart}
+        onTouchEnd={single ? undefined : onTouchEnd}
       >
         {visibleRange.map((offset) => {
           const i = wrap(index + offset);
@@ -70,22 +71,26 @@ export function ThemeCarousel({ themes, index, onChange }: Props) {
           );
         })}
 
-        <button
-          type="button"
-          onClick={prev}
-          aria-label="Mapa anterior"
-          className="absolute left-2 top-1/2 z-40 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all hover:border-fuchsia-400/70 hover:text-white hover:shadow-[0_0_24px_rgba(168,85,247,0.65)]"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <button
-          type="button"
-          onClick={next}
-          aria-label="Próximo mapa"
-          className="absolute right-2 top-1/2 z-40 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all hover:border-fuchsia-400/70 hover:text-white hover:shadow-[0_0_24px_rgba(168,85,247,0.65)]"
-        >
-          <ChevronRight size={20} />
-        </button>
+        {!single && (
+          <>
+            <button
+              type="button"
+              onClick={prev}
+              aria-label="Mapa anterior"
+              className="absolute left-2 top-1/2 z-40 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all hover:border-fuchsia-400/70 hover:text-white hover:shadow-[0_0_24px_rgba(168,85,247,0.65)]"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <button
+              type="button"
+              onClick={next}
+              aria-label="Próximo mapa"
+              className="absolute right-2 top-1/2 z-40 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur-md transition-all hover:border-fuchsia-400/70 hover:text-white hover:shadow-[0_0_24px_rgba(168,85,247,0.65)]"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </>
+        )}
       </div>
 
       <div className="mt-3 h-10 text-center">
