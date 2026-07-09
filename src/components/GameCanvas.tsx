@@ -86,32 +86,18 @@ function GameLogic({
   const level = LEVELS[currentLevel - 1] ?? LEVELS[0];
   const themeId = level.theme in THEMES ? level.theme : selectedTheme;
 
-  const generated = useMemo(
-    () => {
-      const hx = helixRuntime.get().settings;
-      // Progressão da dificuldade aplicada como fator geral sobre densidade/frequência.
-      const progression = hx.difficultyProgressionRate;
-      const obstacleRate = Math.min(
-        1,
-        Math.max(0, level.obstacleRate * hx.obstacleDensity * hx.obstacleFrequency * progression) /
-          Math.max(0.0001, 0.35),
-      );
-      // gapSize é inteiro: multiplica e arredonda mantendo mínimo 1.
-      const gap = Math.max(1, Math.round(level.gapSize * hx.gapSize));
-      const gravityMult = level.gravityMult * hx.gravity;
-      return generateLevel(
-        level.id,
-        level.platformCount,
-        Math.min(0.9, level.obstacleRate * hx.obstacleDensity * (0.6 + 0.4 * hx.obstacleFrequency) * (0.7 + 0.3 * progression)),
-        gap,
-        gravityMult,
-        level.coinRate,
-      );
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      void obstacleRate;
-    },
-    [level],
-  );
+  const generated = useMemo(() => {
+    const hx = helixRuntime.get().settings;
+    const progression = 0.7 + 0.3 * hx.difficultyProgressionRate;
+    const obstacleRate = Math.min(
+      0.9,
+      Math.max(0, level.obstacleRate * hx.obstacleDensity * (0.6 + 0.4 * hx.obstacleFrequency) * progression),
+    );
+    const gap = Math.max(1, Math.round(level.gapSize * hx.gapSize));
+    const gravityMult = level.gravityMult * hx.gravity;
+    return generateLevel(level.id, level.platformCount, obstacleRate, gap, gravityMult, level.coinRate);
+  }, [level]);
+
 
 
   const ballRef = useRef<THREE.Mesh>(null);
