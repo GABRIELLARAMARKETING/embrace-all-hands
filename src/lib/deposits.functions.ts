@@ -210,6 +210,3 @@ export const reconcilePendingDeposits = createServerFn({ method: "POST" })
     }
     return { checked: results.length, results };
   });
-
-// Helper (não exportado como server fn)
-export { getRequestHeader };
