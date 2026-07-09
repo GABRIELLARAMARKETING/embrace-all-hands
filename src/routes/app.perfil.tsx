@@ -345,3 +345,56 @@ function WithdrawalHistory({ items }: { items: WithdrawalHistoryItem[] }) {
     </PlayerCard>
   );
 }
+
+function depositStatusMeta(status: string): { label: string; cls: string; tone: "ok" | "err" | "pending" } {
+  const s = (status || "").toLowerCase();
+  if (["paid", "approved", "credited", "completed"].includes(s))
+    return { label: "Aprovado", tone: "ok", cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" };
+  if (["failed", "canceled", "cancelled", "refused", "rejected", "expired", "refunded", "chargeback"].includes(s))
+    return { label: "Recusado", tone: "err", cls: "bg-red-500/15 text-red-300 border-red-500/30" };
+  return { label: "Processando", tone: "pending", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" };
+}
+
+function DepositHistory({ items }: { items: MyDepositRow[] }) {
+  return (
+    <PlayerCard className="mt-4 p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-[11px] font-bold tracking-widest text-white/60">
+          <Wallet className="h-4 w-4 text-[#C084FC]" /> DEPÓSITOS RECENTES
+        </div>
+        <div className="text-[10px] font-bold tracking-widest text-white/40">
+          {items.length} {items.length === 1 ? "registro" : "registros"}
+        </div>
+      </div>
+      {items.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-white/10 py-6 text-center text-xs text-white/50">
+          Nenhum depósito ainda.
+        </div>
+      ) : (
+        <ul className="divide-y divide-white/5">
+          {items.map((d) => {
+            const meta = depositStatusMeta(d.status);
+            const date = new Date(d.created_at).toLocaleString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            return (
+              <li key={d.id} className="flex items-center justify-between py-3">
+                <div>
+                  <div className="text-sm font-bold text-white">{formatCurrency(d.amount)}</div>
+                  <div className="text-[11px] text-white/50">{date}</div>
+                </div>
+                <span className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${meta.cls}`}>
+                  {meta.label}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </PlayerCard>
+  );
+}
