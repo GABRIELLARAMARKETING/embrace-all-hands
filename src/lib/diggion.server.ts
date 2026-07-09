@@ -56,6 +56,25 @@ export type DiggionTxStatus = {
   raw: unknown;
 };
 
+function readStatus(data: any): string {
+  return String(
+    data?.payment_status ??
+      data?.transaction_status ??
+      data?.current_status ??
+      data?.status_name ??
+      data?.status ??
+      "waiting_payment",
+  );
+}
+
+function readAmountCents(data: any): number | undefined {
+  const raw = data?.amount ?? data?.total_amount ?? data?.value ?? data?.price;
+  if (raw === null || raw === undefined || raw === "") return undefined;
+  const value = Number(raw);
+  if (!Number.isFinite(value)) return undefined;
+  return Math.round(value);
+}
+
 function getEnv() {
   const base = process.env.DIGGION_BASE_URL || DEFAULT_BASE;
   const apiKey = process.env.DIGGION_API_KEY;
@@ -145,14 +164,14 @@ export class DiggionPayService {
     const pix = data?.pix || {};
     return {
       hash: data?.hash || data?.token || data?.id,
-      status: data?.status || "waiting_payment",
+      status: readStatus(data),
       pix,
       qr_code: pix?.pix_qr_code || data?.qr_code,
       qr_code_url: pix?.pix_url || data?.qr_code_url,
       copy_paste: pix?.pix_qr_code || data?.copy_paste || data?.pix_copy_paste,
       checkout_url: data?.checkout_url || data?.payment_url,
       expires_at: data?.expires_at || data?.expiration,
-      amount: data?.amount,
+      amount: readAmountCents(data),
       raw: resp,
     };
   }
@@ -172,8 +191,8 @@ export class DiggionPayService {
     const data = resp?.data ?? resp;
     return {
       hash: data?.hash || hash,
-      status: data?.status,
-      amount: data?.amount,
+      status: readStatus(data),
+      amount: readAmountCents(data),
       paid_at: data?.paid_at || null,
       raw: resp,
     };

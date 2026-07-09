@@ -117,9 +117,15 @@ export const Route = createFileRoute("/api/public/webhooks/diggion/$secret")({
         const data = payload?.data ?? payload ?? {};
         const providerTxId: string | null =
           data?.hash || data?.transaction_hash || data?.transaction?.hash || data?.id || null;
-        const eventType: string | null = payload?.event || payload?.type || data?.status || null;
-        const eventId: string | null =
-          payload?.event_id || payload?.id || (providerTxId ? `${providerTxId}:${data?.status ?? "unknown"}` : null);
+        const statusForEvent: string | null =
+          data?.payment_status || data?.status || data?.transaction_status || data?.current_status || null;
+        const eventType: string | null = payload?.event || payload?.type || statusForEvent || null;
+        const rawEventId = payload?.event_id || payload?.id || data?.event_id || data?.id || null;
+        const eventId: string | null = providerTxId
+          ? `${providerTxId}:${eventType ?? "transaction"}:${statusForEvent ?? "unknown"}:${rawEventId ?? "noid"}`
+          : rawEventId
+            ? `unknown:${eventType ?? "transaction"}:${statusForEvent ?? "unknown"}:${rawEventId}`
+            : null;
 
         // 1. Log bruto (idempotente via event_id)
         const { data: existing } = await supabaseAdmin
