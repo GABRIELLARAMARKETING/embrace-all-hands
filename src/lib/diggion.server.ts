@@ -58,11 +58,11 @@ export type DiggionTxStatus = {
 
 function readStatus(data: any): string {
   return String(
-    data?.status ??
-      data?.payment_status ??
+    data?.payment_status ??
       data?.transaction_status ??
       data?.current_status ??
       data?.status_name ??
+      data?.status ??
       "waiting_payment",
   );
 }
