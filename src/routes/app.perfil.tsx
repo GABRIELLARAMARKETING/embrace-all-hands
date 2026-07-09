@@ -11,7 +11,9 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { copyToClipboard } from "@/utils/clipboard";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyProfile } from "@/lib/profile.functions";
+import { getReferralStats } from "@/lib/referral.functions";
 import helixLogo from "@/assets/helix-multi-logo.png";
+
 
 const myProfileQuery = queryOptions({
   queryKey: ["my-profile"],
