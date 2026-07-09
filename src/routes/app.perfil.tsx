@@ -102,9 +102,17 @@ function PerfilPage() {
   const [saving, setSaving] = useState(false);
 
 
+  const referralUrl = referral.referralUrl ?? PLAYER_MOCK.referralUrl;
+  const affiliateCode = referral.affiliateCode;
+
   const copyLink = async () => {
-    const ok = await copyToClipboard(PLAYER_MOCK.referralUrl);
+    if (!referralUrl) {
+      toast.error("Seu link ainda não está disponível.");
+      return;
+    }
+    const ok = await copyToClipboard(referralUrl);
     toast[ok ? "success" : "error"](ok ? "Link copiado!" : "Falha ao copiar");
+
   };
 
   const changePassword = async (e: React.FormEvent) => {
