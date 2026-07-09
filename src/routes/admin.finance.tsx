@@ -25,7 +25,7 @@ export const Route = createFileRoute("/admin/finance")({
   ),
 });
 
-const TYPES = ["", "withdrawal_requested", "withdrawal_paid", "withdrawal_rejected", "commission_created", "commission_approved", "manual_adjustment_positive", "manual_adjustment_negative"];
+const TYPES = ["", "deposit_paid", "withdrawal_requested", "withdrawal_paid", "withdrawal_rejected", "commission_created", "commission_approved", "manual_adjustment_positive", "manual_adjustment_negative"];
 
 function Page() {
   const [type, setType] = useState<string>("");
