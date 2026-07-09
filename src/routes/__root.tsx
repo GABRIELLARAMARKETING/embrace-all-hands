@@ -89,7 +89,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "Torre helicoidal, física 3D, 8 temas, 8 skins e 20 níveis. Jogue já.",
+          "Gire a torre helicoidal, atravesse os espaços, colete moedas virtuais e domine 20 níveis. Jogo 3D premium — sem dinheiro real.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -105,7 +105,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/__l5e/assets-v1/9ff97da3-ea14-49ab-8bd8-78dd8722a4af/helixfast-logo.png", type: "image/png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
