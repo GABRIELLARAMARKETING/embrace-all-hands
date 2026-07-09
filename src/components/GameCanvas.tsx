@@ -189,13 +189,15 @@ function GameLogic({
     const dt = Math.min(deltaRaw, PHYSICS.MAX_DELTA);
 
     // Smooth rotation: framerate-independent lerp toward the input target.
-    const smoothT = 1 - Math.pow(1 - CONSTANTS.ROTATION_SMOOTHING, dt * 60);
+    const hxRot = helixRuntime.get().settings.towerRotationSpeed;
+    const smoothT = 1 - Math.pow(1 - CONSTANTS.ROTATION_SMOOTHING, dt * 60 * hxRot);
     currentRotation.current = THREE.MathUtils.lerp(
       currentRotation.current,
       towerRotation.current,
       smoothT,
     );
     towerGroup.current.rotation.y = currentRotation.current;
+
 
     const isFever = state.clock.elapsedTime < feverUntil.current;
     if (isFever !== fever) setFever(isFever);
