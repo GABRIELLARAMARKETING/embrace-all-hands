@@ -7,6 +7,8 @@ import { PHYSICS } from "@/game/physicsConstants";
 import { LEVELS } from "@/game/config/levels";
 import { THEMES } from "@/game/config/themes";
 import { generateLevel, type RingData, type SectorType } from "@/game/engine/levelGenerator";
+import { helixRuntime } from "@/game/config/difficulty";
+
 import { useGameStore } from "@/store/useGameStore";
 import { PlatformRing } from "@/game/entities/PlatformRing";
 import { TowerCore } from "@/game/entities/TowerCore";
