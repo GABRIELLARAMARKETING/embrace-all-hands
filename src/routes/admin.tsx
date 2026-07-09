@@ -15,6 +15,8 @@ import {
   Settings,
   LogOut,
   Menu,
+  Gamepad2,
+
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -60,7 +62,9 @@ const NAV = [
   { to: "/admin/reports", label: "Relatórios", icon: FileBarChart },
   { to: "/admin/risk-alerts", label: "Alertas", icon: ShieldAlert },
   { to: "/admin/audit-logs", label: "Logs", icon: ScrollText },
+  { to: "/admin/helix", label: "Jogo Helix", icon: Gamepad2 },
   { to: "/admin/settings", label: "Configurações", icon: Settings },
+
 ] as const;
 
 function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {

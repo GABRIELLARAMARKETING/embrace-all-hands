@@ -7,6 +7,8 @@ import { PHYSICS } from "@/game/physicsConstants";
 import { LEVELS } from "@/game/config/levels";
 import { THEMES } from "@/game/config/themes";
 import { generateLevel, type RingData, type SectorType } from "@/game/engine/levelGenerator";
+import { helixRuntime } from "@/game/config/difficulty";
+
 import { useGameStore } from "@/store/useGameStore";
 import { PlatformRing } from "@/game/entities/PlatformRing";
 import { TowerCore } from "@/game/entities/TowerCore";
@@ -84,18 +86,19 @@ function GameLogic({
   const level = LEVELS[currentLevel - 1] ?? LEVELS[0];
   const themeId = level.theme in THEMES ? level.theme : selectedTheme;
 
-  const generated = useMemo(
-    () =>
-      generateLevel(
-        level.id,
-        level.platformCount,
-        level.obstacleRate,
-        level.gapSize,
-        level.gravityMult,
-        level.coinRate,
-      ),
-    [level],
-  );
+  const generated = useMemo(() => {
+    const hx = helixRuntime.get().settings;
+    const progression = 0.7 + 0.3 * hx.difficultyProgressionRate;
+    const obstacleRate = Math.min(
+      0.9,
+      Math.max(0, level.obstacleRate * hx.obstacleDensity * (0.6 + 0.4 * hx.obstacleFrequency) * progression),
+    );
+    const gap = Math.max(1, Math.round(level.gapSize * hx.gapSize));
+    const gravityMult = level.gravityMult * hx.gravity;
+    return generateLevel(level.id, level.platformCount, obstacleRate, gap, gravityMult, level.coinRate);
+  }, [level]);
+
+
 
   const ballRef = useRef<THREE.Mesh>(null);
   const towerGroup = useRef<THREE.Group>(null);
@@ -186,13 +189,15 @@ function GameLogic({
     const dt = Math.min(deltaRaw, PHYSICS.MAX_DELTA);
 
     // Smooth rotation: framerate-independent lerp toward the input target.
-    const smoothT = 1 - Math.pow(1 - CONSTANTS.ROTATION_SMOOTHING, dt * 60);
+    const hxRot = helixRuntime.get().settings.towerRotationSpeed;
+    const smoothT = 1 - Math.pow(1 - CONSTANTS.ROTATION_SMOOTHING, dt * 60 * hxRot);
     currentRotation.current = THREE.MathUtils.lerp(
       currentRotation.current,
       towerRotation.current,
       smoothT,
     );
     towerGroup.current.rotation.y = currentRotation.current;
+
 
     const isFever = state.clock.elapsedTime < feverUntil.current;
     if (isFever !== fever) setFever(isFever);
@@ -345,14 +350,16 @@ function GameLogic({
           lastBounceRing.current = i;
           collisionCooldownUntil.current =
             state.clock.elapsedTime + CONSTANTS.COLLISION_COOLDOWN;
+          const hxBall = helixRuntime.get().settings.ballSpeed;
           velocity.current = Math.min(
-            CONSTANTS.MAX_BOUNCE_VELOCITY,
+            CONSTANTS.MAX_BOUNCE_VELOCITY * hxBall,
             Math.max(
-              CONSTANTS.BOUNCE_VELOCITY,
+              CONSTANTS.BOUNCE_VELOCITY * hxBall,
               impactSpeed * CONSTANTS.BOUNCE_RESTITUTION *
                 (1 - CONSTANTS.IMPACT_FRICTION),
             ),
           );
+
           spinVelocity.current = Math.min(
             28,
             (impactSpeed / CONSTANTS.BALL_RADIUS) *
