@@ -335,3 +335,32 @@ export const reconcileDepositById = createServerFn({ method: "POST" })
     }
     return { ok: true, result: "ainda_pendente", provider_status: tx.status };
   });
+
+/* ============================ USER: MY RECENT DEPOSITS ============================ */
+
+export type MyDepositRow = {
+  id: string;
+  amount: number;
+  status: string;
+  provider: string | null;
+  created_at: string;
+  paid_at: string | null;
+  credited_at: string | null;
+  expires_at: string | null;
+};
+
+export const listMyRecentDeposits = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z.object({ limit: z.number().int().min(1).max(50).optional() }).parse(data ?? {}),
+  )
+  .handler(async ({ data, context }): Promise<MyDepositRow[]> => {
+    const { data: rows, error } = await context.supabase
+      .from("deposits")
+      .select("id, amount, status, provider, created_at, paid_at, credited_at, expires_at")
+      .eq("user_id", context.userId)
+      .order("created_at", { ascending: false })
+      .limit(data.limit ?? 10);
+    if (error) throw new Error(error.message);
+    return (rows ?? []).map((r: any) => ({ ...r, amount: Number(r.amount) }));
+  });
