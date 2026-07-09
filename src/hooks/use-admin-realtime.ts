@@ -8,7 +8,14 @@ import { toast } from "sonner";
  * caches so admin views update in real time.
  */
 export function useAdminRealtime(opts: {
-  table: "affiliate_withdrawals" | "risk_alerts";
+  table:
+    | "affiliate_withdrawals"
+    | "risk_alerts"
+    | "deposits"
+    | "wallet_transactions"
+    | "transactions"
+    | "payment_webhook_logs";
+
   invalidateKeys: Array<readonly unknown[]>;
   toastOnInsert?: (payload: Record<string, unknown>) => string | null;
 }) {

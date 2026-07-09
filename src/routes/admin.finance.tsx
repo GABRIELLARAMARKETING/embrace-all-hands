@@ -2,8 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { useState } from "react";
 import { listTransactions } from "@/lib/admin-extras.functions";
+import { useAdminRealtime } from "@/hooks/use-admin-realtime";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
+
 
 const txQuery = (type?: string) =>
   queryOptions({
@@ -23,13 +25,32 @@ export const Route = createFileRoute("/admin/finance")({
   ),
 });
 
-const TYPES = ["", "withdrawal_requested", "withdrawal_paid", "withdrawal_rejected", "commission_created", "commission_approved", "manual_adjustment_positive", "manual_adjustment_negative"];
+const TYPES = ["", "deposit_paid", "withdrawal_requested", "withdrawal_paid", "withdrawal_rejected", "commission_created", "commission_approved", "manual_adjustment_positive", "manual_adjustment_negative"];
 
 function Page() {
   const [type, setType] = useState<string>("");
   const { data } = useQuery(txQuery(type || undefined));
   const rows = data?.rows ?? [];
   const s = data?.summary ?? { totalIn: 0, totalOut: 0, netFlow: 0, txCount: 0 };
+
+  const invalidateAll = [["admin", "transactions"], ["admin", "dashboard-summary"]] as const;
+  useAdminRealtime({
+    table: "deposits",
+    invalidateKeys: invalidateAll as unknown as Array<readonly unknown[]>,
+    toastOnInsert: (row) =>
+      row.status === "paid" ? `Nova venda confirmada: R$ ${Number(row.amount).toFixed(2)}` : null,
+  });
+  useAdminRealtime({
+    table: "wallet_transactions",
+    invalidateKeys: invalidateAll as unknown as Array<readonly unknown[]>,
+    toastOnInsert: (row) =>
+      row.type === "deposit" ? `Depósito creditado: R$ ${Number(row.amount).toFixed(2)}` : null,
+  });
+  useAdminRealtime({
+    table: "transactions",
+    invalidateKeys: invalidateAll as unknown as Array<readonly unknown[]>,
+  });
+
 
   return (
     <div className="space-y-6">

@@ -13,7 +13,9 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { getAdminDashboardSummary } from "@/lib/admin.functions";
+import { useAdminRealtime } from "@/hooks/use-admin-realtime";
 import { formatCurrency } from "@/utils/formatCurrency";
+
 
 const summaryQuery = () =>
   queryOptions({
@@ -54,6 +56,18 @@ function AdminDashboard() {
     ...summaryQuery(),
     queryFn: () => fetchSummary(),
   });
+
+  useAdminRealtime({
+    table: "deposits",
+    invalidateKeys: [["admin", "dashboard-summary"], ["admin", "transactions"]],
+    toastOnInsert: (row) =>
+      row.status === "paid" ? `Nova venda: R$ ${Number(row.amount).toFixed(2)}` : null,
+  });
+  useAdminRealtime({
+    table: "wallet_transactions",
+    invalidateKeys: [["admin", "dashboard-summary"], ["admin", "transactions"]],
+  });
+
 
   const cards = [
     { label: "Total de usuários", value: data?.totalUsers ?? 0, icon: Users, tone: "cyan" },
