@@ -15,6 +15,7 @@ import { CoinPopLayer } from "@/components/CoinPopLayer";
 import { MoneyProgressBar } from "@/components/MoneyProgressBar";
 import { useGameSession } from "@/hooks/useGameSession";
 import { useThemePreload } from "@/hooks/useThemePreload";
+import { LogoHelix } from "@/components/LogoHelix";
 
 export const Route = createFileRoute("/game")({
   component: GamePage,
@@ -91,11 +92,12 @@ function GamePage() {
             transition={{ duration: 0.5 }}
             className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-fuchsia-950"
           >
-            <div className="text-center">
-              <div className="text-4xl sm:text-5xl font-black tracking-tighter text-white">
+            <div className="flex flex-col items-center text-center">
+              <LogoHelix className="w-[140px] sm:w-[170px]" />
+              <div className="mt-4 text-2xl sm:text-3xl font-black tracking-tight text-white">
                 HELIX{" "}
                 <span className="bg-gradient-to-br from-amber-300 to-fuchsia-400 bg-clip-text text-transparent">
-                  CASH
+                  FAST
                 </span>
               </div>
               <div className="mt-3 text-xs uppercase tracking-[0.4em] text-white/60">
