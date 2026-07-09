@@ -1,19 +1,19 @@
-import cottonBg from "@/assets/themes/cotton-bg.jpg.asset.json";
-import neonBg from "@/assets/themes/neon-bg.jpg.asset.json";
-import goldBg from "@/assets/themes/gold-bg.jpg.asset.json";
-import oceanBg from "@/assets/themes/ocean-bg.jpg.asset.json";
-import candyBg from "@/assets/themes/candy-bg.jpg.asset.json";
-import cyberBg from "@/assets/themes/cyber-bg.jpg.asset.json";
-import lavaBg from "@/assets/themes/lava-bg.jpg.asset.json";
-import luxuryBg from "@/assets/themes/luxury-bg.jpg.asset.json";
-import cottonCard from "@/assets/themes/cotton-card.jpg.asset.json";
-import neonCard from "@/assets/themes/neon-card.jpg.asset.json";
-import goldCard from "@/assets/themes/gold-card.jpg.asset.json";
-import oceanCard from "@/assets/themes/ocean-card.jpg.asset.json";
-import candyCard from "@/assets/themes/candy-card.jpg.asset.json";
-import cyberCard from "@/assets/themes/cyber-card.jpg.asset.json";
-import lavaCard from "@/assets/themes/lava-card.jpg.asset.json";
-import luxuryCard from "@/assets/themes/luxury-card.jpg.asset.json";
+const cottonBg = { url: "/images/themes/cotton-bg.jpg" };
+const neonBg = { url: "/images/themes/neon-bg.jpg" };
+const goldBg = { url: "/images/themes/gold-bg.jpg" };
+const oceanBg = { url: "/images/themes/ocean-bg.jpg" };
+const candyBg = { url: "/images/themes/candy-bg.jpg" };
+const cyberBg = { url: "/images/themes/cyber-bg.jpg" };
+const lavaBg = { url: "/images/themes/lava-bg.jpg" };
+const luxuryBg = { url: "/images/themes/luxury-bg.jpg" };
+const cottonCard = { url: "/images/themes/cotton-card.jpg" };
+const neonCard = { url: "/images/themes/neon-card.jpg" };
+const goldCard = { url: "/images/themes/gold-card.jpg" };
+const oceanCard = { url: "/images/themes/ocean-card.jpg" };
+const candyCard = { url: "/images/themes/candy-card.jpg" };
+const cyberCard = { url: "/images/themes/cyber-card.jpg" };
+const lavaCard = { url: "/images/themes/lava-card.jpg" };
+const luxuryCard = { url: "/images/themes/luxury-card.jpg" };
 
 export type ThemeId =
   | "cotton"
