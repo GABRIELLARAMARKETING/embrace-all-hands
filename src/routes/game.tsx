@@ -15,6 +15,7 @@ import { CoinPopLayer } from "@/components/CoinPopLayer";
 import { MoneyProgressBar } from "@/components/MoneyProgressBar";
 import { useGameSession } from "@/hooks/useGameSession";
 import { useThemePreload } from "@/hooks/useThemePreload";
+import { LogoHelix } from "@/components/LogoHelix";
 
 export const Route = createFileRoute("/game")({
   component: GamePage,
