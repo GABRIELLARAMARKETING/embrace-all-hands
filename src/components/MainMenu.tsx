@@ -127,19 +127,8 @@ export function MainMenu(_props: { onOpenThemes?: () => void; onOpenSkins?: () =
             </motion.p>
           </div>
 
-          <div className="w-full">
-            {isLoading && (
-              <div className="grid h-[240px] sm:h-[340px] place-items-center text-white/60">Carregando temas…</div>
-            )}
-            {error && (
-              <div className="grid h-[240px] sm:h-[340px] place-items-center text-red-300">
-                Erro ao carregar temas
-              </div>
-            )}
-            {themes && themes.length > 0 && (
-              <ThemeCarousel themes={themes} index={index} onChange={handleChange} />
-            )}
-          </div>
+          <div className="w-full" />
+
 
           <div className="flex w-full flex-col items-center gap-3 pb-3">
             <PrimaryButton onClick={handlePlay} aria-label="Jogar grátis" disabled={!current}>
