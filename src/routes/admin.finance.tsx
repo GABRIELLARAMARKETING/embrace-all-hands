@@ -33,6 +33,25 @@ function Page() {
   const rows = data?.rows ?? [];
   const s = data?.summary ?? { totalIn: 0, totalOut: 0, netFlow: 0, txCount: 0 };
 
+  const invalidateAll = [["admin", "transactions"], ["admin", "dashboard-summary"]] as const;
+  useAdminRealtime({
+    table: "deposits",
+    invalidateKeys: invalidateAll as unknown as Array<readonly unknown[]>,
+    toastOnInsert: (row) =>
+      row.status === "paid" ? `Nova venda confirmada: R$ ${Number(row.amount).toFixed(2)}` : null,
+  });
+  useAdminRealtime({
+    table: "wallet_transactions",
+    invalidateKeys: invalidateAll as unknown as Array<readonly unknown[]>,
+    toastOnInsert: (row) =>
+      row.type === "deposit" ? `Depósito creditado: R$ ${Number(row.amount).toFixed(2)}` : null,
+  });
+  useAdminRealtime({
+    table: "transactions",
+    invalidateKeys: invalidateAll as unknown as Array<readonly unknown[]>,
+  });
+
+
   return (
     <div className="space-y-6">
       <div>
