@@ -126,10 +126,15 @@ export const useGameStore = create<Store>((set, get) => ({
 
   collectCoin: (amount = 1) => {
     SFX.coin();
-    set((s) => ({ coins: s.coins + amount, score: s.score + 5 * amount }));
+    const mult = helixRuntime.get().settings.scoreMultiplier;
+    set((s) => ({ coins: s.coins + amount, score: s.score + Math.round(5 * amount * mult) }));
   },
 
-  addScore: (amount) => set((s) => ({ score: s.score + amount })),
+  addScore: (amount) => {
+    const mult = helixRuntime.get().settings.scoreMultiplier;
+    set((s) => ({ score: s.score + Math.round(amount * mult) }));
+  },
+
 
   bumpCombo: () => {
     set((s) => {
