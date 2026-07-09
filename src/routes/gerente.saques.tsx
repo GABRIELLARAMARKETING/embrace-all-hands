@@ -224,6 +224,34 @@ function SaquesGerentePage() {
           />
         </AdminCard>
 
+        <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+          <p className="text-xs text-[color:var(--admin-text-3)]">
+            {total === 0
+              ? "Nenhum registro"
+              : `Mostrando ${page * PAGE_SIZE + 1}–${Math.min(total, (page + 1) * PAGE_SIZE)} de ${total}`}
+          </p>
+          <div className="flex items-center gap-2">
+            <AdminButton
+              variant="ghost"
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={page === 0 || query.isFetching}
+            >
+              Anterior
+            </AdminButton>
+            <span className="text-xs text-[color:var(--admin-text-2)]">
+              {page + 1} / {totalPages}
+            </span>
+            <AdminButton
+              variant="ghost"
+              onClick={() => setPage((p) => (p + 1 < totalPages ? p + 1 : p))}
+              disabled={page + 1 >= totalPages || query.isFetching}
+            >
+              Próxima
+            </AdminButton>
+          </div>
+        </div>
+
+
         {query.isError && (
           <AdminCard className="border-[color:var(--admin-red)]/40 bg-[color:var(--admin-red)]/8">
             <p className="text-sm text-[color:var(--admin-red)]">
