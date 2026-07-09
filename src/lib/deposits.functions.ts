@@ -257,7 +257,7 @@ export const listDiggionDeposits = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(data.limit ?? 100);
 
-    if (data.status && data.status !== "all") q = q.eq("status", data.status);
+    if (data.status && data.status !== "all") q = q.eq("status", data.status as any);
     if (data.search) {
       const s = data.search.trim();
       if (s) q = q.or(`external_id.ilike.%${s}%,id.ilike.%${s}%`);
