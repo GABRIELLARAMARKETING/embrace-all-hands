@@ -17,8 +17,9 @@ export function useHelixDifficultyLoader() {
   const query = useQuery<HelixDifficultyConfig>({
     queryKey: ["helix", "difficulty"],
     queryFn: () => fn(),
-    staleTime: 15_000,
-    refetchInterval: 15_000,
+    staleTime: 3_000,
+    refetchInterval: 5_000,
+    refetchIntervalInBackground: true,
     refetchOnWindowFocus: true,
     retry: 1,
   });

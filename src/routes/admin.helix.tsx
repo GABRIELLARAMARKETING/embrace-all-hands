@@ -157,25 +157,30 @@ function Page() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="sticky bottom-4 z-10 rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-cyan-500/10 via-slate-900/80 to-fuchsia-500/10 p-4 shadow-[0_10px_40px_-10px_rgba(34,211,238,0.5)] backdrop-blur">
         <button
           type="button"
           onClick={save}
           disabled={mutation.isPending}
-          className="rounded-lg border border-cyan-400/40 bg-cyan-500/15 px-5 py-2 text-sm font-medium text-cyan-100 transition hover:bg-cyan-500/25 disabled:opacity-60"
+          className="w-full rounded-xl bg-gradient-to-r from-cyan-500 to-fuchsia-500 px-8 py-5 text-lg font-bold uppercase tracking-wider text-white shadow-lg transition hover:from-cyan-400 hover:to-fuchsia-400 hover:shadow-cyan-500/40 active:scale-[0.99] disabled:opacity-60"
         >
-          {mutation.isPending ? "Publicando..." : "Salvar e Publicar"}
+          {mutation.isPending ? "PUBLICANDO NO JOGO..." : "🚀 SALVAR E PUBLICAR NO JOGO REAL"}
         </button>
-        <button
-          type="button"
-          onClick={restoreDefault}
-          className="rounded-lg border border-white/10 bg-white/[0.03] px-5 py-2 text-sm text-white/80 hover:bg-white/[0.06]"
-        >
-          Restaurar padrão
-        </button>
-        <div className="text-xs text-white/50">
-          Dificuldade ativa no banco:{" "}
-          <span className="text-white/80">{HELIX_DIFFICULTY_LABELS[data?.difficulty ?? "normal"]}</span>
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={restoreDefault}
+            className="rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-white/80 hover:bg-white/[0.06]"
+          >
+            Restaurar padrão (Normal)
+          </button>
+          <div className="text-xs text-white/60">
+            Ativa no banco:{" "}
+            <span className="font-semibold text-cyan-300">
+              {HELIX_DIFFICULTY_LABELS[data?.difficulty ?? "normal"]}
+            </span>
+            <span className="ml-2 text-white/40">· propagação em ~5s</span>
+          </div>
         </div>
       </div>
     </div>
