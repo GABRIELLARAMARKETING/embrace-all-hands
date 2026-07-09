@@ -247,3 +247,198 @@ export const updateAffiliate = createServerFn({ method: "POST" })
 
     return { ok: true };
   });
+
+// ============================================================
+// Rede de Indicações (multinível)
+// ============================================================
+
+export type ReferralNetworkRow = {
+  id: string;
+  display_name: string | null;
+  email: string | null;
+  status: "active" | "inactive" | "blocked";
+  created_at: string;
+  level: 1 | 2 | 3;
+};
+
+export type ReferralNetworkResult = {
+  user: {
+    id: string;
+    display_name: string | null;
+    status: string;
+    affiliate_code: string | null;
+    role: "admin" | "gerente" | "afiliado" | "jogador";
+  };
+  directReferrals: ReferralNetworkRow[];
+  totalReferrals: number;
+  pendingCommissions: number;
+  paidCommissions: number;
+  totalWithdrawals: number;
+};
+
+export const getReferralNetwork = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z.object({ userId: z.string().uuid() }).parse(raw),
+  )
+  .handler(async ({ data, context }): Promise<ReferralNetworkResult> => {
+    await ensureAdmin(context);
+    const { supabase } = context;
+
+    const { data: prof, error: pErr } = await supabase
+      .from("profiles")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .select("id, display_name, status, affiliate_code" as any)
+      .eq("id", data.userId)
+      .maybeSingle();
+    if (pErr) throw new Error(pErr.message);
+    if (!prof) throw new Error("Usuário não encontrado.");
+
+    const { data: rolesRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.userId);
+    const rset = new Set((rolesRows ?? []).map((r) => r.role));
+    const role: ReferralNetworkResult["user"]["role"] = rset.has("admin")
+      ? "admin"
+      : rset.has("gerente")
+        ? "gerente"
+        : rset.has("afiliado")
+          ? "afiliado"
+          : "jogador";
+
+    // Todos os referrals onde este usuário é referrer (níveis 1/2/3)
+    const { data: refs } = await supabase
+      .from("referrals")
+      .select("referred_id, level, created_at")
+      .eq("referrer_id", data.userId);
+    const referralRows = (refs ?? []) as Array<{
+      referred_id: string;
+      level: number;
+      created_at: string;
+    }>;
+
+    // Perfis dos indicados diretos (level 1)
+    const level1Ids = referralRows.filter((r) => r.level === 1).map((r) => r.referred_id);
+    let directReferrals: ReferralNetworkRow[] = [];
+    if (level1Ids.length) {
+      const { data: peers } = await supabase
+        .from("profiles")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .select("id, display_name, email, status, created_at" as any)
+        .in("id", level1Ids)
+        .order("created_at", { ascending: false });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      directReferrals = ((peers ?? []) as any[]).map((p) => ({
+        id: p.id,
+        display_name: p.display_name ?? null,
+        email: p.email ?? null,
+        status: (p.status ?? "active") as ReferralNetworkRow["status"],
+        created_at: p.created_at,
+        level: 1 as const,
+      }));
+    }
+
+    // Comissões agregadas (como afiliado OU manager)
+    const { data: comms } = await supabase
+      .from("commissions")
+      .select("amount, status, affiliate_id, manager_id")
+      .or(`affiliate_id.eq.${data.userId},manager_id.eq.${data.userId}`);
+    let pendingCommissions = 0;
+    let paidCommissions = 0;
+    for (const c of (comms ?? []) as Array<{ amount: number; status: string }>) {
+      const amt = Number(c.amount ?? 0);
+      if (c.status === "paid") paidCommissions += amt;
+      else if (c.status === "pending" || c.status === "available") pendingCommissions += amt;
+    }
+
+    // Saques pagos
+    const { data: wds } = await supabase
+      .from("affiliate_withdrawals")
+      .select("amount, status")
+      .eq("user_id", data.userId)
+      .eq("status", "paid");
+    const totalWithdrawals = ((wds ?? []) as Array<{ amount: number }>).reduce(
+      (s, r) => s + Number(r.amount ?? 0),
+      0,
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const p = prof as any;
+    return {
+      user: {
+        id: p.id,
+        display_name: p.display_name ?? null,
+        status: p.status ?? "active",
+        affiliate_code: p.affiliate_code ?? null,
+        role,
+      },
+      directReferrals,
+      totalReferrals: referralRows.length,
+      pendingCommissions,
+      paidCommissions,
+      totalWithdrawals,
+    };
+  });
+
+export type ReferralOverviewNode = {
+  id: string;
+  display_name: string | null;
+  status: "active" | "inactive" | "blocked";
+  affiliate_code: string | null;
+  role: "gerente" | "afiliado";
+  directReferralsCount: number;
+};
+
+export const listReferralOverview = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<ReferralOverviewNode[]> => {
+    await ensureAdmin(context);
+    const { supabase } = context;
+
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("user_id, role")
+      .in("role", ["gerente", "afiliado"]);
+    const roleMap = new Map<string, "gerente" | "afiliado">();
+    for (const r of (roles ?? []) as Array<{ user_id: string; role: string }>) {
+      const prev = roleMap.get(r.user_id);
+      // gerente prevalece
+      if (prev === "gerente") continue;
+      roleMap.set(r.user_id, r.role as "gerente" | "afiliado");
+    }
+    const ids = Array.from(roleMap.keys());
+    if (!ids.length) return [];
+
+    const { data: profs } = await supabase
+      .from("profiles")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .select("id, display_name, status, affiliate_code" as any)
+      .in("id", ids);
+
+    // Contagem de indicados diretos por referrer
+    const { data: refs } = await supabase
+      .from("referrals")
+      .select("referrer_id")
+      .eq("level", 1)
+      .in("referrer_id", ids);
+    const counts = new Map<string, number>();
+    for (const r of (refs ?? []) as Array<{ referrer_id: string }>) {
+      counts.set(r.referrer_id, (counts.get(r.referrer_id) ?? 0) + 1);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return ((profs ?? []) as any[])
+      .map((p) => ({
+        id: p.id,
+        display_name: p.display_name ?? null,
+        status: (p.status ?? "active") as ReferralOverviewNode["status"],
+        affiliate_code: p.affiliate_code ?? null,
+        role: roleMap.get(p.id) ?? "afiliado",
+        directReferralsCount: counts.get(p.id) ?? 0,
+      }))
+      .sort((a, b) => {
+        if (a.role !== b.role) return a.role === "gerente" ? -1 : 1;
+        return b.directReferralsCount - a.directReferralsCount;
+      });
+  });

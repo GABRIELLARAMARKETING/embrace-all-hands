@@ -36,6 +36,7 @@ import { Route as AdminWithdrawalsRouteImport } from './routes/admin.withdrawals
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRiskAlertsRouteImport } from './routes/admin.risk-alerts'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminNetworkRouteImport } from './routes/admin.network'
 import { Route as AdminManagersRouteImport } from './routes/admin.managers'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminHelixRouteImport } from './routes/admin.helix'
@@ -181,6 +182,11 @@ const AdminReportsRoute = AdminReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminNetworkRoute = AdminNetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminManagersRoute = AdminManagersRouteImport.update({
   id: '/managers',
   path: '/managers',
@@ -244,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/admin/helix': typeof AdminHelixRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
+  '/admin/network': typeof AdminNetworkRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -281,6 +288,7 @@ export interface FileRoutesByTo {
   '/admin/helix': typeof AdminHelixRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
+  '/admin/network': typeof AdminNetworkRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -320,6 +328,7 @@ export interface FileRoutesById {
   '/admin/helix': typeof AdminHelixRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
+  '/admin/network': typeof AdminNetworkRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -360,6 +369,7 @@ export interface FileRouteTypes {
     | '/admin/helix'
     | '/admin/login'
     | '/admin/managers'
+    | '/admin/network'
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
@@ -397,6 +407,7 @@ export interface FileRouteTypes {
     | '/admin/helix'
     | '/admin/login'
     | '/admin/managers'
+    | '/admin/network'
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
@@ -435,6 +446,7 @@ export interface FileRouteTypes {
     | '/admin/helix'
     | '/admin/login'
     | '/admin/managers'
+    | '/admin/network'
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
@@ -660,6 +672,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReportsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/network': {
+      id: '/admin/network'
+      path: '/network'
+      fullPath: '/admin/network'
+      preLoaderRoute: typeof AdminNetworkRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/managers': {
       id: '/admin/managers'
       path: '/managers'
@@ -735,6 +754,7 @@ interface AdminRouteChildren {
   AdminHelixRoute: typeof AdminHelixRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminManagersRoute: typeof AdminManagersRoute
+  AdminNetworkRoute: typeof AdminNetworkRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminRiskAlertsRoute: typeof AdminRiskAlertsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -750,6 +770,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminHelixRoute: AdminHelixRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminManagersRoute: AdminManagersRoute,
+  AdminNetworkRoute: AdminNetworkRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminRiskAlertsRoute: AdminRiskAlertsRoute,
   AdminSettingsRoute: AdminSettingsRoute,

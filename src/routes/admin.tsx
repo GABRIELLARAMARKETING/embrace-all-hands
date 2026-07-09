@@ -56,6 +56,7 @@ const NAV = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/managers", label: "Gerentes", icon: UserCog },
   { to: "/admin/affiliates", label: "Afiliados", icon: Users },
+  { to: "/admin/network", label: "Rede de Indicações", icon: Users },
   { to: "/admin/withdrawals", label: "Saques", icon: Wallet },
   { to: "/admin/finance", label: "Financeiro", icon: DollarSign },
   { to: "/admin/commissions", label: "Comissões", icon: Percent },
