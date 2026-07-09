@@ -1,6 +1,7 @@
 /**
- * E2E-style test: garante que depósitos de R$ 5,00 e R$ 10,00
- *  1. usam o offer_hash correto na criação (b8d7p / ifnis)
+ * E2E-style test: garante que depósitos oficiais de R$ 5,00, R$ 10,00,
+ * R$ 20,00, R$ 30,00, R$ 50,00 e R$ 100,00
+ *  1. usam o offer_hash correto na criação
  *  2. são reconhecidos pelo webhook da Diggion via external_id
  *  3. creditam o valor exato no saldo do usuário
  *
@@ -112,7 +113,7 @@ function installFetchMock() {
         JSON.stringify({
           data: {
             hash,
-            status: "waiting_payment",
+            payment_status: "waiting_payment",
             amount: body.amount,
             pix: { pix_qr_code: "PIX-CODE", pix_url: "https://x/pix" },
           },
@@ -124,7 +125,7 @@ function installFetchMock() {
       const hash = decodeURIComponent(url.split("/transactions/")[1].split("?")[0]);
       const amountCents = Number(hash.split("_").pop());
       return new Response(
-        JSON.stringify({ data: { hash, status: "paid", amount: amountCents } }),
+        JSON.stringify({ data: { hash, payment_status: "paid", amount: amountCents } }),
         { status: 200, headers: { "content-type": "application/json" } },
       );
     }
@@ -157,7 +158,14 @@ async function createDeposit(userId: string, amount: number) {
   const { DiggionPayService } = await import("@/lib/diggion.server");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  const OFFER_HASH_BY_AMOUNT: Record<number, string> = { 500: "b8d7p", 1000: "ifnis" };
+  const OFFER_HASH_BY_AMOUNT: Record<number, string> = {
+    500: "b8d7p",
+    1000: "ifnis",
+    2000: "c6efpjme3v",
+    3000: "forua",
+    5000: "yljxy",
+    10000: "jb861",
+  };
   const amountCents = Math.round(amount * 100);
   const offerHash = OFFER_HASH_BY_AMOUNT[amountCents] ?? process.env.DIGGION_OFFER_HASH!;
 
@@ -210,10 +218,14 @@ async function simulateWebhook(providerTxId: string) {
   return { dep, credited, expectedAmount };
 }
 
-describe("Diggion deposit flow – R$5 e R$10", () => {
+describe("Diggion deposit flow – valores oficiais", () => {
   it.each([
     { amount: 5, expectedHash: "b8d7p" },
     { amount: 10, expectedHash: "ifnis" },
+    { amount: 20, expectedHash: "c6efpjme3v" },
+    { amount: 30, expectedHash: "forua" },
+    { amount: 50, expectedHash: "yljxy" },
+    { amount: 100, expectedHash: "jb861" },
   ])("cria e credita depósito de R$ %s corretamente", async ({ amount, expectedHash }) => {
     const userId = `user-${amount}`;
     const { depositId, providerTxId, offerHashUsed } = await createDeposit(userId, amount);
@@ -241,16 +253,25 @@ describe("Diggion deposit flow – R$5 e R$10", () => {
     expect(stored.external_id).toBe(providerTxId);
   });
 
-  it("não confunde depósitos de R$5 e R$10 simultâneos", async () => {
-    const a = await createDeposit("user-A", 5);
-    const b = await createDeposit("user-B", 10);
-    expect(a.offerHashUsed).toBe("b8d7p");
-    expect(b.offerHashUsed).toBe("ifnis");
+  it("não confunde depósitos simultâneos de valores diferentes", async () => {
+    const deposits = await Promise.all([
+      createDeposit("user-5", 5),
+      createDeposit("user-10", 10),
+      createDeposit("user-20", 20),
+      createDeposit("user-30", 30),
+      createDeposit("user-50", 50),
+      createDeposit("user-100", 100),
+    ]);
 
-    await simulateWebhook(b.providerTxId);
-    await simulateWebhook(a.providerTxId);
+    for (const deposit of deposits.reverse()) {
+      await simulateWebhook(deposit.providerTxId);
+    }
 
-    expect(fake._state.balances.get("user-A")).toBe(5);
-    expect(fake._state.balances.get("user-B")).toBe(10);
+    expect(fake._state.balances.get("user-5")).toBe(5);
+    expect(fake._state.balances.get("user-10")).toBe(10);
+    expect(fake._state.balances.get("user-20")).toBe(20);
+    expect(fake._state.balances.get("user-30")).toBe(30);
+    expect(fake._state.balances.get("user-50")).toBe(50);
+    expect(fake._state.balances.get("user-100")).toBe(100);
   });
 });
