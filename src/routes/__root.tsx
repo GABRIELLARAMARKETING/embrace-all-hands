@@ -79,13 +79,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Helix Cash — Jogo Arcade 3D de Habilidade" },
+      { title: "HelixFast — Jogo Arcade 3D de Habilidade" },
       {
         name: "description",
         content:
           "Gire a torre helicoidal, atravesse os espaços, colete moedas virtuais e domine 20 níveis. Jogo 3D premium — sem dinheiro real.",
       },
-      { property: "og:title", content: "Helix Cash — Jogo Arcade 3D de Habilidade" },
+      { property: "og:title", content: "HelixFast — Jogo Arcade 3D de Habilidade" },
       {
         property: "og:description",
         content:
@@ -93,7 +93,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Helix Cash — Jogo Arcade 3D de Habilidade" },
+      { name: "twitter:title", content: "HelixFast — Jogo Arcade 3D de Habilidade" },
       { name: "description", content: "Gire a torre helicoidal, atravesse os espaços, colete moedas virtuais e domine 20 níveis. Jogo 3D premium — sem dinheiro real." },
       { property: "og:description", content: "Gire a torre helicoidal, atravesse os espaços, colete moedas virtuais e domine 20 níveis. Jogo 3D premium — sem dinheiro real." },
       { name: "twitter:description", content: "Gire a torre helicoidal, atravesse os espaços, colete moedas virtuais e domine 20 níveis. Jogo 3D premium — sem dinheiro real." },
