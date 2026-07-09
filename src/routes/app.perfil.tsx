@@ -12,7 +12,7 @@ import { copyToClipboard } from "@/utils/clipboard";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyProfile } from "@/lib/profile.functions";
 import { getReferralStats } from "@/lib/referral.functions";
-import helixLogo from "@/assets/helix-multi-logo.png";
+const helixLogo = "/images/helixfast-logo.png";
 
 
 const myProfileQuery = queryOptions({
