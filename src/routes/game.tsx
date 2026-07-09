@@ -32,6 +32,8 @@ function GamePage() {
   const [splash, setSplash] = useState(true);
   const { finishSession } = useGameSession();
   useThemePreload();
+  useHelixDifficultyLoader();
+
   const score = useGameStore((s) => s.score);
   const currentLevel = useGameStore((s) => s.currentLevel);
   const prevStateRef = useRef(gameState);
