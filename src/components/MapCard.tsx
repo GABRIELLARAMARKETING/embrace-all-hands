@@ -11,15 +11,15 @@ interface Props {
 }
 
 const SIZE_DESKTOP = {
-  center: { w: 175, h: 305, scale: 1, opacity: 1, blur: 0, spacing: 130 },
-  near: { w: 140, h: 240, scale: 0.92, opacity: 0.75, blur: 0.5, spacing: 130 },
-  far: { w: 110, h: 190, scale: 0.82, opacity: 0.45, blur: 1.5, spacing: 130 },
+  center: { w: 260, h: 260, scale: 1, opacity: 1, blur: 0, spacing: 200 },
+  near: { w: 220, h: 220, scale: 0.92, opacity: 0.75, blur: 0.5, spacing: 200 },
+  far: { w: 180, h: 180, scale: 0.82, opacity: 0.45, blur: 1.5, spacing: 200 },
 } as const;
 
 const SIZE_MOBILE = {
-  center: { w: 128, h: 220, scale: 1, opacity: 1, blur: 0, spacing: 92 },
-  near: { w: 104, h: 178, scale: 0.9, opacity: 0.7, blur: 0.5, spacing: 92 },
-  far: { w: 82, h: 140, scale: 0.78, opacity: 0.35, blur: 1.5, spacing: 92 },
+  center: { w: 200, h: 200, scale: 1, opacity: 1, blur: 0, spacing: 150 },
+  near: { w: 170, h: 170, scale: 0.9, opacity: 0.7, blur: 0.5, spacing: 150 },
+  far: { w: 140, h: 140, scale: 0.78, opacity: 0.35, blur: 1.5, spacing: 150 },
 } as const;
 
 export function MapCard({ theme, role, offset, onClick }: Props) {
