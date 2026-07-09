@@ -179,9 +179,9 @@ async function createDeposit(userId: string, amount: number) {
   await supabaseAdmin
     .from("deposits")
     .update({ external_id: created.hash, status: "waiting_payment" })
-    .eq("id", dep.id);
+    .eq("id", dep!.id);
 
-  return { depositId: dep.id, providerTxId: created.hash, offerHashUsed: offerHash };
+  return { depositId: dep!.id as string, providerTxId: created.hash, offerHashUsed: offerHash };
 }
 
 async function simulateWebhook(providerTxId: string) {
