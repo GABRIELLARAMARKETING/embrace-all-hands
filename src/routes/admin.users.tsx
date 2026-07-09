@@ -10,6 +10,7 @@ import {
   blockAdminUser,
   unblockAdminUser,
   type AdminUserRow,
+  type AdminUserDetails,
 } from "@/lib/admin-users.functions";
 import { formatDate } from "@/utils/formatDate";
 import { X, RefreshCw, Download, Search, Copy, Ban, Check, Edit3, Eye } from "lucide-react";
