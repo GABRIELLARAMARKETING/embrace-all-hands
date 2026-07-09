@@ -35,7 +35,7 @@ export function MapCard({ theme, role, offset, onClick }: Props) {
       type="button"
       onClick={onClick}
       aria-label={`Selecionar mapa ${theme.label}`}
-      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 focus:outline-none"
+      className="absolute left-1/2 top-1/2 focus:outline-none"
       style={{ zIndex: isCenter ? 30 : 20 - Math.abs(offset) }}
       initial={false}
       animate={{
