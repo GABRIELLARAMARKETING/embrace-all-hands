@@ -29,7 +29,11 @@ export const createDiggionDeposit = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) =>
     z
       .object({
-        amount: z.number().min(MIN_DEPOSIT).max(MAX_DEPOSIT),
+        amount: z
+          .number()
+          .min(MIN_DEPOSIT)
+          .max(MAX_DEPOSIT)
+          .refine((v) => ALLOWED_AMOUNTS.has(v), "Valor de depósito não permitido"),
         cpf: z
           .string()
           .transform(onlyDigits)
