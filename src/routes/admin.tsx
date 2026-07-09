@@ -15,6 +15,8 @@ import {
   Settings,
   LogOut,
   Menu,
+  Gamepad2,
+
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
