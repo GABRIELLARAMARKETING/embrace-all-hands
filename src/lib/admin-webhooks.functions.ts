@@ -29,7 +29,7 @@ export type AdminWebhookRow = {
   deposit_status: string | null;
   balance_before: number | null;
   balance_after: number | null;
-  raw_payload: unknown;
+  raw_payload: Record<string, unknown> | null;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
