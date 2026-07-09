@@ -57,10 +57,18 @@ function IndicarPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [processing, setProcessing] = useState(false);
 
+  const referralUrl = data.referralUrl ?? PLAYER_MOCK.referralUrl;
+  const affiliateCode = data.affiliateCode;
+
   const copyLink = async () => {
-    const ok = await copyToClipboard(PLAYER_MOCK.referralUrl);
+    if (!referralUrl) {
+      toast.error("Seu link ainda não está disponível.");
+      return;
+    }
+    const ok = await copyToClipboard(referralUrl);
     toast[ok ? "success" : "error"](ok ? "Link copiado com sucesso!" : "Falha ao copiar");
   };
+
 
   const handleWithdrawClick = () => {
     if (affiliateBalance < withdrawMin) {
