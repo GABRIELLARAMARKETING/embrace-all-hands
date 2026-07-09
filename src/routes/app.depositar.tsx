@@ -161,6 +161,15 @@ function DepositarPage() {
         </GradientButton>
       </form>
 
+      <ConfirmDepositModal
+        open={confirmOpen}
+        amount={amount}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          setKycOpen(true);
+        }}
+      />
       <KycModal
         open={kycOpen}
         onClose={() => setKycOpen(false)}
@@ -176,6 +185,58 @@ function DepositarPage() {
         data={pending}
       />
     </AppLayout>
+  );
+}
+
+function ConfirmDepositModal({
+  open,
+  amount,
+  onClose,
+  onConfirm,
+}: {
+  open: boolean;
+  amount: number;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          onClick={onClose}
+        >
+          <motion.div
+            className="relative w-full max-w-sm rounded-3xl border border-white/10 bg-[#160828] p-6 text-center"
+            initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button type="button" onClick={onClose} className="absolute right-4 top-4 text-white/60 hover:text-white" aria-label="Fechar">
+              <X className="h-5 w-5" />
+            </button>
+            <h3 className="text-lg font-bold text-white">Confirmar depósito</h3>
+            <p className="mt-2 text-xs text-white/60">Você está prestes a depositar:</p>
+            <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-6">
+              <div className="text-[11px] font-bold tracking-widest text-white/60">VALOR SELECIONADO</div>
+              <div className="mt-1 text-4xl font-black text-emerald-400">{formatCurrency(amount)}</div>
+            </div>
+            <div className="mt-5 flex flex-col gap-2">
+              <GradientButton type="button" onClick={onConfirm}>
+                Confirmar e continuar
+              </GradientButton>
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full rounded-full border border-white/15 py-3 text-sm font-semibold text-white/80 hover:bg-white/5"
+              >
+                Alterar valor
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
