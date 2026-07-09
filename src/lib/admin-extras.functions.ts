@@ -46,17 +46,51 @@ export const listTransactions = createServerFn({ method: "GET" })
   .handler(async ({ data, context }): Promise<{ rows: TransactionRow[]; summary: FinanceSummary }> => {
     await ensureAdmin(context);
     const { supabase } = context;
+    const limit = data.limit ?? 200;
+
+    // 1. Transações internas (comissões, saques, ajustes)
     let q = supabase
       .from("transactions")
       .select("id, user_id, type, amount, balance_before, balance_after, description, reference_id, created_at")
       .order("created_at", { ascending: false })
-      .limit(data.limit ?? 200);
+      .limit(limit);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (data.type) q = q.eq("type", data.type as any);
-    const { data: rows, error } = await q;
+    const { data: txRows, error } = await q;
     if (error) throw new Error(error.message);
+
+    // 2. Depósitos creditados (vendas via gateway) - vêm de wallet_transactions
+    //    quando type inclui deposit ou nenhum filtro está aplicado.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const list = (rows ?? []) as any[];
+    let depositRows: any[] = [];
+    if (!data.type || data.type === "deposit" || data.type === "deposit_paid") {
+      const { data: wtx, error: wErr } = await supabase
+        .from("wallet_transactions")
+        .select("id, user_id, type, amount, balance_before, balance_after, description, deposit_id, created_at")
+        .eq("type", "deposit")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      if (wErr) throw new Error(wErr.message);
+      depositRows = wtx ?? [];
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const list: any[] = [
+      ...((txRows ?? []) as any[]),
+      ...depositRows.map((w) => ({
+        id: `wtx_${w.id}`,
+        user_id: w.user_id,
+        type: "deposit_paid",
+        amount: Number(w.amount ?? 0),
+        balance_before: w.balance_before,
+        balance_after: w.balance_after,
+        description: w.description ?? "Depósito confirmado",
+        reference_id: w.deposit_id ?? null,
+        created_at: w.created_at,
+      })),
+    ]
+      .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))
+      .slice(0, limit);
 
     const ids = Array.from(new Set(list.map((r) => r.user_id).filter(Boolean))) as string[];
     const names = new Map<string, string | null>();
@@ -91,6 +125,7 @@ export const listTransactions = createServerFn({ method: "GET" })
       summary: { totalIn, totalOut, netFlow: totalIn - totalOut, txCount: list.length },
     };
   });
+
 
 // ===================== COMMISSIONS =====================
 export type CommissionRow = {
