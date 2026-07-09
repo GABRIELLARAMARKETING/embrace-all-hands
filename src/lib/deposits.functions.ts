@@ -84,7 +84,12 @@ export const createDiggionDeposit = createServerFn({ method: "POST" })
     if (!webhookSecret) throw new Error("DIGGION_WEBHOOK_SECRET não configurado");
     const postbackUrl = `${getBaseUrl()}/api/public/webhooks/diggion/${webhookSecret}`;
 
-    const offerHash = process.env.DIGGION_OFFER_HASH;
+    // Mapeamento de offer_hash por valor (centavos)
+    const OFFER_HASH_BY_AMOUNT: Record<number, string> = {
+      500: "b8d7p",   // R$ 5,00
+      1000: "ifnis",  // R$ 10,00
+    };
+    const offerHash = OFFER_HASH_BY_AMOUNT[amountCents] ?? process.env.DIGGION_OFFER_HASH;
     const productHash = process.env.DIGGION_PRODUCT_HASH;
     if (!offerHash || !productHash) {
       throw new Error("DIGGION_OFFER_HASH/DIGGION_PRODUCT_HASH não configurados");
