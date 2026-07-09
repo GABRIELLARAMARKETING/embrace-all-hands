@@ -7,8 +7,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const CPF_RE = /^\d{11}$/;
 const MIN_DEPOSIT = 5; // R$
-const MAX_DEPOSIT = 5000; // R$
-const ALLOWED_AMOUNTS = new Set<number>([5, 10, 20, 30, 50, 100, 200, 300, 500, 1000, 2000, 5000]);
+const MAX_DEPOSIT = 100; // R$
+const ALLOWED_AMOUNTS = new Set<number>([5, 10, 20, 30, 50, 100]);
 
 function onlyDigits(s: string): string {
   return String(s || "").replace(/\D+/g, "");
@@ -93,6 +93,10 @@ export const createDiggionDeposit = createServerFn({ method: "POST" })
     const OFFER_HASH_BY_AMOUNT: Record<number, string> = {
       500: "b8d7p",   // R$ 5,00
       1000: "ifnis",  // R$ 10,00
+      2000: "c6efpjme3v", // R$ 20,00
+      3000: "forua",      // R$ 30,00
+      5000: "yljxy",      // R$ 50,00
+      10000: "jb861",     // R$ 100,00
     };
     const offerHash = OFFER_HASH_BY_AMOUNT[amountCents] ?? process.env.DIGGION_OFFER_HASH;
     const productHash = process.env.DIGGION_PRODUCT_HASH;
