@@ -46,7 +46,7 @@ export function ThemeCarousel({ themes, index, onChange }: Props) {
   if (total === 0) return null;
   const current = themes[index];
   const single = total === 1;
-  const visibleRange = single ? ([0] as const) : ([-2, -1, 0, 1, 2] as const);
+  const visibleRange = single ? ([0] as const) : ([0] as const);
   const glow = current.ui_config.textGlow ?? current.preview_config.cardGlow;
 
   return (
