@@ -91,6 +91,23 @@ function PerfilPage() {
         { event: "*", schema: "public", table: "affiliate_withdrawals", filter: `user_id=eq.${profile.userId}` },
         () => queryClient.invalidateQueries({ queryKey: ["affiliate-withdrawals"] }),
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "deposits", filter: `user_id=eq.${profile.userId}` },
+        (payload) => {
+          queryClient.invalidateQueries({ queryKey: ["my-deposits"] });
+          queryClient.invalidateQueries({ queryKey: ["my-profile"] });
+          const next = (payload.new ?? {}) as { status?: string; amount?: number };
+          const prev = (payload.old ?? {}) as { status?: string };
+          if (next.status && next.status !== prev.status) {
+            const meta = depositStatusMeta(next.status);
+            const amt = next.amount ? ` de ${formatCurrency(Number(next.amount))}` : "";
+            if (meta.tone === "ok") toast.success(`Depósito${amt} aprovado!`);
+            else if (meta.tone === "err") toast.error(`Depósito${amt} recusado.`);
+            else toast(`Depósito${amt}: ${meta.label.toLowerCase()}`);
+          }
+        },
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
