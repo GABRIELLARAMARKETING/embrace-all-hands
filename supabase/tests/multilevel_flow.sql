@@ -20,6 +20,10 @@
 -- =============================================================================
 BEGIN;
 
+-- Remove FK profiles→auth.users apenas dentro desta transação (ROLLBACK restaura).
+-- Necessário porque psql não tem privilégio para inserir em auth.users.
+ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_id_fkey;
+
 CREATE OR REPLACE FUNCTION pg_temp._test_signup(_id uuid, _display text, _ref text DEFAULT NULL)
 RETURNS void LANGUAGE plpgsql AS $fn$
 DECLARE
