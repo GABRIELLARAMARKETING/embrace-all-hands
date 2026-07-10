@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useIsMobile } from "@/hooks/use-mobile";
 import * as THREE from "three";
@@ -86,8 +86,16 @@ function GameLogic({
   const level = LEVELS[currentLevel - 1] ?? LEVELS[0];
   const themeId = level.theme in THEMES ? level.theme : selectedTheme;
 
+  // Subscribe to live difficulty updates so the level regenerates when
+  // an admin publishes a new config (mobile + desktop).
+  const helixConfig = useSyncExternalStore(
+    helixRuntime.subscribe,
+    helixRuntime.get,
+    helixRuntime.get,
+  );
+
   const generated = useMemo(() => {
-    const hx = helixRuntime.get().settings;
+    const hx = helixConfig.settings;
     const progression = 0.7 + 0.3 * hx.difficultyProgressionRate;
     const obstacleRate = Math.min(
       0.9,
@@ -96,7 +104,7 @@ function GameLogic({
     const gap = Math.max(1, Math.round(level.gapSize * hx.gapSize));
     const gravityMult = level.gravityMult * hx.gravity;
     return generateLevel(level.id, level.platformCount, obstacleRate, gap, gravityMult, level.coinRate);
-  }, [level]);
+  }, [level, helixConfig]);
 
 
 
