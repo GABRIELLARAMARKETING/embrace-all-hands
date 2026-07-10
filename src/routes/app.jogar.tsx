@@ -23,7 +23,7 @@ function JogarPage() {
   const setSelectedMap = usePlayerStore((s) => s.setSelectedMap);
   const value = usePlayerStore((s) => s.selectedPlayValue);
   const setValue = usePlayerStore((s) => s.setSelectedPlayValue);
-  const [custom, setCustom] = useState("");
+  
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const selectedMap = useMemo(
@@ -66,13 +66,12 @@ function JogarPage() {
           <div className="mt-6 text-[11px] font-bold tracking-widest text-[#B47CFF]">VALOR DE ENTRADA</div>
           <div className="mt-3 flex flex-wrap gap-2">
             {PLAYER_MOCK.playOptions.map((v) => {
-              const active = value === v && !custom;
+              const active = value === v;
               return (
                 <button
                   key={v}
                   onClick={() => {
                     setValue(v);
-                    setCustom("");
                   }}
                   className={cn(
                     "rounded-full px-4 py-2 text-sm font-bold transition-all",
@@ -87,22 +86,8 @@ function JogarPage() {
             })}
           </div>
 
-          {/* Custom input */}
-          <div className="mt-3 flex items-center gap-2 rounded-2xl border border-[#3a1d5a] bg-[#1a0c30] px-4 py-3.5">
-            <span className="text-sm font-semibold text-white/40">R$</span>
-            <input
-              inputMode="numeric"
-              placeholder="Valor personalizado"
-              value={custom}
-              onChange={(e) => {
-                const raw = e.target.value.replace(/[^\d,]/g, "");
-                setCustom(raw);
-                const n = Number(raw.replace(",", "."));
-                setValue(Number.isFinite(n) && n > 0 ? n : null);
-              }}
-              className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/40"
-            />
-          </div>
+
+
 
           {/* Recompensa mínima */}
           <div className="mt-4 rounded-2xl border border-[#3a1d5a] bg-[#150a28] px-5 py-4 text-center">
