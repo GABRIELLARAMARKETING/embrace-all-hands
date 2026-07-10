@@ -57,6 +57,7 @@ import { Route as AdminCodesRouteImport } from './routes/admin.codes'
 import { Route as AdminBackupsRouteImport } from './routes/admin.backups'
 import { Route as AdminAuditoriaRouteImport } from './routes/admin.auditoria'
 import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
+import { Route as AdminApiKeysRouteImport } from './routes/admin.api-keys'
 import { Route as AdminAffiliatesRouteImport } from './routes/admin.affiliates'
 import { Route as ApiPublicRCodeRouteImport } from './routes/api/public/r.$code'
 import { Route as ApiPublicWebhooksDiggionSecretRouteImport } from './routes/api/public/webhooks.diggion.$secret'
@@ -301,6 +302,11 @@ const AdminAuditLogsRoute = AdminAuditLogsRouteImport.update({
   path: '/audit-logs',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminApiKeysRoute = AdminApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAffiliatesRoute = AdminAffiliatesRouteImport.update({
   id: '/affiliates',
   path: '/affiliates',
@@ -327,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
   '/admin/affiliates': typeof AdminAffiliatesRoute
+  '/admin/api-keys': typeof AdminApiKeysRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
   '/admin/backups': typeof AdminBackupsRoute
@@ -379,6 +386,7 @@ export interface FileRoutesByTo {
   '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
   '/admin/affiliates': typeof AdminAffiliatesRoute
+  '/admin/api-keys': typeof AdminApiKeysRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
   '/admin/backups': typeof AdminBackupsRoute
@@ -433,6 +441,7 @@ export interface FileRoutesById {
   '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
   '/admin/affiliates': typeof AdminAffiliatesRoute
+  '/admin/api-keys': typeof AdminApiKeysRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
   '/admin/backups': typeof AdminBackupsRoute
@@ -488,6 +497,7 @@ export interface FileRouteTypes {
     | '/gerente'
     | '/login'
     | '/admin/affiliates'
+    | '/admin/api-keys'
     | '/admin/audit-logs'
     | '/admin/auditoria'
     | '/admin/backups'
@@ -540,6 +550,7 @@ export interface FileRouteTypes {
     | '/gerente'
     | '/login'
     | '/admin/affiliates'
+    | '/admin/api-keys'
     | '/admin/audit-logs'
     | '/admin/auditoria'
     | '/admin/backups'
@@ -593,6 +604,7 @@ export interface FileRouteTypes {
     | '/gerente'
     | '/login'
     | '/admin/affiliates'
+    | '/admin/api-keys'
     | '/admin/audit-logs'
     | '/admin/auditoria'
     | '/admin/backups'
@@ -989,6 +1001,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAuditLogsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/api-keys': {
+      id: '/admin/api-keys'
+      path: '/api-keys'
+      fullPath: '/admin/api-keys'
+      preLoaderRoute: typeof AdminApiKeysRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/affiliates': {
       id: '/admin/affiliates'
       path: '/affiliates'
@@ -1015,6 +1034,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAffiliatesRoute: typeof AdminAffiliatesRoute
+  AdminApiKeysRoute: typeof AdminApiKeysRoute
   AdminAuditLogsRoute: typeof AdminAuditLogsRoute
   AdminAuditoriaRoute: typeof AdminAuditoriaRoute
   AdminBackupsRoute: typeof AdminBackupsRoute
@@ -1043,6 +1063,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAffiliatesRoute: AdminAffiliatesRoute,
+  AdminApiKeysRoute: AdminApiKeysRoute,
   AdminAuditLogsRoute: AdminAuditLogsRoute,
   AdminAuditoriaRoute: AdminAuditoriaRoute,
   AdminBackupsRoute: AdminBackupsRoute,
