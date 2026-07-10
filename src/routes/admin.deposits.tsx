@@ -117,33 +117,58 @@ function Page() {
     .reduce((s, r) => s + r.amount, 0);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
+    <div className="space-y-6 p-4 sm:p-6">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <div className="text-xs uppercase tracking-widest text-cyan-300/70">Admin</div>
           <h1 className="mt-1 text-2xl font-semibold">Depósitos Diggion</h1>
-          <p className="text-sm text-white/50">Validação e reconciliação de depósitos PIX (Diggion Pay).</p>
+          <p className="text-sm text-white/50">Validação, reconciliação e auditoria de pagamentos PIX.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2">
+          {tab === "list" && (
+            <button
+              onClick={() => allMut.mutate()}
+              disabled={allMut.isPending}
+              className="inline-flex items-center gap-2 rounded-md border border-cyan-400/30 bg-cyan-500/10 px-3 py-1.5 text-xs text-cyan-200 hover:bg-cyan-500/20 disabled:opacity-50"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${allMut.isPending ? "animate-spin" : ""}`} />
+              Reconciliar pendentes
+            </button>
+          )}
+          {tab === "divergences" && divs.length > 0 && (
+            <button
+              onClick={() => alertsMut.mutate()}
+              disabled={alertsMut.isPending}
+              className="inline-flex items-center gap-2 rounded-md border border-red-400/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-200 hover:bg-red-500/20 disabled:opacity-50"
+            >
+              <ShieldAlert className="h-3.5 w-3.5" />
+              Gerar alertas
+            </button>
+          )}
           <button
-            onClick={() => allMut.mutate()}
-            disabled={allMut.isPending}
-            className="inline-flex items-center gap-2 rounded-md border border-cyan-400/30 bg-cyan-500/10 px-3 py-1.5 text-xs text-cyan-200 hover:bg-cyan-500/20 disabled:opacity-50"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${allMut.isPending ? "animate-spin" : ""}`} />
-            Reconciliar pendentes
-          </button>
-          <button
-            onClick={() => refetch()}
-            disabled={isFetching}
+            onClick={() => (tab === "list" ? refetch() : refetchDivs())}
+            disabled={isFetching || divFetching}
             className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/80 hover:bg-white/10 disabled:opacity-50"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${(isFetching || divFetching) ? "animate-spin" : ""}`} />
             Atualizar
           </button>
         </div>
       </div>
 
+      <div className="flex gap-2 border-b border-white/10">
+        <TabBtn active={tab === "list"} onClick={() => setTab("list")}>Depósitos</TabBtn>
+        <TabBtn active={tab === "divergences"} onClick={() => setTab("divergences")}>
+          Divergências{divs.length ? ` (${divs.length})` : ""}
+        </TabBtn>
+      </div>
+
+      {tab === "divergences" && (
+        <DivergencesPanel rows={divs} loading={divFetching} />
+      )}
+
+      {tab === "list" && (
+      <>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Kpi label="Pagos (visível)" value={formatCurrency(totalPaid)} icon={CheckCircle2} tone="emerald" />
         <Kpi label="Pendentes (visível)" value={formatCurrency(totalPending)} icon={Clock} tone="amber" />
