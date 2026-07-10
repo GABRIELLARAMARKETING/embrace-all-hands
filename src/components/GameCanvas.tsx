@@ -82,30 +82,47 @@ function GameLogic({
   const resetCombo = useGameStore((s) => s.resetCombo);
   const collectCoin = useGameStore((s) => s.collectCoin);
   const loseGame = useGameStore((s) => s.loseGame);
-  const completeLevel = useGameStore((s) => s.completeLevel);
+  // NOTE: `completeLevel` intencionalmente removido — não existe "fim" no modo infinito.
 
   const level = LEVELS[currentLevel - 1] ?? LEVELS[0];
   const themeId = level.theme in THEMES ? level.theme : selectedTheme;
 
-  // Subscribe to live difficulty updates so the level regenerates when
-  // an admin publishes a new config (mobile + desktop).
+  // Subscribe to live difficulty updates so a new admin config affects
+  // future rings imediatamente (mobile + desktop).
   const helixConfig = useSyncExternalStore(
     helixRuntime.subscribe,
     helixRuntime.get,
     helixRuntime.get,
   );
 
-  const generated = useMemo(() => {
+  // Gravidade continua vindo do nível base × multiplicador live.
+  const gravity = useMemo(
+    () => CONSTANTS.GRAVITY * level.gravityMult * helixConfig.settings.gravity,
+    [level.gravityMult, helixConfig],
+  );
+
+  /**
+   * =========== GERADOR INFINITO DE PLATAFORMAS ===========
+   * O manager é reconstruído quando muda: (a) o nível (semente), ou
+   * (b) a config live do admin. Em ambos os casos o `useEffect` de
+   * reset abaixo também limpa broken/breaking/deepest.
+   */
+  const manager = useMemo(() => {
     const hx = helixConfig.settings;
-    const progression = 0.7 + 0.3 * hx.difficultyProgressionRate;
-    const obstacleRate = Math.min(
-      0.9,
-      Math.max(0, level.obstacleRate * hx.obstacleDensity * (0.6 + 0.4 * hx.obstacleFrequency) * progression),
-    );
-    const gap = Math.max(1, Math.round(level.gapSize * hx.gapSize));
-    const gravityMult = level.gravityMult * hx.gravity;
-    return generateLevel(level.id, level.platformCount, obstacleRate, gap, gravityMult, level.coinRate);
+    return new InfinitePlatformManager({
+      levelSeed: level.id,
+      baseObstacleRate: level.obstacleRate,
+      baseGapSize: level.gapSize,
+      baseCoinRate: level.coinRate,
+      hxObstacleDensity: hx.obstacleDensity,
+      hxObstacleFrequency: hx.obstacleFrequency,
+      hxGapSize: hx.gapSize,
+      hxDifficultyProgressionRate: hx.difficultyProgressionRate,
+    });
   }, [level, helixConfig]);
+
+  // Bump para re-render sempre que a pool cria/recicla rings.
+  const [ringsVersion, setRingsVersion] = useState(0);
 
 
 
