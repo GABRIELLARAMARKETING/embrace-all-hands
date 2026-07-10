@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
-import { Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { useMemo } from "react";
+import { Play } from "lucide-react";
 import { AppLayout } from "@/components/player/AppLayout";
 import { PLAYER_MOCK, MAP_OPTIONS } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { cn } from "@/lib/utils";
+import helixClassicMap from "@/assets/helix-classic-map.png.asset.json";
 
 export const Route = createFileRoute("/app/jogar")({
   head: () => ({
@@ -19,12 +20,9 @@ export const Route = createFileRoute("/app/jogar")({
 
 function JogarPage() {
   const navigate = useNavigate();
-  const selectedMapId = usePlayerStore((s) => s.selectedMapId);
   const setSelectedMap = usePlayerStore((s) => s.setSelectedMap);
   const value = usePlayerStore((s) => s.selectedPlayValue);
   const setValue = usePlayerStore((s) => s.setSelectedPlayValue);
-  
-  const carouselRef = useRef<HTMLDivElement>(null);
 
   // Apenas o mapa clássico está disponível nesta rota.
   const availableMaps = useMemo(
@@ -33,13 +31,8 @@ function JogarPage() {
   );
   const selectedMap = availableMaps[0];
   // Regra oficial (backend): saque mínimo = 5x o valor do depósito.
-  // R$5→R$25 · R$10→R$50 · R$20→R$100 · R$30→R$150 · R$50→R$250 · R$100→R$500
   const minWithdraw = value ? value * 5 : 0;
 
-
-  const scroll = (dir: -1 | 1) => {
-    carouselRef.current?.scrollBy({ left: dir * 100, behavior: "smooth" });
-  };
 
   return (
     <AppLayout>
@@ -117,52 +110,30 @@ function JogarPage() {
 
           {/* Mapa */}
           <div className="mt-6 text-[11px] font-bold tracking-widest text-[#B47CFF]">MAPA</div>
-          <div className="relative mt-3">
+          <div className="mt-3 flex justify-center">
             <button
-              onClick={() => scroll(-1)}
-              className="absolute left-0 top-1/2 z-10 -translate-y-1/2 text-white/40 hover:text-white"
-              aria-label="Anterior"
+              onClick={() => setSelectedMap(selectedMap.id)}
+              aria-label={selectedMap.name}
+              className="group relative rounded-[26px] p-[2px] bg-gradient-to-br from-[#F472B6] via-[#EC5FA3] to-[#A855F7] shadow-[0_0_28px_rgba(236,95,163,0.45)] transition-transform active:scale-[0.98]"
             >
-              <ChevronLeft className="h-6 w-6" />
+              <div className="relative aspect-[4/5] w-[210px] overflow-hidden rounded-[24px] border border-black/40 bg-[#1a0730]">
+                <img
+                  src={helixClassicMap.url}
+                  alt={selectedMap.name}
+                  className="h-full w-full object-cover"
+                  loading="eager"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-3 text-center">
+                  <div className="text-[10px] font-bold tracking-[0.25em] text-white/70">MAPA</div>
+                  <div className="text-base font-black text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">
+                    {selectedMap.name}
+                  </div>
+                </div>
+              </div>
             </button>
-            <button
-              onClick={() => scroll(1)}
-              className="absolute right-0 top-1/2 z-10 -translate-y-1/2 text-white/40 hover:text-white"
-              aria-label="Próximo"
-            >
-              <ChevronRight className="h-6 w-6" />
-            </button>
-            <div
-              ref={carouselRef}
-              className="flex snap-x snap-mandatory items-center gap-3 overflow-x-auto px-7 py-2 scrollbar-hide"
-            >
-              {availableMaps.map((m) => {
-                const active = m.id === selectedMap.id;
-                return (
-                  <button
-                    key={m.id}
-                    onClick={() => setSelectedMap(m.id)}
-                    className={cn(
-                      "snap-center shrink-0 rounded-2xl p-[2px] transition-all",
-                      active
-                        ? "scale-110 bg-gradient-to-br from-[#F472B6] to-[#A855F7] shadow-[0_0_22px_rgba(236,95,163,0.5)]"
-                        : "bg-transparent opacity-45",
-                    )}
-                    aria-label={m.name}
-                  >
-                    <div
-                      className={cn(
-                        "rounded-2xl border border-black/40",
-                        active ? "h-28 w-[74px]" : "h-24 w-[62px]",
-                      )}
-                      style={{ background: m.gradient }}
-                    />
-                  </button>
-                );
-              })}
-            </div>
           </div>
-          <p className="mt-2 text-center text-sm font-bold text-[#B47CFF]">{selectedMap.name}</p>
+
 
           {/* Play button */}
           <button
