@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { auditLog } from "./audit.functions";
+
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 async function ensureManagerOrAdmin(ctx: any) {
@@ -385,6 +387,16 @@ export const updateCommissionSettings = createServerFn({ method: "POST" })
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
     await audit(context, "commission_settings_updated", "manager_profiles", userId, data);
+    await auditLog(supabase, {
+      eventType: "COMMISSION_SETTINGS_UPDATED",
+      module: "commissions",
+      severity: "warning",
+      title: "Percentuais de comissão atualizados",
+      userId,
+      entityType: "manager_profiles",
+      entityId: userId,
+      metadata: { ...data, total_budget: budget, sum },
+    });
     return { ok: true };
   });
 
@@ -399,6 +411,15 @@ export const resetCommissionSettings = createServerFn({ method: "POST" })
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
     await audit(context, "commission_settings_reset", "manager_profiles", userId);
+    await auditLog(supabase, {
+      eventType: "COMMISSION_SETTINGS_RESET",
+      module: "commissions",
+      severity: "info",
+      title: "Percentuais de comissão restaurados ao padrão",
+      userId,
+      entityType: "manager_profiles",
+      entityId: userId,
+    });
     return { ok: true };
   });
 
