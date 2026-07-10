@@ -32,3 +32,30 @@ export function getExpectedPayoutCents(amountCents: number): number | null {
 export function isAllowedDepositAmount(amount: number): boolean {
   return HELIX_ALLOWED_AMOUNTS.has(amount);
 }
+
+/**
+ * Espelho puro-JS de `public.helix_payout_cents` (backend é a fonte oficial).
+ * Lança para qualquer valor fora da tabela — impede uso silencioso.
+ */
+export function getPayoutPerPlatform(amountCents: number): number {
+  const rule = HELIX_DEPOSIT_RULES.find((r) => r.amountCents === amountCents);
+  if (!rule) {
+    throw new Error(`Unsupported deposit amount: ${amountCents} cents`);
+  }
+  return rule.payoutCents;
+}
+
+/**
+ * Espelho puro-JS de `validated_platforms_passed * payout_per_platform_cents`
+ * usado pelo backend em `helix_finish_session`. Somente para testes/UX; a
+ * recompensa oficial vem sempre do backend.
+ */
+export function calculateReward(validatedPlatforms: number, payoutPerPlatformCents: number): number {
+  if (!Number.isInteger(validatedPlatforms) || validatedPlatforms < 0) {
+    throw new Error("validatedPlatforms must be a non-negative integer");
+  }
+  if (!Number.isInteger(payoutPerPlatformCents) || payoutPerPlatformCents < 0) {
+    throw new Error("payoutPerPlatformCents must be a non-negative integer");
+  }
+  return validatedPlatforms * payoutPerPlatformCents;
+}
