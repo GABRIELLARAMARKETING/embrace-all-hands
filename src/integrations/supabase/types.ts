@@ -332,39 +332,76 @@ export type Database = {
       }
       game_sessions: {
         Row: {
+          anti_fraud_score: number
           created_at: string
+          credited_at: string | null
+          deposit_id: string | null
           duration_seconds: number
+          expires_at: string | null
           finished_at: string | null
           id: string
+          idempotency_key: string | null
+          last_platform_at: string | null
           level_reached: number
+          payout_per_platform_cents: number
+          platforms_passed: number
+          reward_cents: number
           score: number
           status: string
           theme_id: string | null
           user_id: string | null
+          validated_platforms_passed: number
         }
         Insert: {
+          anti_fraud_score?: number
           created_at?: string
+          credited_at?: string | null
+          deposit_id?: string | null
           duration_seconds?: number
+          expires_at?: string | null
           finished_at?: string | null
           id?: string
+          idempotency_key?: string | null
+          last_platform_at?: string | null
           level_reached?: number
+          payout_per_platform_cents?: number
+          platforms_passed?: number
+          reward_cents?: number
           score?: number
           status?: string
           theme_id?: string | null
           user_id?: string | null
+          validated_platforms_passed?: number
         }
         Update: {
+          anti_fraud_score?: number
           created_at?: string
+          credited_at?: string | null
+          deposit_id?: string | null
           duration_seconds?: number
+          expires_at?: string | null
           finished_at?: string | null
           id?: string
+          idempotency_key?: string | null
+          last_platform_at?: string | null
           level_reached?: number
+          payout_per_platform_cents?: number
+          platforms_passed?: number
+          reward_cents?: number
           score?: number
           status?: string
           theme_id?: string | null
           user_id?: string | null
+          validated_platforms_passed?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "game_sessions_deposit_id_fkey"
+            columns: ["deposit_id"]
+            isOneToOne: false
+            referencedRelation: "deposits"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "game_sessions_theme_id_fkey"
             columns: ["theme_id"]
@@ -436,6 +473,59 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      helix_platform_events: {
+        Row: {
+          client_timestamp: number | null
+          created_at: string
+          delta_time_ms: number | null
+          event_hash: string | null
+          id: string
+          invalid_reason: string | null
+          is_valid: boolean
+          metadata: Json | null
+          platform_index: number
+          server_timestamp: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          client_timestamp?: number | null
+          created_at?: string
+          delta_time_ms?: number | null
+          event_hash?: string | null
+          id?: string
+          invalid_reason?: string | null
+          is_valid?: boolean
+          metadata?: Json | null
+          platform_index: number
+          server_timestamp?: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          client_timestamp?: number | null
+          created_at?: string
+          delta_time_ms?: number | null
+          event_hash?: string | null
+          id?: string
+          invalid_reason?: string | null
+          is_valid?: boolean
+          metadata?: Json | null
+          platform_index?: number
+          server_timestamp?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "helix_platform_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invite_code_audit: {
         Row: {
@@ -1190,6 +1280,24 @@ export type Database = {
         }
         Returns: boolean
       }
+      helix_create_session: {
+        Args: { _deposit_id: string; _theme_id?: string }
+        Returns: Json
+      }
+      helix_finish_session: {
+        Args: { _reason?: string; _session_id: string }
+        Returns: Json
+      }
+      helix_payout_cents: { Args: { _amount_cents: number }; Returns: number }
+      helix_register_platform: {
+        Args: {
+          _client_ts?: number
+          _event_hash?: string
+          _platform_index: number
+          _session_id: string
+        }
+        Returns: Json
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       process_deposit_commissions: {
         Args: { _deposit_id: string }
@@ -1206,6 +1314,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      test_helix_flow: { Args: never; Returns: string }
       test_multilevel_flow: { Args: never; Returns: string }
     }
     Enums: {
