@@ -47,12 +47,24 @@ export const requestAffiliateWithdrawal = createServerFn({ method: "POST" })
       .eq("id", userId);
     if (updateError) throw new Error(updateError.message);
 
+    await auditLog(supabase, {
+      eventType: "WITHDRAWAL_REQUESTED",
+      module: "withdrawals",
+      severity: "info",
+      title: "Saque de afiliado solicitado",
+      userId,
+      entityType: "affiliate_withdrawal",
+      entityId: withdrawal.id,
+      metadata: { amount: data.amount, balance_after: newBalance },
+    });
+
     return {
       withdrawal,
       affiliateBalance: newBalance,
       totalReceived: profile.total_received ?? 0,
     };
   });
+
 
 export type WithdrawalHistoryItem = {
   id: string;
