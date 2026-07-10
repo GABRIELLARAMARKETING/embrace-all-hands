@@ -1023,6 +1023,7 @@ export type Database = {
         Args: { _display: string; _id: string; _ref?: string }
         Returns: undefined
       }
+      assert_reconciliation: { Args: never; Returns: string }
       credit_deposit_atomic: {
         Args: {
           _deposit_id: string
@@ -1043,6 +1044,17 @@ export type Database = {
       process_deposit_commissions: {
         Args: { _deposit_id: string }
         Returns: undefined
+      }
+      reconcile_payments: {
+        Args: never
+        Returns: {
+          actual: number
+          deposit_id: string
+          detail: string
+          expected: number
+          kind: string
+          user_id: string
+        }[]
       }
       test_multilevel_flow: { Args: never; Returns: string }
     }
