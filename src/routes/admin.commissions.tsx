@@ -147,6 +147,12 @@ function Page() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="inline-flex flex-wrap justify-end gap-1">
+                      <button
+                        onClick={() => setHistoryRow(r)}
+                        className="rounded-md border border-white/15 bg-white/[0.03] px-2 py-1 text-xs text-white/70 hover:bg-white/10"
+                      >
+                        Histórico
+                      </button>
                       {r.status !== "paid" && (
                         <button
                           onClick={() => setModal({ row: r, action: "pay" })}
