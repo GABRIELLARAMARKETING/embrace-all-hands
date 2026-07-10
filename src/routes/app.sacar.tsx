@@ -4,8 +4,10 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import { Clock, Coins, CheckCircle2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AppLayout, GradientButton, PlayerCard } from "@/components/player/AppLayout";
-import { usePlayerStore } from "@/store/usePlayerStore";
+import { getMyProfile } from "@/lib/profile.functions";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { makeWithdrawSchema, type WithdrawFormValues } from "@/utils/playerValidators";
 import { maskCpf } from "@/utils/cpfMask";
@@ -22,7 +24,13 @@ export const Route = createFileRoute("/app/sacar")({
 });
 
 function SacarPage() {
-  const balance = usePlayerStore((s) => s.balance);
+  const profileFn = useServerFn(getMyProfile);
+  const { data: profile } = useQuery({
+    queryKey: ["my-profile"],
+    queryFn: () => profileFn({}),
+    staleTime: 30_000,
+  });
+  const balance = profile?.balance ?? 0;
   const [done, setDone] = useState(false);
   const schema = useMemo(() => makeWithdrawSchema(balance), [balance]);
 

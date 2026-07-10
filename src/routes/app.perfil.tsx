@@ -7,7 +7,6 @@ import { listAffiliateWithdrawals, type WithdrawalHistoryItem } from "@/lib/with
 import { listMyRecentDeposits, type MyDepositRow } from "@/lib/deposits.functions";
 import { AppLayout, PlayerCard, GradientButton } from "@/components/player/AppLayout";
 import { PLAYER_MOCK } from "@/data/playerMockData";
-import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { copyToClipboard } from "@/utils/clipboard";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,14 +61,8 @@ function PerfilPage() {
   const { data: referral } = useSuspenseQuery(referralStatsQuery);
   const { data: deposits = [] } = useSuspenseQuery(myDepositsQuery);
 
-  // Mirror server values into the local store when setters exist
-  const store = usePlayerStore.getState() as unknown as Record<string, unknown>;
-  useEffect(() => {
-    if (typeof store.setBalance === "function") (store.setBalance as (v: number) => void)(profile.balance);
-    if (typeof store.setAffiliateBalance === "function")
-      (store.setAffiliateBalance as (v: number) => void)(profile.affiliateBalance);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile.balance, profile.affiliateBalance]);
+
+
 
 
   // Realtime: refresh when profile row or game_sessions change
