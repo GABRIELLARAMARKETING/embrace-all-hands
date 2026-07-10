@@ -35,6 +35,7 @@ import { Route as AppDepositarRouteImport } from './routes/app.depositar'
 import { Route as AdminWithdrawalsRouteImport } from './routes/admin.withdrawals'
 import { Route as AdminWebhooksRouteImport } from './routes/admin.webhooks'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminTrackingRouteImport } from './routes/admin.tracking'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRiskAlertsRouteImport } from './routes/admin.risk-alerts'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
@@ -181,6 +182,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTrackingRoute = AdminTrackingRouteImport.update({
+  id: '/tracking',
+  path: '/tracking',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -279,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
@@ -321,6 +328,7 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
@@ -365,6 +373,7 @@ export interface FileRoutesById {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
@@ -410,6 +419,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
+    | '/admin/tracking'
     | '/admin/users'
     | '/admin/webhooks'
     | '/admin/withdrawals'
@@ -452,6 +462,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
+    | '/admin/tracking'
     | '/admin/users'
     | '/admin/webhooks'
     | '/admin/withdrawals'
@@ -495,6 +506,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
+    | '/admin/tracking'
     | '/admin/users'
     | '/admin/webhooks'
     | '/admin/withdrawals'
@@ -714,6 +726,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/tracking': {
+      id: '/admin/tracking'
+      path: '/tracking'
+      fullPath: '/admin/tracking'
+      preLoaderRoute: typeof AdminTrackingRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -836,6 +855,7 @@ interface AdminRouteChildren {
   AdminReportsRoute: typeof AdminReportsRoute
   AdminRiskAlertsRoute: typeof AdminRiskAlertsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTrackingRoute: typeof AdminTrackingRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminWebhooksRoute: typeof AdminWebhooksRoute
   AdminWithdrawalsRoute: typeof AdminWithdrawalsRoute
@@ -855,6 +875,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminReportsRoute: AdminReportsRoute,
   AdminRiskAlertsRoute: AdminRiskAlertsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminTrackingRoute: AdminTrackingRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminWebhooksRoute: AdminWebhooksRoute,
   AdminWithdrawalsRoute: AdminWithdrawalsRoute,
