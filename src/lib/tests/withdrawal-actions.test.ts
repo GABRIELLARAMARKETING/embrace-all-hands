@@ -111,8 +111,11 @@ describe("Withdrawals admin actions – lista e modal refletem status imediatame
   }
 
   async function afterMutation() {
-    // exatamente o que as mutations do painel fazem
+    // Em produção, invalidateQueries dispara refetch nos observers ativos
+    // (lista + modal montadas). Sem componentes React aqui, refetchQueries
+    // reproduz esse mesmo efeito de forma determinística.
     await qc.invalidateQueries({ queryKey: ["admin", "withdrawals"] });
+    await qc.refetchQueries({ queryKey: ["admin", "withdrawals"] });
   }
 
   function listStatus() {
