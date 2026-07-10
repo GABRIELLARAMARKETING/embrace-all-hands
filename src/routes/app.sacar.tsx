@@ -31,14 +31,24 @@ function SacarPage() {
   const qc = useQueryClient();
   const profileFn = useServerFn(getMyProfile);
   const requestFn = useServerFn(requestAffiliateWithdrawal);
+  const rulesFn = useServerFn(getHelixWithdrawalRules);
   const { data: profile } = useQuery({
     queryKey: ["my-profile"],
     queryFn: () => profileFn({}),
     staleTime: 30_000,
   });
+  const { data: rules } = useQuery({
+    queryKey: ["helix-withdrawal-rules"],
+    queryFn: () => rulesFn({}),
+    staleTime: 15_000,
+  });
   const balance = profile?.affiliateBalance ?? 0;
+  const canWithdraw = rules?.can_withdraw ?? false;
+  const minCents = rules?.minimum_withdraw_cents ?? null;
+  const missingCents = rules?.missing_to_withdraw_cents ?? null;
   const [done, setDone] = useState(false);
   const schema = useMemo(() => makeWithdrawSchema(balance), [balance]);
+
 
   const {
     register,
