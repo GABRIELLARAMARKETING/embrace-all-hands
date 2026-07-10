@@ -251,7 +251,7 @@ function GameLogic({
       stepsTaken++;
 
       // Gravity + clamp.
-      velocity.current += generated.gravity * sdt;
+      velocity.current += gravity * sdt;
       velocity.current *= Math.exp(-CONSTANTS.AIR_FRICTION * sdt);
       if (velocity.current < CONSTANTS.MAX_FALL_SPEED) {
         velocity.current = CONSTANTS.MAX_FALL_SPEED;
