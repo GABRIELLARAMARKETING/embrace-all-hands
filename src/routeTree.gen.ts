@@ -49,6 +49,7 @@ import { Route as AdminKycRouteImport } from './routes/admin.kyc'
 import { Route as AdminIntegrationsRouteImport } from './routes/admin.integrations'
 import { Route as AdminHelixAuditRouteImport } from './routes/admin.helix-audit'
 import { Route as AdminHelixRouteImport } from './routes/admin.helix'
+import { Route as AdminHealthRouteImport } from './routes/admin.health'
 import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
 import { Route as AdminDepositsRouteImport } from './routes/admin.deposits'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
@@ -262,6 +263,11 @@ const AdminHelixRoute = AdminHelixRouteImport.update({
   path: '/helix',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminHealthRoute = AdminHealthRouteImport.update({
+  id: '/health',
+  path: '/health',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminFinanceRoute = AdminFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
@@ -342,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/deposits': typeof AdminDepositsRoute
   '/admin/finance': typeof AdminFinanceRoute
+  '/admin/health': typeof AdminHealthRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/helix-audit': typeof AdminHelixAuditRoute
   '/admin/integrations': typeof AdminIntegrationsRoute
@@ -395,6 +402,7 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/deposits': typeof AdminDepositsRoute
   '/admin/finance': typeof AdminFinanceRoute
+  '/admin/health': typeof AdminHealthRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/helix-audit': typeof AdminHelixAuditRoute
   '/admin/integrations': typeof AdminIntegrationsRoute
@@ -450,6 +458,7 @@ export interface FileRoutesById {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/deposits': typeof AdminDepositsRoute
   '/admin/finance': typeof AdminFinanceRoute
+  '/admin/health': typeof AdminHealthRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/helix-audit': typeof AdminHelixAuditRoute
   '/admin/integrations': typeof AdminIntegrationsRoute
@@ -506,6 +515,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/deposits'
     | '/admin/finance'
+    | '/admin/health'
     | '/admin/helix'
     | '/admin/helix-audit'
     | '/admin/integrations'
@@ -559,6 +569,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/deposits'
     | '/admin/finance'
+    | '/admin/health'
     | '/admin/helix'
     | '/admin/helix-audit'
     | '/admin/integrations'
@@ -613,6 +624,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/deposits'
     | '/admin/finance'
+    | '/admin/health'
     | '/admin/helix'
     | '/admin/helix-audit'
     | '/admin/integrations'
@@ -945,6 +957,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminHelixRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/health': {
+      id: '/admin/health'
+      path: '/health'
+      fullPath: '/admin/health'
+      preLoaderRoute: typeof AdminHealthRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/finance': {
       id: '/admin/finance'
       path: '/finance'
@@ -1043,6 +1062,7 @@ interface AdminRouteChildren {
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminDepositsRoute: typeof AdminDepositsRoute
   AdminFinanceRoute: typeof AdminFinanceRoute
+  AdminHealthRoute: typeof AdminHealthRoute
   AdminHelixRoute: typeof AdminHelixRoute
   AdminHelixAuditRoute: typeof AdminHelixAuditRoute
   AdminIntegrationsRoute: typeof AdminIntegrationsRoute
@@ -1072,6 +1092,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDashboardRoute: AdminDashboardRoute,
   AdminDepositsRoute: AdminDepositsRoute,
   AdminFinanceRoute: AdminFinanceRoute,
+  AdminHealthRoute: AdminHealthRoute,
   AdminHelixRoute: AdminHelixRoute,
   AdminHelixAuditRoute: AdminHelixAuditRoute,
   AdminIntegrationsRoute: AdminIntegrationsRoute,
