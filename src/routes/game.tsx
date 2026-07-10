@@ -6,7 +6,7 @@ import { MainMenu } from "@/components/MainMenu";
 import { GameHUD } from "@/components/GameHUD";
 import { PauseMenu } from "@/components/PauseMenu";
 import { GameOverModal } from "@/components/GameOverModal";
-import { VictoryModal } from "@/components/VictoryModal";
+
 import { ThemeSelector } from "@/components/ThemeSelector";
 import { SkinShop } from "@/components/SkinShop";
 import { useGameStore } from "@/store/useGameStore";
@@ -84,7 +84,7 @@ function GamePage() {
 
       <PauseMenu open={gameState === "paused"} />
       <GameOverModal open={gameState === "gameOver"} />
-      <VictoryModal open={gameState === "victory"} />
+      
       <ThemeSelector open={themesOpen} onClose={() => setThemesOpen(false)} />
       <SkinShop open={skinsOpen} onClose={() => setSkinsOpen(false)} />
 
