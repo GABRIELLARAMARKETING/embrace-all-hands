@@ -110,29 +110,31 @@ function JogarPage() {
 
           {/* Mapa */}
           <div className="mt-6 text-[11px] font-bold tracking-widest text-[#B47CFF]">MAPA</div>
-          <div className="mt-3 flex justify-center">
+          <div className="mt-3">
             <button
+              type="button"
               onClick={() => setSelectedMap(selectedMap.id)}
               aria-label={selectedMap.name}
-              className="group relative rounded-[26px] p-[2px] bg-gradient-to-br from-[#F472B6] via-[#EC5FA3] to-[#A855F7] shadow-[0_0_28px_rgba(236,95,163,0.45)] transition-transform active:scale-[0.98]"
+              className="group relative block w-full rounded-[26px] p-[2px] bg-gradient-to-br from-[#F472B6] via-[#EC5FA3] to-[#A855F7] shadow-[0_0_28px_rgba(236,95,163,0.45)] transition-transform active:scale-[0.99]"
             >
-              <div className="relative aspect-[4/5] w-[210px] overflow-hidden rounded-[24px] border border-black/40 bg-[#1a0730]">
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[24px] border border-black/40 bg-[#1a0730]">
                 <img
                   src={helixClassicMap.url}
                   alt={selectedMap.name}
-                  className="h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full scale-[1.08] object-cover object-center"
                   loading="eager"
                 />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-3 text-center">
-                  <div className="text-[10px] font-bold tracking-[0.25em] text-white/70">MAPA</div>
-                  <div className="text-base font-black text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-4 text-center">
+                  <div className="text-[10px] font-bold tracking-[0.3em] text-white/75">MAPA</div>
+                  <div className="mt-0.5 text-lg font-black text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
                     {selectedMap.name}
                   </div>
                 </div>
               </div>
             </button>
           </div>
+
 
 
           {/* Play button */}
