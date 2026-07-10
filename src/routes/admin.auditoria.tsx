@@ -82,7 +82,7 @@ function AuditoriaGeralPage() {
   async function onEmitTest() {
     setEmitting(true);
     try {
-      const res = await emitTestFn({ data: {} });
+      const res = await emitTestFn();
       toast.success(`3 eventos de teste emitidos (${res.correlationId})`);
     } catch (e) {
       toast.error((e as Error).message);
