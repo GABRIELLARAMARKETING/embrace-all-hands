@@ -144,17 +144,7 @@ export function MainMenu(_props: { onOpenThemes?: () => void; onOpenSkins?: () =
 
 
           <div className="flex w-full flex-col items-center gap-3 pb-3">
-            <div className="relative w-full max-w-[295px] overflow-hidden rounded-[24px] border border-fuchsia-400/30 bg-[#1a0730] p-[2px] shadow-[0_0_28px_rgba(236,95,163,0.35)]">
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[22px]">
-                <img
-                  src={helixClassicMap.url}
-                  alt="Helix Clássico"
-                  className="absolute inset-0 h-full w-full scale-[1.08] object-cover object-center"
-                  loading="eager"
-                />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
-              </div>
-            </div>
+
 
             <PrimaryButton onClick={handlePlay} aria-label="Jogar grátis" disabled={!current}>
               JOGAR GRATIS
