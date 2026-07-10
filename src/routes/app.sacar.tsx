@@ -4,10 +4,12 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import { Clock, Coins, CheckCircle2 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { AppLayout, GradientButton, PlayerCard } from "@/components/player/AppLayout";
 import { getMyProfile } from "@/lib/profile.functions";
+import { requestAffiliateWithdrawal } from "@/lib/withdrawals.functions";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { makeWithdrawSchema, type WithdrawFormValues } from "@/utils/playerValidators";
 import { maskCpf } from "@/utils/cpfMask";
@@ -24,13 +26,15 @@ export const Route = createFileRoute("/app/sacar")({
 });
 
 function SacarPage() {
+  const qc = useQueryClient();
   const profileFn = useServerFn(getMyProfile);
+  const requestFn = useServerFn(requestAffiliateWithdrawal);
   const { data: profile } = useQuery({
     queryKey: ["my-profile"],
     queryFn: () => profileFn({}),
     staleTime: 30_000,
   });
-  const balance = profile?.balance ?? 0;
+  const balance = profile?.affiliateBalance ?? 0;
   const [done, setDone] = useState(false);
   const schema = useMemo(() => makeWithdrawSchema(balance), [balance]);
 
@@ -45,10 +49,25 @@ function SacarPage() {
     defaultValues: { amount: undefined as unknown as number, pixKey: "", cpf: "" },
   });
 
-  const onSubmit = () => {
-    setDone(true);
-    reset({ amount: undefined as unknown as number, pixKey: "", cpf: "" });
-  };
+  const mutation = useMutation({
+    mutationFn: (values: WithdrawFormValues) =>
+      requestFn({
+        data: {
+          amount: Math.round(values.amount),
+          pixKey: values.pixKey,
+        },
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-profile"] });
+      setDone(true);
+      reset({ amount: undefined as unknown as number, pixKey: "", cpf: "" });
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || "Não foi possível solicitar o saque.");
+    },
+  });
+
+  const onSubmit = (values: WithdrawFormValues) => mutation.mutate(values);
 
   return (
     <AppLayout title="Solicitar Saque">
