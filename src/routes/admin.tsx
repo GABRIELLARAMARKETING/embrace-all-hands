@@ -80,6 +80,13 @@ const NAV = [
   { to: "/admin/helix", label: "Jogo Helix", icon: Gamepad2 },
   { to: "/admin/helix-audit", label: "Auditoria Helix", icon: ShieldAlert },
   { to: "/admin/codes", label: "Códigos", icon: ScrollText },
+  { to: "/admin/kyc", label: "KYC", icon: BadgeCheck },
+  { to: "/admin/notifications", label: "Notificações", icon: Bell },
+  { to: "/admin/integrations", label: "Integrações", icon: Plug },
+  { to: "/admin/roles", label: "Perfis & Permissões", icon: Lock },
+  { to: "/admin/backups", label: "Backups", icon: DatabaseBackup },
+  { to: "/admin/api-keys", label: "API Keys", icon: KeyRound },
+  { to: "/admin/health", label: "Saúde do Sistema", icon: Activity },
   { to: "/admin/settings", label: "Configurações", icon: Settings },
 
 ] as const;
