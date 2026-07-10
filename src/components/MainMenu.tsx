@@ -14,7 +14,7 @@ import { LogoHelix } from "./LogoHelix";
 import { ThemeCarousel } from "./ThemeCarousel";
 import { PrimaryButton } from "./PrimaryButton";
 import { ThemeProvider } from "./ThemeProvider";
-import helixClassicMap from "@/assets/helix-classic-map.png.asset.json";
+
 
 export function MainMenu(_props: { onOpenThemes?: () => void; onOpenSkins?: () => void }) {
   const navigate = useNavigate();
