@@ -128,6 +128,15 @@ export const listTransactions = createServerFn({ method: "GET" })
 
 
 // ===================== COMMISSIONS =====================
+export type CommissionStatus =
+  | "pending"
+  | "available"
+  | "approved"
+  | "canceled"
+  | "disputed"
+  | "paid"
+  | "reversed";
+
 export type CommissionRow = {
   id: string;
   affiliate_id: string;
@@ -137,18 +146,30 @@ export type CommissionRow = {
   base_amount: number;
   percentage: number;
   amount: number;
-  status: string;
+  status: CommissionStatus;
   available_at: string | null;
+  paid_at: string | null;
+  reversed_at: string | null;
+  paid_amount: number | null;
+  notes: string | null;
   created_at: string;
 };
+
+const commissionStatusEnum = z.enum([
+  "pending",
+  "available",
+  "approved",
+  "canceled",
+  "disputed",
+  "paid",
+  "reversed",
+]);
 
 export const listCommissions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) =>
     z
-      .object({
-        status: z.enum(["pending","available","approved","canceled","disputed"]).optional(),
-      })
+      .object({ status: commissionStatusEnum.optional() })
       .partial()
       .parse(raw ?? {}),
   )
@@ -157,10 +178,13 @@ export const listCommissions = createServerFn({ method: "GET" })
     const { supabase } = context;
     let q = supabase
       .from("commissions")
-      .select("id, affiliate_id, manager_id, base_amount, percentage, amount, status, available_at, created_at")
+      .select(
+        "id, affiliate_id, manager_id, base_amount, percentage, amount, status, available_at, paid_at, reversed_at, paid_amount, notes, created_at",
+      )
       .order("created_at", { ascending: false })
       .limit(500);
-    if (data.status) q = q.eq("status", data.status);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (data.status) q = q.eq("status", data.status as any);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -188,6 +212,10 @@ export const listCommissions = createServerFn({ method: "GET" })
       amount: Number(r.amount ?? 0),
       status: r.status,
       available_at: r.available_at ?? null,
+      paid_at: r.paid_at ?? null,
+      reversed_at: r.reversed_at ?? null,
+      paid_amount: r.paid_amount == null ? null : Number(r.paid_amount),
+      notes: r.notes ?? null,
       created_at: r.created_at,
     }));
   });
@@ -198,7 +226,7 @@ export const updateCommissionStatus = createServerFn({ method: "POST" })
     z
       .object({
         commissionId: z.string().uuid(),
-        status: z.enum(["pending","available","approved","canceled","disputed"]),
+        status: commissionStatusEnum,
         reason: z.string().trim().max(500).optional(),
       })
       .parse(raw),
@@ -208,7 +236,8 @@ export const updateCommissionStatus = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("commissions")
-      .update({ status: data.status, updated_at: new Date().toISOString() })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .update({ status: data.status as any, updated_at: new Date().toISOString() })
       .eq("id", data.commissionId);
     if (error) throw new Error(error.message);
     await supabaseAdmin.from("audit_logs").insert({
@@ -219,6 +248,90 @@ export const updateCommissionStatus = createServerFn({ method: "POST" })
       reason: data.reason ?? null,
     });
     return { ok: true };
+  });
+
+/**
+ * Marca comissão como paga OU estornada, com data, valor e observação —
+ * tudo espelhado em audit_logs.
+ */
+export const settleCommission = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z
+      .object({
+        commissionId: z.string().uuid(),
+        action: z.enum(["pay", "reverse"]),
+        amount: z.number().positive().max(1_000_000).optional(),
+        notes: z.string().trim().max(1000).optional(),
+        occurredAt: z.string().datetime().optional(),
+      })
+      .parse(raw),
+  )
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: current, error: readErr } = await (supabaseAdmin as any)
+      .from("commissions")
+      .select("id, status, amount, paid_at, reversed_at, paid_amount, notes")
+      .eq("id", data.commissionId)
+      .maybeSingle();
+    if (readErr) throw new Error(readErr.message);
+    if (!current) throw new Error("Comissão não encontrada.");
+
+    const when = data.occurredAt ?? new Date().toISOString();
+    const effectiveAmount =
+      data.action === "pay"
+        ? Number(data.amount ?? current.amount ?? 0)
+        : Number(current.amount ?? 0);
+    const nextStatus = data.action === "pay" ? "paid" : "reversed";
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const patch: Record<string, any> = {
+      status: nextStatus,
+      updated_at: new Date().toISOString(),
+      notes: data.notes ?? current.notes ?? null,
+    };
+    if (data.action === "pay") {
+      patch.paid_at = when;
+      patch.paid_amount = effectiveAmount;
+      patch.reversed_at = null;
+    } else {
+      patch.reversed_at = when;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: updErr } = await (supabaseAdmin as any)
+      .from("commissions")
+      .update(patch)
+      .eq("id", data.commissionId);
+    if (updErr) throw new Error(updErr.message);
+
+    await supabaseAdmin.from("audit_logs").insert({
+      actor_id: context.userId,
+      action: data.action === "pay" ? "commission.paid" : "commission.reversed",
+      entity_type: "commission",
+      entity_id: data.commissionId,
+      reason: data.notes ?? null,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      old_value: {
+        status: current.status,
+        amount: Number(current.amount ?? 0),
+        paid_at: current.paid_at,
+        reversed_at: current.reversed_at,
+        paid_amount: current.paid_amount,
+      } as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      new_value: {
+        status: nextStatus,
+        amount: effectiveAmount,
+        occurred_at: when,
+        notes: data.notes ?? null,
+      } as any,
+    });
+
+    return { ok: true, status: nextStatus, amount: effectiveAmount, occurredAt: when };
   });
 
 // ===================== RISK ALERTS =====================
