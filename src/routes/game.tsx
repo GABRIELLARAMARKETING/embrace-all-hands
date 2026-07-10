@@ -17,6 +17,7 @@ import { useGameSession } from "@/hooks/useGameSession";
 import { useThemePreload } from "@/hooks/useThemePreload";
 import { useHelixDifficultyLoader } from "@/hooks/useHelixDifficultyLoader";
 import { LogoHelix } from "@/components/LogoHelix";
+import helixClassicMap from "@/assets/helix-classic-map.png.asset.json";
 
 
 export const Route = createFileRoute("/game")({
