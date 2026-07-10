@@ -304,3 +304,116 @@ export const markWithdrawalPaid = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+export type WithdrawalAuditEntry = {
+  id: string;
+  action: string;
+  actor_id: string | null;
+  actor_name: string | null;
+  reason: string | null;
+  old_value: unknown;
+  new_value: unknown;
+  created_at: string;
+};
+
+export type WithdrawalDetail = {
+  withdrawal: AdminWithdrawalRow & {
+    request_ip: string | null;
+    request_user_agent: string | null;
+    reviewer_name: string | null;
+    user_email: string | null;
+    user_affiliate_balance: number;
+    user_total_received: number;
+  };
+  audit: WithdrawalAuditEntry[];
+  userHistory: AdminWithdrawalRow[];
+};
+
+export const getWithdrawalDetail = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => z.object({ withdrawalId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }): Promise<WithdrawalDetail> => {
+    await ensureAdmin(context);
+    const { supabase } = context;
+
+    const { data: w, error } = await supabase
+      .from("affiliate_withdrawals")
+      .select(
+        "id, user_id, amount, status, pix_key, note, admin_notes, rejection_reason, reviewed_by, reviewed_at, paid_at, created_at, request_ip, request_user_agent",
+      )
+      .eq("id", data.withdrawalId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!w) throw new Error("Saque não encontrado.");
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("display_name, affiliate_balance, total_received")
+      .eq("id", w.user_id)
+      .maybeSingle();
+
+    let reviewerName: string | null = null;
+    if (w.reviewed_by) {
+      const { data: rp } = await supabase
+        .from("profiles")
+        .select("display_name")
+        .eq("id", w.reviewed_by)
+        .maybeSingle();
+      reviewerName = rp?.display_name ?? null;
+    }
+
+    const { data: auditRows } = await supabase
+      .from("audit_logs")
+      .select("id, action, actor_id, reason, old_value, new_value, created_at")
+      .eq("entity_type", "affiliate_withdrawal")
+      .eq("entity_id", data.withdrawalId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    const actorIds = Array.from(
+      new Set((auditRows ?? []).map((a) => a.actor_id).filter((x): x is string => !!x)),
+    );
+    let actorNames: Record<string, string | null> = {};
+    if (actorIds.length) {
+      const { data: ap } = await supabase
+        .from("profiles")
+        .select("id, display_name")
+        .in("id", actorIds);
+      actorNames = Object.fromEntries((ap ?? []).map((p) => [p.id, p.display_name]));
+    }
+
+    const { data: history } = await supabase
+      .from("affiliate_withdrawals")
+      .select(
+        "id, user_id, amount, status, pix_key, note, admin_notes, rejection_reason, reviewed_by, reviewed_at, paid_at, created_at",
+      )
+      .eq("user_id", w.user_id)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    return {
+      withdrawal: {
+        ...w,
+        user_email: null,
+        user_display_name: profile?.display_name ?? null,
+        user_affiliate_balance: profile?.affiliate_balance ?? 0,
+        user_total_received: profile?.total_received ?? 0,
+        reviewer_name: reviewerName,
+      } as WithdrawalDetail["withdrawal"],
+      audit: (auditRows ?? []).map((a) => ({
+        id: a.id,
+        action: a.action,
+        actor_id: a.actor_id,
+        actor_name: a.actor_id ? actorNames[a.actor_id] ?? null : null,
+        reason: a.reason,
+        old_value: a.old_value,
+        new_value: a.new_value,
+        created_at: a.created_at,
+      })),
+      userHistory: (history ?? []).map((r) => ({
+        ...r,
+        user_email: null,
+        user_display_name: profile?.display_name ?? null,
+      })) as AdminWithdrawalRow[],
+    };
+  });
