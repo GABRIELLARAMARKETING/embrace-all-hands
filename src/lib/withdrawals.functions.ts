@@ -287,6 +287,17 @@ export const rejectWithdrawal = createServerFn({ method: "POST" })
       newValue: { status: "rejected", balance_after: newBalance },
       reason: data.reason,
     });
+    await auditLog(supabase, {
+      eventType: "WITHDRAWAL_REJECTED",
+      module: "withdrawals",
+      severity: "warning",
+      title: "Saque rejeitado (saldo devolvido)",
+      message: data.reason,
+      userId,
+      entityType: "affiliate_withdrawal",
+      entityId: data.withdrawalId,
+      metadata: { amount: current.amount, target_user: current.user_id, refunded_to: newBalance },
+    });
     return { ok: true };
   });
 
