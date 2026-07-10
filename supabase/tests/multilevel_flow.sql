@@ -78,7 +78,7 @@ BEGIN
   ----------------------------------------------------------------
   -- 1) A (gerente, sem indicação)
   ----------------------------------------------------------------
-  PERFORM _test_signup(a_id, 'userA', NULL);
+  PERFORM pg_temp._test_signup(a_id, 'userA', NULL);
   SELECT affiliate_code INTO a_code FROM public.profiles WHERE id = a_id;
   IF a_code IS NULL OR length(a_code) < 4 THEN
     RAISE EXCEPTION 'FAIL[1]: A sem affiliate_code (%)', a_code;
@@ -92,7 +92,7 @@ BEGIN
   ----------------------------------------------------------------
   -- 2) B via link de A
   ----------------------------------------------------------------
-  PERFORM _test_signup(b_id, 'userB', a_code);
+  PERFORM pg_temp._test_signup(b_id, 'userB', a_code);
   PERFORM 1 FROM public.profiles
     WHERE id=b_id AND referred_by_id=a_id AND manager_id=a_id;
   IF NOT FOUND THEN RAISE EXCEPTION 'FAIL[2]: B não vinculado a A'; END IF;
@@ -104,7 +104,7 @@ BEGIN
   ----------------------------------------------------------------
   -- 3) C via link de B → L1=B, L2=A, manager herdado=A
   ----------------------------------------------------------------
-  PERFORM _test_signup(c_id, 'userC', b_code);
+  PERFORM pg_temp._test_signup(c_id, 'userC', b_code);
   PERFORM 1 FROM public.referrals
     WHERE referrer_id=b_id AND referred_id=c_id AND level=1;
   IF NOT FOUND THEN RAISE EXCEPTION 'FAIL[3]: L1 B→C ausente'; END IF;
@@ -117,7 +117,7 @@ BEGIN
   ----------------------------------------------------------------
   -- 4) Autoindicação bloqueada
   ----------------------------------------------------------------
-  PERFORM _test_signup(d_id, 'userD', NULL);
+  PERFORM pg_temp._test_signup(d_id, 'userD', NULL);
   SELECT affiliate_code INTO d_code FROM public.profiles WHERE id=d_id;
   -- tenta re-signup de si mesmo (simula um id igual ao dono do ref) —
   -- a função zera ref_owner nesse caso; testamos que D não é ref de si.
