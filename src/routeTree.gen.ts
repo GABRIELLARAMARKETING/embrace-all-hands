@@ -35,6 +35,7 @@ import { Route as AppDepositarRouteImport } from './routes/app.depositar'
 import { Route as AdminWithdrawalsRouteImport } from './routes/admin.withdrawals'
 import { Route as AdminWebhooksRouteImport } from './routes/admin.webhooks'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminTrackingRouteImport } from './routes/admin.tracking'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRiskAlertsRouteImport } from './routes/admin.risk-alerts'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
@@ -48,6 +49,7 @@ import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
 import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
 import { Route as AdminAffiliatesRouteImport } from './routes/admin.affiliates'
+import { Route as ApiPublicRCodeRouteImport } from './routes/api/public/r.$code'
 import { Route as ApiPublicWebhooksDiggionSecretRouteImport } from './routes/api/public/webhooks.diggion.$secret'
 
 const LoginRoute = LoginRouteImport.update({
@@ -180,6 +182,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTrackingRoute = AdminTrackingRouteImport.update({
+  id: '/tracking',
+  path: '/tracking',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -245,6 +252,11 @@ const AdminAffiliatesRoute = AdminAffiliatesRouteImport.update({
   path: '/affiliates',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicRCodeRoute = ApiPublicRCodeRouteImport.update({
+  id: '/api/public/r/$code',
+  path: '/api/public/r/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicWebhooksDiggionSecretRoute =
   ApiPublicWebhooksDiggionSecretRouteImport.update({
     id: '/api/public/webhooks/diggion/$secret',
@@ -273,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
@@ -292,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/app/': typeof AppIndexRoute
+  '/api/public/r/$code': typeof ApiPublicRCodeRoute
   '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
 }
 export interface FileRoutesByTo {
@@ -314,6 +328,7 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
@@ -333,6 +348,7 @@ export interface FileRoutesByTo {
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/app': typeof AppIndexRoute
+  '/api/public/r/$code': typeof ApiPublicRCodeRoute
   '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
 }
 export interface FileRoutesById {
@@ -357,6 +373,7 @@ export interface FileRoutesById {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
@@ -376,6 +393,7 @@ export interface FileRoutesById {
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/app/': typeof AppIndexRoute
+  '/api/public/r/$code': typeof ApiPublicRCodeRoute
   '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
 }
 export interface FileRouteTypes {
@@ -401,6 +419,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
+    | '/admin/tracking'
     | '/admin/users'
     | '/admin/webhooks'
     | '/admin/withdrawals'
@@ -420,6 +439,7 @@ export interface FileRouteTypes {
     | '/gerente/painel'
     | '/gerente/saques'
     | '/app/'
+    | '/api/public/r/$code'
     | '/api/public/webhooks/diggion/$secret'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -442,6 +462,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
+    | '/admin/tracking'
     | '/admin/users'
     | '/admin/webhooks'
     | '/admin/withdrawals'
@@ -461,6 +482,7 @@ export interface FileRouteTypes {
     | '/gerente/painel'
     | '/gerente/saques'
     | '/app'
+    | '/api/public/r/$code'
     | '/api/public/webhooks/diggion/$secret'
   id:
     | '__root__'
@@ -484,6 +506,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
+    | '/admin/tracking'
     | '/admin/users'
     | '/admin/webhooks'
     | '/admin/withdrawals'
@@ -503,6 +526,7 @@ export interface FileRouteTypes {
     | '/gerente/painel'
     | '/gerente/saques'
     | '/app/'
+    | '/api/public/r/$code'
     | '/api/public/webhooks/diggion/$secret'
   fileRoutesById: FileRoutesById
 }
@@ -514,6 +538,7 @@ export interface RootRouteChildren {
   GameRoute: typeof GameRoute
   GerenteRoute: typeof GerenteRouteWithChildren
   LoginRoute: typeof LoginRoute
+  ApiPublicRCodeRoute: typeof ApiPublicRCodeRoute
   ApiPublicWebhooksDiggionSecretRoute: typeof ApiPublicWebhooksDiggionSecretRoute
 }
 
@@ -701,6 +726,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/tracking': {
+      id: '/admin/tracking'
+      path: '/tracking'
+      fullPath: '/admin/tracking'
+      preLoaderRoute: typeof AdminTrackingRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -792,6 +824,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAffiliatesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/r/$code': {
+      id: '/api/public/r/$code'
+      path: '/api/public/r/$code'
+      fullPath: '/api/public/r/$code'
+      preLoaderRoute: typeof ApiPublicRCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/webhooks/diggion/$secret': {
       id: '/api/public/webhooks/diggion/$secret'
       path: '/api/public/webhooks/diggion/$secret'
@@ -816,6 +855,7 @@ interface AdminRouteChildren {
   AdminReportsRoute: typeof AdminReportsRoute
   AdminRiskAlertsRoute: typeof AdminRiskAlertsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTrackingRoute: typeof AdminTrackingRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminWebhooksRoute: typeof AdminWebhooksRoute
   AdminWithdrawalsRoute: typeof AdminWithdrawalsRoute
@@ -835,6 +875,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminReportsRoute: AdminReportsRoute,
   AdminRiskAlertsRoute: AdminRiskAlertsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminTrackingRoute: AdminTrackingRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminWebhooksRoute: AdminWebhooksRoute,
   AdminWithdrawalsRoute: AdminWithdrawalsRoute,
@@ -899,18 +940,9 @@ const rootRouteChildren: RootRouteChildren = {
   GameRoute: GameRoute,
   GerenteRoute: GerenteRouteWithChildren,
   LoginRoute: LoginRoute,
+  ApiPublicRCodeRoute: ApiPublicRCodeRoute,
   ApiPublicWebhooksDiggionSecretRoute: ApiPublicWebhooksDiggionSecretRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

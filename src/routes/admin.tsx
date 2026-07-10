@@ -17,6 +17,7 @@ import {
   LogOut,
   Menu,
   Gamepad2,
+  Radar,
 
 } from "lucide-react";
 
@@ -59,6 +60,7 @@ const NAV = [
   { to: "/admin/affiliates", label: "Afiliados", icon: Users },
   { to: "/admin/users", label: "Usuários / Acessos", icon: Users },
   { to: "/admin/network", label: "Rede de Indicações", icon: Users },
+  { to: "/admin/tracking", label: "Rastreamento", icon: Radar },
   { to: "/admin/withdrawals", label: "Saques", icon: Wallet },
   { to: "/admin/finance", label: "Financeiro", icon: DollarSign },
   { to: "/admin/deposits", label: "Depósitos Diggion", icon: Landmark },
