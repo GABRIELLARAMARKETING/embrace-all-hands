@@ -70,6 +70,7 @@ const NAV = [
   { to: "/admin/risk-alerts", label: "Alertas", icon: ShieldAlert },
   { to: "/admin/audit-logs", label: "Logs", icon: ScrollText },
   { to: "/admin/helix", label: "Jogo Helix", icon: Gamepad2 },
+  { to: "/admin/helix-audit", label: "Auditoria Helix", icon: ShieldAlert },
   { to: "/admin/codes", label: "Códigos", icon: ScrollText },
   { to: "/admin/settings", label: "Configurações", icon: Settings },
 
