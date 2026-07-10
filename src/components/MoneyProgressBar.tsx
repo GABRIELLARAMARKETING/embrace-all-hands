@@ -115,7 +115,7 @@ export function MoneyProgressBar() {
                 className="pointer-events-auto flex h-[64px] w-[78%] max-w-[300px] items-center justify-center gap-[10px] whitespace-nowrap rounded-full border-none bg-gradient-to-r from-[#FFC400] to-[#FFAB00] text-[18px] font-black tracking-[-0.3px] text-[#050505] shadow-[0_14px_28px_rgba(0,0,0,0.22)] outline-none transition-transform duration-150 active:scale-[0.98] disabled:opacity-70"
               >
                 <span className="text-[20px] leading-none">🏆</span>
-                <span>{isClaimingReward ? "RESGATANDO..." : "RESGATAR R$ 20,00"}</span>
+                <span>{isClaimingReward ? "RESGATANDO..." : `RESGATAR ${formatCurrency(money)}`}</span>
               </button>
               <p className="mt-[10px] text-center text-[14px] font-semibold text-[#FFD43B]">
                 Continue jogando para ganhar mais!
