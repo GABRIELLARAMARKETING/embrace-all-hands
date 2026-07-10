@@ -6,6 +6,7 @@ import { PLAYER_MOCK, MAP_OPTIONS } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { cn } from "@/lib/utils";
+import helixClassicMap from "@/assets/helix-classic-map.png.asset.json";
 
 export const Route = createFileRoute("/app/jogar")({
   head: () => ({
