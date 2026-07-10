@@ -272,8 +272,10 @@ function GameLogic({
         const normalizedAngle =
           ((ballAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
 
-        for (let i = 0; i < generated.rings.length; i++) {
-          const ring = generated.rings[i];
+        const rings = manager.rings;
+        for (let i = manager.firstAliveIdx; i < rings.length; i++) {
+          const ring = rings[i];
+          if (!ring) continue;
           const ringTopY = ring.y + CONSTANTS.PLATFORM_HEIGHT / 2;
 
           const prevBottom = prevY - CONSTANTS.BALL_RADIUS;
