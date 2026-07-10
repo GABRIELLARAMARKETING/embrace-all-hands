@@ -36,6 +36,16 @@ const BADGE_COLORS: Record<string, string> = {
   bonus: "bg-[#EC5FA3] text-white",
 };
 
+// Mesmo mapa do backend (helix_payout_cents)
+const PAYOUT_PER_PLATFORM: Record<number, number> = {
+  5: 0.5,
+  10: 1,
+  20: 2,
+  30: 3,
+  50: 5,
+  100: 10,
+};
+
 const kycSchema = z.object({
   fullName: z.string().trim().min(3, "Nome completo obrigatório").max(120),
   email: z.string().trim().email("E-mail inválido").max(200),
@@ -471,6 +481,32 @@ function PixQrModal({
             <div className="mt-1 text-[11px] text-white/50">
               Status: <span className="font-bold">{status?.status ?? "carregando..."}</span>
             </div>
+
+            {status?.status === "paid" && (
+              <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-left">
+                <div className="text-[11px] font-bold tracking-widest text-emerald-300">
+                  RESUMO DO DEPÓSITO
+                </div>
+                <div className="mt-2 flex items-center justify-between text-sm">
+                  <span className="text-white/70">Creditado</span>
+                  <span className="font-black text-emerald-400">{formatCurrency(data.amount)}</span>
+                </div>
+                <div className="mt-1 flex items-center justify-between text-sm">
+                  <span className="text-white/70">Por plataforma ultrapassada</span>
+                  <span className="font-black text-white">
+                    {formatCurrency(PAYOUT_PER_PLATFORM[data.amount] ?? 0)}
+                  </span>
+                </div>
+                <p className="mt-2 text-[11px] leading-snug text-white/60">
+                  A cada plataforma que você ultrapassar no Helix, ganhará{" "}
+                  <span className="font-bold text-emerald-300">
+                    {formatCurrency(PAYOUT_PER_PLATFORM[data.amount] ?? 0)}
+                  </span>{" "}
+                  direto na sua carteira.
+                </p>
+              </div>
+            )}
+
 
             {status?.status !== "paid" && (
               <div className="mt-4 flex flex-col gap-2">
