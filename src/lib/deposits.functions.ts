@@ -157,6 +157,18 @@ export const createDiggionDeposit = createServerFn({ method: "POST" })
       })
       .eq("id", dep.id);
 
+    const { auditLog } = await import("./audit.functions");
+    await auditLog(supabaseAdmin, {
+      eventType: "DEPOSIT_CREATED",
+      module: "deposits",
+      severity: "success",
+      title: `Depósito PIX criado (R$ ${data.amount.toFixed(2)})`,
+      metadata: { depositId: dep.id, amount: data.amount, providerTx: created.hash },
+      entityType: "deposit",
+      entityId: dep.id,
+      userId,
+    });
+
     return {
       depositId: dep.id,
       status: "waiting_payment" as const,
