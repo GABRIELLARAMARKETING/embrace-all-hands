@@ -136,8 +136,8 @@ function JogarPage() {
               ref={carouselRef}
               className="flex snap-x snap-mandatory items-center gap-3 overflow-x-auto px-7 py-2 scrollbar-hide"
             >
-              {MAP_OPTIONS.map((m) => {
-                const active = m.id === selectedMapId;
+              {availableMaps.map((m) => {
+                const active = m.id === selectedMap.id;
                 return (
                   <button
                     key={m.id}
