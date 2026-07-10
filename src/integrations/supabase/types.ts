@@ -678,6 +678,63 @@ export type Database = {
           },
         ]
       }
+      referral_clicks: {
+        Row: {
+          code: string
+          converted_at: string | null
+          converted_user_id: string | null
+          created_at: string
+          id: string
+          ip_hash: string | null
+          landing_page: string | null
+          owner_type: string
+          owner_user_id: string | null
+          tracking_id: string
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+        }
+        Insert: {
+          code: string
+          converted_at?: string | null
+          converted_user_id?: string | null
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          landing_page?: string | null
+          owner_type?: string
+          owner_user_id?: string | null
+          tracking_id: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+        }
+        Update: {
+          code?: string
+          converted_at?: string | null
+          converted_user_id?: string | null
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          landing_page?: string | null
+          owner_type?: string
+          owner_user_id?: string | null
+          tracking_id?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+        }
+        Relationships: []
+      }
       referral_logs: {
         Row: {
           created_at: string
