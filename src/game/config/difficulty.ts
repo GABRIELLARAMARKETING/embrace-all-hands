@@ -126,6 +126,8 @@ export function settingsForDifficulty(d: HelixDifficulty, custom?: HelixSettings
 // Módulo compartilhado lido pelo GameCanvas e pela store. Atualizado pelo
 // loader que consome a API pública (fallback seguro: DEFAULT).
 let runtime: HelixDifficultyConfig = DEFAULT_HELIX_CONFIG;
+const listeners = new Set<() => void>();
+const emit = () => listeners.forEach((l) => l());
 
 export const helixRuntime = {
   get(): HelixDifficultyConfig {
@@ -136,8 +138,14 @@ export const helixRuntime = {
       difficulty: next.difficulty,
       settings: clampSettings(next.settings),
     };
+    emit();
   },
   reset() {
     runtime = DEFAULT_HELIX_CONFIG;
+    emit();
+  },
+  subscribe(fn: () => void) {
+    listeners.add(fn);
+    return () => listeners.delete(fn);
   },
 };
