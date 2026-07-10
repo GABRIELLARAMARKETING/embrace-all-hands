@@ -17,6 +17,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as GerenteSaquesRouteImport } from './routes/gerente.saques'
 import { Route as GerentePainelRouteImport } from './routes/gerente.painel'
 import { Route as GerenteNotificacoesRouteImport } from './routes/gerente.notificacoes'
@@ -92,6 +93,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
+} as any)
+const RCodeRoute = RCodeRouteImport.update({
+  id: '/r/$code',
+  path: '/r/$code',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const GerenteSaquesRoute = GerenteSaquesRouteImport.update({
   id: '/saques',
@@ -311,6 +317,7 @@ export interface FileRoutesByFullPath {
   '/gerente/notificacoes': typeof GerenteNotificacoesRoute
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/saques': typeof GerenteSaquesRoute
+  '/r/$code': typeof RCodeRoute
   '/app/': typeof AppIndexRoute
   '/api/public/r/$code': typeof ApiPublicRCodeRoute
   '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
@@ -355,6 +362,7 @@ export interface FileRoutesByTo {
   '/gerente/notificacoes': typeof GerenteNotificacoesRoute
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/saques': typeof GerenteSaquesRoute
+  '/r/$code': typeof RCodeRoute
   '/app': typeof AppIndexRoute
   '/api/public/r/$code': typeof ApiPublicRCodeRoute
   '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
@@ -401,6 +409,7 @@ export interface FileRoutesById {
   '/gerente/notificacoes': typeof GerenteNotificacoesRoute
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/saques': typeof GerenteSaquesRoute
+  '/r/$code': typeof RCodeRoute
   '/app/': typeof AppIndexRoute
   '/api/public/r/$code': typeof ApiPublicRCodeRoute
   '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
@@ -448,6 +457,7 @@ export interface FileRouteTypes {
     | '/gerente/notificacoes'
     | '/gerente/painel'
     | '/gerente/saques'
+    | '/r/$code'
     | '/app/'
     | '/api/public/r/$code'
     | '/api/public/webhooks/diggion/$secret'
@@ -492,6 +502,7 @@ export interface FileRouteTypes {
     | '/gerente/notificacoes'
     | '/gerente/painel'
     | '/gerente/saques'
+    | '/r/$code'
     | '/app'
     | '/api/public/r/$code'
     | '/api/public/webhooks/diggion/$secret'
@@ -537,6 +548,7 @@ export interface FileRouteTypes {
     | '/gerente/notificacoes'
     | '/gerente/painel'
     | '/gerente/saques'
+    | '/r/$code'
     | '/app/'
     | '/api/public/r/$code'
     | '/api/public/webhooks/diggion/$secret'
@@ -550,6 +562,7 @@ export interface RootRouteChildren {
   GameRoute: typeof GameRoute
   GerenteRoute: typeof GerenteRouteWithChildren
   LoginRoute: typeof LoginRoute
+  RCodeRoute: typeof RCodeRoute
   ApiPublicRCodeRoute: typeof ApiPublicRCodeRoute
   ApiPublicWebhooksDiggionSecretRoute: typeof ApiPublicWebhooksDiggionSecretRoute
 }
@@ -611,6 +624,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/r/$code': {
+      id: '/r/$code'
+      path: '/r/$code'
+      fullPath: '/r/$code'
+      preLoaderRoute: typeof RCodeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/gerente/saques': {
       id: '/gerente/saques'
@@ -961,9 +981,20 @@ const rootRouteChildren: RootRouteChildren = {
   GameRoute: GameRoute,
   GerenteRoute: GerenteRouteWithChildren,
   LoginRoute: LoginRoute,
+  RCodeRoute: RCodeRoute,
   ApiPublicRCodeRoute: ApiPublicRCodeRoute,
   ApiPublicWebhooksDiggionSecretRoute: ApiPublicWebhooksDiggionSecretRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
