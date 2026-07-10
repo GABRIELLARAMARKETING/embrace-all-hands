@@ -50,6 +50,7 @@ import { Route as AdminDepositsRouteImport } from './routes/admin.deposits'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
 import { Route as AdminCodesRouteImport } from './routes/admin.codes'
+import { Route as AdminAuditoriaRouteImport } from './routes/admin.auditoria'
 import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
 import { Route as AdminAffiliatesRouteImport } from './routes/admin.affiliates'
 import { Route as ApiPublicRCodeRouteImport } from './routes/api/public/r.$code'
@@ -260,6 +261,11 @@ const AdminCodesRoute = AdminCodesRouteImport.update({
   path: '/codes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAuditoriaRoute = AdminAuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAuditLogsRoute = AdminAuditLogsRouteImport.update({
   id: '/audit-logs',
   path: '/audit-logs',
@@ -292,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/admin/affiliates': typeof AdminAffiliatesRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/auditoria': typeof AdminAuditoriaRoute
   '/admin/codes': typeof AdminCodesRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -338,6 +345,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin/affiliates': typeof AdminAffiliatesRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/auditoria': typeof AdminAuditoriaRoute
   '/admin/codes': typeof AdminCodesRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -386,6 +394,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/admin/affiliates': typeof AdminAffiliatesRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/auditoria': typeof AdminAuditoriaRoute
   '/admin/codes': typeof AdminCodesRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -435,6 +444,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/affiliates'
     | '/admin/audit-logs'
+    | '/admin/auditoria'
     | '/admin/codes'
     | '/admin/commissions'
     | '/admin/dashboard'
@@ -481,6 +491,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/affiliates'
     | '/admin/audit-logs'
+    | '/admin/auditoria'
     | '/admin/codes'
     | '/admin/commissions'
     | '/admin/dashboard'
@@ -528,6 +539,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/affiliates'
     | '/admin/audit-logs'
+    | '/admin/auditoria'
     | '/admin/codes'
     | '/admin/commissions'
     | '/admin/dashboard'
@@ -868,6 +880,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCodesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/auditoria': {
+      id: '/admin/auditoria'
+      path: '/auditoria'
+      fullPath: '/admin/auditoria'
+      preLoaderRoute: typeof AdminAuditoriaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/audit-logs': {
       id: '/admin/audit-logs'
       path: '/audit-logs'
@@ -902,6 +921,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAffiliatesRoute: typeof AdminAffiliatesRoute
   AdminAuditLogsRoute: typeof AdminAuditLogsRoute
+  AdminAuditoriaRoute: typeof AdminAuditoriaRoute
   AdminCodesRoute: typeof AdminCodesRoute
   AdminCommissionsRoute: typeof AdminCommissionsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
@@ -924,6 +944,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAffiliatesRoute: AdminAffiliatesRoute,
   AdminAuditLogsRoute: AdminAuditLogsRoute,
+  AdminAuditoriaRoute: AdminAuditoriaRoute,
   AdminCodesRoute: AdminCodesRoute,
   AdminCommissionsRoute: AdminCommissionsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
