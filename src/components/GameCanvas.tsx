@@ -187,7 +187,7 @@ function GameLogic({
     breakingRingsRef.current = new Map();
     deepestRingRef.current = -1;
     setBreakingRings(new Map());
-  }, [gameState, currentLevel]);
+  }, [gameState, currentLevel, manager]);
 
 
 
