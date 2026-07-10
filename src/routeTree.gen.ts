@@ -43,6 +43,7 @@ import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminNetworkRouteImport } from './routes/admin.network'
 import { Route as AdminManagersRouteImport } from './routes/admin.managers'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminHelixAuditRouteImport } from './routes/admin.helix-audit'
 import { Route as AdminHelixRouteImport } from './routes/admin.helix'
 import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
 import { Route as AdminDepositsRouteImport } from './routes/admin.deposits'
@@ -224,6 +225,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminHelixAuditRoute = AdminHelixAuditRouteImport.update({
+  id: '/helix-audit',
+  path: '/helix-audit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminHelixRoute = AdminHelixRouteImport.update({
   id: '/helix',
   path: '/helix',
@@ -292,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/admin/deposits': typeof AdminDepositsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/helix': typeof AdminHelixRoute
+  '/admin/helix-audit': typeof AdminHelixAuditRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
   '/admin/network': typeof AdminNetworkRoute
@@ -337,6 +344,7 @@ export interface FileRoutesByTo {
   '/admin/deposits': typeof AdminDepositsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/helix': typeof AdminHelixRoute
+  '/admin/helix-audit': typeof AdminHelixAuditRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
   '/admin/network': typeof AdminNetworkRoute
@@ -384,6 +392,7 @@ export interface FileRoutesById {
   '/admin/deposits': typeof AdminDepositsRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/helix': typeof AdminHelixRoute
+  '/admin/helix-audit': typeof AdminHelixAuditRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
   '/admin/network': typeof AdminNetworkRoute
@@ -432,6 +441,7 @@ export interface FileRouteTypes {
     | '/admin/deposits'
     | '/admin/finance'
     | '/admin/helix'
+    | '/admin/helix-audit'
     | '/admin/login'
     | '/admin/managers'
     | '/admin/network'
@@ -477,6 +487,7 @@ export interface FileRouteTypes {
     | '/admin/deposits'
     | '/admin/finance'
     | '/admin/helix'
+    | '/admin/helix-audit'
     | '/admin/login'
     | '/admin/managers'
     | '/admin/network'
@@ -523,6 +534,7 @@ export interface FileRouteTypes {
     | '/admin/deposits'
     | '/admin/finance'
     | '/admin/helix'
+    | '/admin/helix-audit'
     | '/admin/login'
     | '/admin/managers'
     | '/admin/network'
@@ -807,6 +819,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/helix-audit': {
+      id: '/admin/helix-audit'
+      path: '/helix-audit'
+      fullPath: '/admin/helix-audit'
+      preLoaderRoute: typeof AdminHelixAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/helix': {
       id: '/admin/helix'
       path: '/helix'
@@ -889,6 +908,7 @@ interface AdminRouteChildren {
   AdminDepositsRoute: typeof AdminDepositsRoute
   AdminFinanceRoute: typeof AdminFinanceRoute
   AdminHelixRoute: typeof AdminHelixRoute
+  AdminHelixAuditRoute: typeof AdminHelixAuditRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminManagersRoute: typeof AdminManagersRoute
   AdminNetworkRoute: typeof AdminNetworkRoute
@@ -910,6 +930,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDepositsRoute: AdminDepositsRoute,
   AdminFinanceRoute: AdminFinanceRoute,
   AdminHelixRoute: AdminHelixRoute,
+  AdminHelixAuditRoute: AdminHelixAuditRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminManagersRoute: AdminManagersRoute,
   AdminNetworkRoute: AdminNetworkRoute,

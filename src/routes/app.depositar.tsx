@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 const helixLogo = "/images/helixfast-logo.png";
 import { createDiggionDeposit, getDepositStatus } from "@/lib/deposits.functions";
 import { getMyProfile } from "@/lib/profile.functions";
+import { HELIX_DEPOSIT_RULES, isAllowedDepositAmount } from "@/lib/helix-rules";
 
 export const Route = createFileRoute("/app/depositar")({
   head: () => ({
@@ -37,14 +38,9 @@ const BADGE_COLORS: Record<string, string> = {
 };
 
 // Mesmo mapa do backend (helix_payout_cents)
-const PAYOUT_PER_PLATFORM: Record<number, number> = {
-  5: 0.5,
-  10: 1,
-  20: 2,
-  30: 3,
-  50: 5,
-  100: 10,
-};
+const PAYOUT_PER_PLATFORM: Record<number, number> = Object.fromEntries(
+  HELIX_DEPOSIT_RULES.map((r) => [r.amount, r.payoutPerPlatform]),
+);
 
 const kycSchema = z.object({
   fullName: z.string().trim().min(3, "Nome completo obrigatório").max(120),
@@ -86,7 +82,13 @@ function DepositarPage() {
   });
   const amount = watch("amount");
 
-  const onSubmit = () => setConfirmOpen(true);
+  const onSubmit = () => {
+    if (!isAllowedDepositAmount(amount)) {
+      toast.error("Selecione um valor permitido: R$ 5, 10, 20, 30, 50 ou 100.");
+      return;
+    }
+    setConfirmOpen(true);
+  };
 
   return (
     <AppLayout title="Depositar via PIX">
