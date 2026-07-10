@@ -1019,6 +1019,10 @@ export type Database = {
       }
     }
     Functions: {
+      _test_signup: {
+        Args: { _display: string; _id: string; _ref?: string }
+        Returns: undefined
+      }
       credit_deposit_atomic: {
         Args: {
           _deposit_id: string
@@ -1040,6 +1044,7 @@ export type Database = {
         Args: { _deposit_id: string }
         Returns: undefined
       }
+      test_multilevel_flow: { Args: never; Returns: string }
     }
     Enums: {
       app_role: "super_admin" | "admin" | "gerente" | "afiliado"
