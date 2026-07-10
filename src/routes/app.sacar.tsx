@@ -157,9 +157,20 @@ function SacarPage() {
             Saques processados em até 24h úteis.
           </div>
 
-          <GradientButton type="submit" disabled={mutation.isPending} className="mt-5">
-            {mutation.isPending ? "Enviando..." : "Solicitar Saque"}
+          <GradientButton
+            type="submit"
+            disabled={mutation.isPending || !canWithdraw}
+            className="mt-5"
+          >
+            {mutation.isPending
+              ? "Enviando..."
+              : !rules?.has_deposit
+                ? "Faça um depósito para sacar"
+                : !canWithdraw
+                  ? `Faltam ${formatCurrency((missingCents ?? 0) / 100)}`
+                  : "Solicitar Saque"}
           </GradientButton>
+
         </PlayerCard>
       </form>
 
