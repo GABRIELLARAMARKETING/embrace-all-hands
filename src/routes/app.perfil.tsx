@@ -82,7 +82,19 @@ function PerfilPage() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "affiliate_withdrawals", filter: `user_id=eq.${profile.userId}` },
-        () => queryClient.invalidateQueries({ queryKey: ["affiliate-withdrawals"] }),
+        (payload) => {
+          queryClient.invalidateQueries({ queryKey: ["affiliate-withdrawals"] });
+          queryClient.invalidateQueries({ queryKey: ["my-profile"] });
+          const next = (payload.new ?? {}) as { status?: string; amount?: number };
+          const prev = (payload.old ?? {}) as { status?: string };
+          if (payload.eventType === "UPDATE" && next.status && next.status !== prev.status) {
+            const amt = next.amount ? ` de ${formatCurrency(Number(next.amount))}` : "";
+            if (next.status === "approved") toast.success(`Saque${amt} aprovado!`);
+            else if (next.status === "paid") toast.success(`Saque${amt} pago!`);
+            else if (next.status === "rejected") toast.error(`Saque${amt} recusado.`);
+            else toast(`Saque${amt}: ${next.status}`);
+          }
+        },
       )
       .on(
         "postgres_changes",
