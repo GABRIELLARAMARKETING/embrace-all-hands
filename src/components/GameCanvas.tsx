@@ -7,6 +7,7 @@ import { PHYSICS } from "@/game/physicsConstants";
 import { LEVELS } from "@/game/config/levels";
 import { THEMES } from "@/game/config/themes";
 import { generateLevel, type RingData, type SectorType } from "@/game/engine/levelGenerator";
+import { InfinitePlatformManager } from "@/game/engine/infinitePlatforms";
 import { helixRuntime } from "@/game/config/difficulty";
 
 import { useGameStore } from "@/store/useGameStore";
