@@ -92,13 +92,26 @@ function JogarPage() {
 
 
 
-          {/* Recompensa mínima */}
+          {/* Recompensa mínima para saque */}
           <div className="mt-4 rounded-2xl border border-[#3a1d5a] bg-[#150a28] px-5 py-4 text-center">
-            <div className="text-[11px] font-semibold tracking-[0.2em] text-white/60">RECOMPENSA MÍNIMA</div>
-            <div className="mt-1 text-3xl font-black text-[#FFD600] drop-shadow-[0_0_14px_rgba(255,214,0,0.55)]">
-              {formatCurrency(reward)}
+            <div className="text-[11px] font-semibold tracking-[0.2em] text-white/60">
+              RECOMPENSA MÍNIMA PARA SAQUE
             </div>
+            <div className="mt-1 text-3xl font-black text-[#FFD600] drop-shadow-[0_0_14px_rgba(255,214,0,0.55)]">
+              {formatCurrency(minWithdraw)}
+            </div>
+            {value ? (
+              <div className="mt-1 text-[11px] text-white/55">
+                Depósito de {formatCurrency(value)} · sacar só ao atingir{" "}
+                {formatCurrency(minWithdraw)}
+              </div>
+            ) : (
+              <div className="mt-1 text-[11px] text-white/45">
+                Escolha um valor de entrada para ver o mínimo
+              </div>
+            )}
           </div>
+
 
           {/* Mapa */}
           <div className="mt-6 text-[11px] font-bold tracking-widest text-[#B47CFF]">MAPA</div>
