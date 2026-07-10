@@ -2,7 +2,19 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
-import { Activity, MousePointerClick, UserPlus, Percent, Wallet, Search } from "lucide-react";
+import {
+  Activity,
+  MousePointerClick,
+  UserPlus,
+  Percent,
+  Wallet,
+  Search,
+  Mail,
+  Phone,
+  IdCard,
+  KeyRound,
+  Shield,
+} from "lucide-react";
 import { StatCard } from "@/components/admin/StatCard";
 import { AdminCard } from "@/components/admin/AdminCard";
 import { AdminTable } from "@/components/admin/AdminTable";
@@ -13,7 +25,79 @@ import {
   getTrackingOverview,
   listTrackingEvents,
   type TrackingEvent,
+  type TrackingParty,
 } from "@/lib/tracking.functions";
+
+function roleTone(role: TrackingParty["role"]): "green" | "blue" | "amber" | "red" | "gray" {
+  switch (role) {
+    case "admin":
+      return "red";
+    case "gerente":
+      return "amber";
+    case "afiliado":
+      return "green";
+    case "usuario":
+      return "blue";
+    default:
+      return "gray";
+  }
+}
+
+function PartyCell({
+  party,
+  fallbackType,
+}: {
+  party: TrackingParty | null;
+  fallbackType: string;
+}) {
+  if (!party) {
+    return (
+      <div className="text-xs text-white/40">
+        <div>—</div>
+        <div className="mt-0.5 uppercase tracking-wider text-white/30">{fallbackType}</div>
+      </div>
+    );
+  }
+  return (
+    <div className="flex min-w-[220px] flex-col gap-1 text-xs">
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-semibold text-white">
+          {party.fullName || party.displayName || "—"}
+        </span>
+        <Badge tone={roleTone(party.role)}>
+          <Shield size={10} /> {party.role}
+        </Badge>
+      </div>
+      {party.email ? (
+        <div className="flex items-center gap-1.5 text-white/70">
+          <Mail size={11} className="text-white/40" /> {party.email}
+        </div>
+      ) : null}
+      {party.cpf ? (
+        <div className="flex items-center gap-1.5 text-white/70">
+          <IdCard size={11} className="text-white/40" /> CPF {party.cpf}
+        </div>
+      ) : null}
+      {party.phone ? (
+        <div className="flex items-center gap-1.5 text-white/70">
+          <Phone size={11} className="text-white/40" /> {party.phone}
+        </div>
+      ) : null}
+      {party.pixKey ? (
+        <div className="flex items-center gap-1.5 text-emerald-300/90">
+          <KeyRound size={11} /> PIX: {party.pixKey}
+        </div>
+      ) : (
+        <div className="text-white/30">PIX: não cadastrado</div>
+      )}
+      {party.affiliateCode ? (
+        <div className="font-mono text-[10px] text-white/40">
+          código {party.affiliateCode} · saldo {formatCurrency(party.affiliateBalance ?? 0)}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 const overviewQ = () =>
   queryOptions({
