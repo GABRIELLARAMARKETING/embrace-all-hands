@@ -129,8 +129,9 @@ function AdminPanelLayout() {
 
   return (
     <AdminPanelUIContext.Provider value={{ openMobileMenu: () => setMobileOpen(true) }}>
-      <div className="min-h-screen w-full bg-[#050810] text-white">
+      <div className="admin-theme admin-scroll min-h-screen w-full bg-[#050810] text-white">
         <div className="flex min-h-screen w-full">
+
           <div className="hidden w-[240px] shrink-0 lg:block">
             <div className="fixed top-0 left-0 h-screen w-[240px]">
               <AdminSidebar />
