@@ -451,16 +451,20 @@ function GameLogic({
 
     // Trail desativado — visual minimalista. (Componente mantido para reativação futura.)
 
-    // Progress bar (based on descent depth).
-    const p = Math.min(1, Math.abs(ball.position.y) / generated.totalHeight);
-    setProgress(p);
+    // ===== Infinite platform pumping =====
+    // Depois da física do frame, garante rings abaixo da bola e recicla
+    // os que ficaram muito acima. `changed` só é true quando spawn/reciclagem
+    // acontece — evitamos setState todo frame.
+    const changed = manager.update(ball.position.y);
+    if (changed) setRingsVersion((v) => v + 1);
 
-    // Reached bottom?
-    if (ball.position.y < -generated.totalHeight + 0.5) {
-      finishedRef.current = true;
-      completeLevel();
-      return;
-    }
+    // Progresso "infinito" — cresce assintoticamente rumo a 1 conforme desce.
+    // Serve apenas para HUDs; não existe fim de fase.
+    const depth = Math.abs(ball.position.y);
+    setProgress(1 - 1 / (1 + depth / 80));
+
+    // NOTA: sem verificação de "chegou ao fundo". O jogo termina apenas em
+    // gameOver (setor danger, lógica em outro ponto acima).
 
     // Camera follow + subtle shake (camera is purely visual — never touches physics).
     const cameraT = 1 - Math.pow(1 - CONSTANTS.CAMERA_LERP, dt * 60);
