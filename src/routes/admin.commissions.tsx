@@ -4,10 +4,12 @@ import { useMutation, useQuery, useQueryClient, queryOptions } from "@tanstack/r
 import { useState } from "react";
 import {
   listCommissions,
+  listCommissionAudit,
   settleCommission,
   updateCommissionStatus,
   type CommissionRow,
   type CommissionStatus,
+  type CommissionAuditRow,
 } from "@/lib/admin-extras.functions";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
@@ -50,11 +52,13 @@ function Page() {
   const settleFn = useServerFn(settleCommission);
 
   const [modal, setModal] = useState<{ row: CommissionRow; action: "pay" | "reverse" } | null>(null);
+  const [historyRow, setHistoryRow] = useState<CommissionRow | null>(null);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["admin", "commissions"] });
     qc.invalidateQueries({ queryKey: ["admin", "dashboard-summary"] });
     qc.invalidateQueries({ queryKey: ["admin", "audit-logs"] });
+    qc.invalidateQueries({ queryKey: ["admin", "commission-audit"] });
   };
 
   const update = useMutation({
@@ -143,6 +147,12 @@ function Page() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="inline-flex flex-wrap justify-end gap-1">
+                      <button
+                        onClick={() => setHistoryRow(r)}
+                        className="rounded-md border border-white/15 bg-white/[0.03] px-2 py-1 text-xs text-white/70 hover:bg-white/10"
+                      >
+                        Histórico
+                      </button>
                       {r.status !== "paid" && (
                         <button
                           onClick={() => setModal({ row: r, action: "pay" })}
@@ -205,9 +215,96 @@ function Page() {
           }
         />
       )}
+      {historyRow && (
+        <HistoryModal row={historyRow} onClose={() => setHistoryRow(null)} />
+      )}
     </div>
   );
 }
+
+
+function HistoryModal({ row, onClose }: { row: CommissionRow; onClose: () => void }) {
+  const { data: rows = [], isLoading, error } = useQuery({
+    queryKey: ["admin", "commission-audit", row.id],
+    queryFn: () => listCommissionAudit({ data: { commissionId: row.id } }),
+    staleTime: 10_000,
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+      <div
+        className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-white/10 bg-[#0b1220] p-5 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-semibold">Histórico da comissão</h3>
+            <p className="mt-1 text-xs text-white/50">
+              Afiliado: <span className="text-white/80">{row.affiliate_name ?? row.affiliate_id.slice(0, 8)}</span>{" "}
+              · Valor: <span className="font-mono text-white/80">{formatCurrency(row.amount)}</span>
+            </p>
+          </div>
+          <button onClick={onClose} className="rounded-md border border-white/10 px-2 py-1 text-xs text-white/60 hover:text-white">
+            Fechar
+          </button>
+        </div>
+
+        {isLoading && <div className="py-6 text-center text-sm text-white/50">Carregando…</div>}
+        {error && <div className="rounded-md border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">{(error as Error).message}</div>}
+        {!isLoading && !error && rows.length === 0 && (
+          <div className="py-6 text-center text-sm text-white/40">Nenhum evento de auditoria para esta comissão.</div>
+        )}
+
+        <ol className="space-y-3">
+          {rows.map((ev) => (
+            <li key={ev.id} className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className={`rounded-full border px-2 py-0.5 text-xs font-mono ${actionTone(ev.action)}`}>
+                  {ev.action}
+                </span>
+                <span className="text-xs text-white/50">{formatDate(ev.created_at)}</span>
+              </div>
+              <div className="mt-2 text-xs text-white/60">
+                Por: <span className="text-white/80">{ev.actor_name ?? ev.actor_email ?? ev.actor_id?.slice(0, 8) ?? "sistema"}</span>
+                {ev.ip && <span className="ml-2 text-white/40">IP {ev.ip}</span>}
+              </div>
+              {ev.reason && <div className="mt-1 text-xs text-white/60">Motivo: {ev.reason}</div>}
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <ValueBlock title="Antes" value={ev.old_value} tone="red" />
+                <ValueBlock title="Depois" value={ev.new_value} tone="emerald" />
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+}
+
+function ValueBlock({ title, value, tone }: { title: string; value: unknown; tone: "red" | "emerald" }) {
+  const border = tone === "red" ? "border-red-400/20" : "border-emerald-400/20";
+  const label = tone === "red" ? "text-red-200/80" : "text-emerald-200/80";
+  return (
+    <div className={`rounded-md border ${border} bg-black/30 p-2`}>
+      <div className={`mb-1 text-[10px] uppercase tracking-wide ${label}`}>{title}</div>
+      {value == null ? (
+        <div className="text-xs text-white/40">—</div>
+      ) : (
+        <pre className="whitespace-pre-wrap break-all font-mono text-[11px] text-white/80">
+          {JSON.stringify(value, null, 2)}
+        </pre>
+      )}
+    </div>
+  );
+}
+
+function actionTone(action: string) {
+  if (action === "commission.paid") return "border-emerald-400/40 bg-emerald-500/15 text-emerald-100";
+  if (action === "commission.reversed") return "border-orange-400/40 bg-orange-500/15 text-orange-100";
+  if (action.startsWith("commission.status.")) return "border-cyan-400/30 bg-cyan-500/10 text-cyan-200";
+  return "border-white/10 bg-white/5 text-white/70";
+}
+
 
 function SettleModal({
   row,

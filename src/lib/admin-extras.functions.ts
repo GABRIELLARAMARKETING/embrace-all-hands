@@ -334,6 +334,62 @@ export const settleCommission = createServerFn({ method: "POST" })
     return { ok: true, status: nextStatus, amount: effectiveAmount, occurredAt: when };
   });
 
+// ===================== COMMISSION AUDIT =====================
+export type CommissionAuditRow = {
+  id: string;
+  action: string;
+  actor_id: string | null;
+  actor_name: string | null;
+  actor_email: string | null;
+  reason: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  old_value: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  new_value: any;
+  ip: string | null;
+  created_at: string;
+};
+
+export const listCommissionAudit = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z.object({ commissionId: z.string().uuid() }).parse(raw),
+  )
+  .handler(async ({ data, context }): Promise<CommissionAuditRow[]> => {
+    await ensureAdmin(context);
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("audit_logs")
+      .select("id, action, actor_id, actor_email, reason, old_value, new_value, ip, created_at")
+      .eq("entity_type", "commission")
+      .eq("entity_id", data.commissionId)
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw new Error(error.message);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const list = (rows ?? []) as any[];
+    const ids = Array.from(new Set(list.map((r) => r.actor_id).filter(Boolean))) as string[];
+    const names = new Map<string, string | null>();
+    if (ids.length) {
+      const { data: profs } = await supabase.from("profiles").select("id, display_name").in("id", ids);
+      for (const p of (profs ?? []) as Array<{ id: string; display_name: string | null }>) {
+        names.set(p.id, p.display_name);
+      }
+    }
+    return list.map((r) => ({
+      id: r.id,
+      action: r.action,
+      actor_id: r.actor_id ?? null,
+      actor_name: r.actor_id ? names.get(r.actor_id) ?? null : null,
+      actor_email: r.actor_email ?? null,
+      reason: r.reason ?? null,
+      old_value: r.old_value ?? null,
+      new_value: r.new_value ?? null,
+      ip: r.ip ?? null,
+      created_at: r.created_at,
+    }));
+  });
+
 // ===================== RISK ALERTS =====================
 export type RiskAlertRow = {
   id: string;
