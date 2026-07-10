@@ -30,7 +30,10 @@ function JogarPage() {
     () => MAP_OPTIONS.find((m) => m.id === selectedMapId) ?? MAP_OPTIONS[0],
     [selectedMapId],
   );
-  const reward = value ? value * 0 : 0;
+  // Regra oficial (backend): saque mínimo = 5x o valor do depósito.
+  // R$5→R$25 · R$10→R$50 · R$20→R$100 · R$30→R$150 · R$50→R$250 · R$100→R$500
+  const minWithdraw = value ? value * 5 : 0;
+
 
   const scroll = (dir: -1 | 1) => {
     carouselRef.current?.scrollBy({ left: dir * 100, behavior: "smooth" });
@@ -89,13 +92,26 @@ function JogarPage() {
 
 
 
-          {/* Recompensa mínima */}
+          {/* Recompensa mínima para saque */}
           <div className="mt-4 rounded-2xl border border-[#3a1d5a] bg-[#150a28] px-5 py-4 text-center">
-            <div className="text-[11px] font-semibold tracking-[0.2em] text-white/60">RECOMPENSA MÍNIMA</div>
-            <div className="mt-1 text-3xl font-black text-[#FFD600] drop-shadow-[0_0_14px_rgba(255,214,0,0.55)]">
-              {formatCurrency(reward)}
+            <div className="text-[11px] font-semibold tracking-[0.2em] text-white/60">
+              RECOMPENSA MÍNIMA PARA SAQUE
             </div>
+            <div className="mt-1 text-3xl font-black text-[#FFD600] drop-shadow-[0_0_14px_rgba(255,214,0,0.55)]">
+              {formatCurrency(minWithdraw)}
+            </div>
+            {value ? (
+              <div className="mt-1 text-[11px] text-white/55">
+                Depósito de {formatCurrency(value)} · sacar só ao atingir{" "}
+                {formatCurrency(minWithdraw)}
+              </div>
+            ) : (
+              <div className="mt-1 text-[11px] text-white/45">
+                Escolha um valor de entrada para ver o mínimo
+              </div>
+            )}
           </div>
+
 
           {/* Mapa */}
           <div className="mt-6 text-[11px] font-bold tracking-widest text-[#B47CFF]">MAPA</div>
