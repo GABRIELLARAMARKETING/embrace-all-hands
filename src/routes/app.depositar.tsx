@@ -10,7 +10,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { DollarSign, Tag, X, Copy, Loader2 } from "lucide-react";
 import { AppLayout, GradientButton, PlayerCard } from "@/components/player/AppLayout";
 import { PLAYER_MOCK, DEPOSIT_BADGES } from "@/data/playerMockData";
-import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { depositSchema, type DepositFormValues } from "@/utils/playerValidators";
 import { maskCpf, cpfDigits } from "@/utils/cpfMask";
@@ -18,6 +17,7 @@ import { copyToClipboard } from "@/utils/clipboard";
 import { cn } from "@/lib/utils";
 const helixLogo = "/images/helixfast-logo.png";
 import { createDiggionDeposit, getDepositStatus } from "@/lib/deposits.functions";
+import { getMyProfile } from "@/lib/profile.functions";
 
 export const Route = createFileRoute("/app/depositar")({
   head: () => ({
