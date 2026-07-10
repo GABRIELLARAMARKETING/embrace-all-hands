@@ -34,7 +34,7 @@ export function MoneyProgressBar() {
   useEffect(() => {
     const onPop = (e: Event) => {
       const detail = (e as CustomEvent<{ value: number }>).detail;
-      setMoney((m) => Math.min(GOAL, m + (detail?.value ?? PER_PLATFORM)));
+      setMoney((m) => m + (detail?.value ?? PER_PLATFORM));
       setPlatforms((p) => p + 1);
     };
     window.addEventListener("coin-pop", onPop);
