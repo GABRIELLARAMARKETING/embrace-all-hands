@@ -226,6 +226,19 @@ export const Route = createFileRoute("/api/public/webhooks/diggion/$secret")({
               result: credited,
               userId: dep.user_id,
             }, ok ? null : (credited as any)?.reason ?? null);
+            const { auditLog } = await import("@/lib/audit.functions");
+            await auditLog(supabaseAdmin, {
+              eventType: ok ? "DEPOSIT_PAID" : "DEPOSIT_CREDIT_SKIPPED",
+              module: "deposits",
+              severity: ok ? "success" : "warning",
+              title: ok
+                ? `Depósito confirmado (R$ ${expectedAmount.toFixed(2)})`
+                : `Crédito de depósito ignorado: ${(credited as any)?.reason ?? "unknown"}`,
+              metadata: { providerTxId, amount: expectedAmount },
+              entityType: "deposit",
+              entityId: dep.id,
+              userId: dep.user_id,
+            });
           } else if (["expired", "canceled", "refunded", "chargeback"].includes(normalized)) {
             await supabaseAdmin
               .from("deposits")
