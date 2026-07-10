@@ -2,12 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient, queryOptions } from "@tanstack/react-query";
 import { useState } from "react";
-import { RefreshCw, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { RefreshCw, CheckCircle2, Clock, XCircle, AlertTriangle, ShieldAlert } from "lucide-react";
 import {
   listDiggionDeposits,
   reconcileDepositById,
   reconcilePendingDeposits,
 } from "@/lib/deposits.functions";
+import {
+  getPaymentDivergences,
+  generateDivergenceAlerts,
+} from "@/lib/admin-block1.functions";
 import { useAdminRealtime } from "@/hooks/use-admin-realtime";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { formatDate } from "@/utils/formatDate";
@@ -56,9 +60,24 @@ function statusBadge(s: string) {
 }
 
 function Page() {
+  const [tab, setTab] = useState<"list" | "divergences">("list");
   const [status, setStatus] = useState("all");
   const [search, setSearch] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
+
+  const fetchDivs = useServerFn(getPaymentDivergences);
+  const genAlerts = useServerFn(generateDivergenceAlerts);
+  const { data: divs = [], refetch: refetchDivs, isFetching: divFetching } = useQuery({
+    queryKey: ["admin", "payment-divergences"],
+    queryFn: () => fetchDivs(),
+    staleTime: 30_000,
+    enabled: tab === "divergences",
+  });
+  const alertsMut = useMutation({
+    mutationFn: () => genAlerts(),
+    onSuccess: (r) => setMsg(`${r.created} alerta(s) criados a partir das divergências`),
+    onError: (e: any) => setMsg(`Erro: ${e?.message ?? e}`),
+  });
 
   const qc = useQueryClient();
   const { data, isFetching, refetch } = useQuery(depositsQuery(status, search));
@@ -98,33 +117,58 @@ function Page() {
     .reduce((s, r) => s + r.amount, 0);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
+    <div className="space-y-6 p-4 sm:p-6">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <div className="text-xs uppercase tracking-widest text-cyan-300/70">Admin</div>
           <h1 className="mt-1 text-2xl font-semibold">Depósitos Diggion</h1>
-          <p className="text-sm text-white/50">Validação e reconciliação de depósitos PIX (Diggion Pay).</p>
+          <p className="text-sm text-white/50">Validação, reconciliação e auditoria de pagamentos PIX.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2">
+          {tab === "list" && (
+            <button
+              onClick={() => allMut.mutate()}
+              disabled={allMut.isPending}
+              className="inline-flex items-center gap-2 rounded-md border border-cyan-400/30 bg-cyan-500/10 px-3 py-1.5 text-xs text-cyan-200 hover:bg-cyan-500/20 disabled:opacity-50"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${allMut.isPending ? "animate-spin" : ""}`} />
+              Reconciliar pendentes
+            </button>
+          )}
+          {tab === "divergences" && divs.length > 0 && (
+            <button
+              onClick={() => alertsMut.mutate()}
+              disabled={alertsMut.isPending}
+              className="inline-flex items-center gap-2 rounded-md border border-red-400/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-200 hover:bg-red-500/20 disabled:opacity-50"
+            >
+              <ShieldAlert className="h-3.5 w-3.5" />
+              Gerar alertas
+            </button>
+          )}
           <button
-            onClick={() => allMut.mutate()}
-            disabled={allMut.isPending}
-            className="inline-flex items-center gap-2 rounded-md border border-cyan-400/30 bg-cyan-500/10 px-3 py-1.5 text-xs text-cyan-200 hover:bg-cyan-500/20 disabled:opacity-50"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${allMut.isPending ? "animate-spin" : ""}`} />
-            Reconciliar pendentes
-          </button>
-          <button
-            onClick={() => refetch()}
-            disabled={isFetching}
+            onClick={() => (tab === "list" ? refetch() : refetchDivs())}
+            disabled={isFetching || divFetching}
             className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/80 hover:bg-white/10 disabled:opacity-50"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${(isFetching || divFetching) ? "animate-spin" : ""}`} />
             Atualizar
           </button>
         </div>
       </div>
 
+      <div className="flex gap-2 border-b border-white/10">
+        <TabBtn active={tab === "list"} onClick={() => setTab("list")}>Depósitos</TabBtn>
+        <TabBtn active={tab === "divergences"} onClick={() => setTab("divergences")}>
+          Divergências{divs.length ? ` (${divs.length})` : ""}
+        </TabBtn>
+      </div>
+
+      {tab === "divergences" && (
+        <DivergencesPanel rows={divs} loading={divFetching} />
+      )}
+
+      {tab === "list" && (
+      <>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Kpi label="Pagos (visível)" value={formatCurrency(totalPaid)} icon={CheckCircle2} tone="emerald" />
         <Kpi label="Pendentes (visível)" value={formatCurrency(totalPending)} icon={Clock} tone="amber" />
@@ -214,6 +258,72 @@ function Page() {
           </tbody>
         </table>
       </div>
+      </>
+      )}
+    </div>
+  );
+}
+
+function TabBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`-mb-px border-b-2 px-3 py-2 text-sm ${
+        active ? "border-cyan-400 text-white" : "border-transparent text-white/50 hover:text-white"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function DivergencesPanel({ rows, loading }: { rows: any[]; loading: boolean }) {
+  const kindLabel: Record<string, string> = {
+    paid_without_credit: "Pago sem crédito",
+    missing_wallet_tx: "Sem lançamento",
+    wallet_amount_mismatch: "Valor divergente",
+    webhook_paid_no_deposit: "Webhook s/ depósito",
+  };
+  return (
+    <div className="overflow-hidden rounded-xl border border-red-400/20 bg-red-500/[0.03]">
+      <div className="border-b border-red-400/20 bg-red-500/10 px-4 py-2 text-xs text-red-200">
+        <AlertTriangle className="mr-1 inline h-3.5 w-3.5" />
+        Divergências entre Diggion Pay, depósitos e carteira. Reprocessar em <b>Auditoria Webhooks</b>.
+      </div>
+      <table className="w-full text-sm">
+        <thead className="bg-white/[0.03] text-left text-xs uppercase text-white/50">
+          <tr>
+            <th className="px-4 py-2">Tipo</th>
+            <th className="px-4 py-2">Usuário</th>
+            <th className="px-4 py-2">Depósito / TX</th>
+            <th className="px-4 py-2 text-right">Esperado</th>
+            <th className="px-4 py-2 text-right">Real</th>
+            <th className="px-4 py-2">Detalhe</th>
+          </tr>
+        </thead>
+        <tbody>
+          {loading ? (
+            <tr><td colSpan={6} className="px-4 py-8 text-center text-white/40">Verificando…</td></tr>
+          ) : rows.length === 0 ? (
+            <tr><td colSpan={6} className="px-4 py-10 text-center text-emerald-300/70">✓ Nenhuma divergência detectada.</td></tr>
+          ) : rows.map((r, i) => (
+            <tr key={i} className="border-t border-white/5">
+              <td className="px-4 py-2">
+                <span className="rounded-full border border-red-400/30 bg-red-500/10 px-2 py-0.5 text-[11px] text-red-200">
+                  {kindLabel[r.kind] ?? r.kind}
+                </span>
+              </td>
+              <td className="px-4 py-2 text-white/80">{r.user_name ?? r.user_id?.slice(0, 8) ?? "—"}</td>
+              <td className="px-4 py-2 font-mono text-[11px] text-white/50">
+                {(r.deposit_id ?? r.provider_tx_id ?? "—").slice(0, 24)}
+              </td>
+              <td className="px-4 py-2 text-right font-mono text-white/80">{r.expected != null ? formatCurrency(r.expected) : "—"}</td>
+              <td className="px-4 py-2 text-right font-mono text-white/80">{r.actual != null ? formatCurrency(r.actual) : "—"}</td>
+              <td className="px-4 py-2 text-xs text-white/60">{r.detail}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

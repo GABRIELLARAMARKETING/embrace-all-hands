@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listAdminWebhooks, type AdminWebhookRow } from "@/lib/admin-webhooks.functions";
+import { reprocessWebhookById } from "@/lib/admin-block1.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/webhooks")({
   ssr: false,
@@ -49,6 +51,19 @@ function AdminWebhooksPage() {
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<AdminWebhookRow | null>(null);
   const pageSize = 25;
+
+  const qc = useQueryClient();
+  const reprocessFn = useServerFn(reprocessWebhookById);
+  const reprocessMut = useMutation({
+    mutationFn: (id: string) => reprocessFn({ data: { webhookId: id } }),
+    onSuccess: (r) => {
+      toast.success(`Reprocessado: ${r.result}${r.provider_status ? ` (${r.provider_status})` : ""}`);
+      qc.invalidateQueries({ queryKey: ["admin-webhooks"] });
+      qc.invalidateQueries({ queryKey: ["admin", "payment-divergences"] });
+      qc.invalidateQueries({ queryKey: ["admin", "dashboard-extras"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["admin-webhooks", status, search, page],
@@ -203,12 +218,24 @@ function AdminWebhooksPage() {
                   )}
                 </td>
                 <td className="px-3 py-2 text-right">
-                  <button
-                    onClick={() => setSelected(r)}
-                    className="rounded-md border border-white/10 px-2 py-1 text-xs hover:bg-white/5"
-                  >
-                    Ver
-                  </button>
+                  <div className="flex justify-end gap-1">
+                    {r.provider === "diggion" && r.provider_transaction_id && (
+                      <button
+                        onClick={() => reprocessMut.mutate(r.id)}
+                        disabled={reprocessMut.isPending}
+                        className="rounded-md border border-cyan-400/30 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200 hover:bg-cyan-500/20 disabled:opacity-40"
+                        title="Reconsultar Diggion e creditar se aprovado"
+                      >
+                        Reprocessar
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setSelected(r)}
+                      className="rounded-md border border-white/10 px-2 py-1 text-xs hover:bg-white/5"
+                    >
+                      Ver
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
