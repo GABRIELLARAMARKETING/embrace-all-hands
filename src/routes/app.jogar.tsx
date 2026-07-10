@@ -66,13 +66,12 @@ function JogarPage() {
           <div className="mt-6 text-[11px] font-bold tracking-widest text-[#B47CFF]">VALOR DE ENTRADA</div>
           <div className="mt-3 flex flex-wrap gap-2">
             {PLAYER_MOCK.playOptions.map((v) => {
-              const active = value === v && !custom;
+              const active = value === v;
               return (
                 <button
                   key={v}
                   onClick={() => {
                     setValue(v);
-                    setCustom("");
                   }}
                   className={cn(
                     "rounded-full px-4 py-2 text-sm font-bold transition-all",
