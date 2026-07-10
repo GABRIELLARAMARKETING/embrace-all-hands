@@ -71,6 +71,8 @@ function SacarPage() {
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["my-profile"] });
+      qc.invalidateQueries({ queryKey: ["helix-withdrawal-rules"] });
+
       setDone(true);
       reset({ amount: undefined as unknown as number, pixKey: "", cpf: "" });
     },
