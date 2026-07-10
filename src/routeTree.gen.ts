@@ -54,6 +54,7 @@ import { Route as AdminDepositsRouteImport } from './routes/admin.deposits'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
 import { Route as AdminCodesRouteImport } from './routes/admin.codes'
+import { Route as AdminBackupsRouteImport } from './routes/admin.backups'
 import { Route as AdminAuditoriaRouteImport } from './routes/admin.auditoria'
 import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
 import { Route as AdminAffiliatesRouteImport } from './routes/admin.affiliates'
@@ -285,6 +286,11 @@ const AdminCodesRoute = AdminCodesRouteImport.update({
   path: '/codes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminBackupsRoute = AdminBackupsRouteImport.update({
+  id: '/backups',
+  path: '/backups',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAuditoriaRoute = AdminAuditoriaRouteImport.update({
   id: '/auditoria',
   path: '/auditoria',
@@ -323,6 +329,7 @@ export interface FileRoutesByFullPath {
   '/admin/affiliates': typeof AdminAffiliatesRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
+  '/admin/backups': typeof AdminBackupsRoute
   '/admin/codes': typeof AdminCodesRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -374,6 +381,7 @@ export interface FileRoutesByTo {
   '/admin/affiliates': typeof AdminAffiliatesRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
+  '/admin/backups': typeof AdminBackupsRoute
   '/admin/codes': typeof AdminCodesRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -427,6 +435,7 @@ export interface FileRoutesById {
   '/admin/affiliates': typeof AdminAffiliatesRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
+  '/admin/backups': typeof AdminBackupsRoute
   '/admin/codes': typeof AdminCodesRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -481,6 +490,7 @@ export interface FileRouteTypes {
     | '/admin/affiliates'
     | '/admin/audit-logs'
     | '/admin/auditoria'
+    | '/admin/backups'
     | '/admin/codes'
     | '/admin/commissions'
     | '/admin/dashboard'
@@ -532,6 +542,7 @@ export interface FileRouteTypes {
     | '/admin/affiliates'
     | '/admin/audit-logs'
     | '/admin/auditoria'
+    | '/admin/backups'
     | '/admin/codes'
     | '/admin/commissions'
     | '/admin/dashboard'
@@ -584,6 +595,7 @@ export interface FileRouteTypes {
     | '/admin/affiliates'
     | '/admin/audit-logs'
     | '/admin/auditoria'
+    | '/admin/backups'
     | '/admin/codes'
     | '/admin/commissions'
     | '/admin/dashboard'
@@ -956,6 +968,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCodesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/backups': {
+      id: '/admin/backups'
+      path: '/backups'
+      fullPath: '/admin/backups'
+      preLoaderRoute: typeof AdminBackupsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/auditoria': {
       id: '/admin/auditoria'
       path: '/auditoria'
@@ -998,6 +1017,7 @@ interface AdminRouteChildren {
   AdminAffiliatesRoute: typeof AdminAffiliatesRoute
   AdminAuditLogsRoute: typeof AdminAuditLogsRoute
   AdminAuditoriaRoute: typeof AdminAuditoriaRoute
+  AdminBackupsRoute: typeof AdminBackupsRoute
   AdminCodesRoute: typeof AdminCodesRoute
   AdminCommissionsRoute: typeof AdminCommissionsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
@@ -1025,6 +1045,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAffiliatesRoute: AdminAffiliatesRoute,
   AdminAuditLogsRoute: AdminAuditLogsRoute,
   AdminAuditoriaRoute: AdminAuditoriaRoute,
+  AdminBackupsRoute: AdminBackupsRoute,
   AdminCodesRoute: AdminCodesRoute,
   AdminCommissionsRoute: AdminCommissionsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
