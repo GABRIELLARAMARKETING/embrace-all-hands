@@ -28,18 +28,20 @@ import {
   type TrackingParty,
 } from "@/lib/tracking.functions";
 
-function roleTone(role: TrackingParty["role"]): "green" | "blue" | "amber" | "red" | "gray" {
+function roleTone(
+  role: TrackingParty["role"],
+): "green" | "blue" | "purple" | "red" | "neutral" {
   switch (role) {
     case "admin":
       return "red";
     case "gerente":
-      return "amber";
+      return "purple";
     case "afiliado":
       return "green";
     case "usuario":
       return "blue";
     default:
-      return "gray";
+      return "neutral";
   }
 }
 
