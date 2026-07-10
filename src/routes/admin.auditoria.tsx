@@ -18,6 +18,7 @@ import {
   type AuditEventRow,
   type AuditSeverity,
 } from "@/lib/audit.functions";
+import { emitAuditTestEvents } from "@/lib/audit-test.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
