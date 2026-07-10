@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { HELIX_DEPOSIT_RULES, getExpectedPayoutCents } from "./helix-rules";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
