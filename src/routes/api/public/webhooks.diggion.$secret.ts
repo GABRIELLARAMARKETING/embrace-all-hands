@@ -271,6 +271,15 @@ export const Route = createFileRoute("/api/public/webhooks/diggion/$secret")({
             .update({ processed: false, processing_error: msg })
             .eq("id", logRow!.id);
           await audit("webhook.error", providerTxId, { message: msg }, "processing_error");
+          const { auditLog } = await import("@/lib/audit.functions");
+          await auditLog(supabaseAdmin, {
+            eventType: "PAYMENT_WEBHOOK_ERROR",
+            module: "webhooks",
+            severity: "error",
+            title: "Erro processando webhook Diggion",
+            message: msg,
+            metadata: { providerTxId },
+          });
           return new Response("ok", { status: 200 });
         }
 
