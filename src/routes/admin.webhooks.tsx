@@ -52,6 +52,19 @@ function AdminWebhooksPage() {
   const [selected, setSelected] = useState<AdminWebhookRow | null>(null);
   const pageSize = 25;
 
+  const qc = useQueryClient();
+  const reprocessFn = useServerFn(reprocessWebhookById);
+  const reprocessMut = useMutation({
+    mutationFn: (id: string) => reprocessFn({ data: { webhookId: id } }),
+    onSuccess: (r) => {
+      toast.success(`Reprocessado: ${r.result}${r.provider_status ? ` (${r.provider_status})` : ""}`);
+      qc.invalidateQueries({ queryKey: ["admin-webhooks"] });
+      qc.invalidateQueries({ queryKey: ["admin", "payment-divergences"] });
+      qc.invalidateQueries({ queryKey: ["admin", "dashboard-extras"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["admin-webhooks", status, search, page],
     queryFn: () => fetchWebhooks({ data: { status, search: search || undefined, page, pageSize } }),
