@@ -101,6 +101,15 @@ export const Route = createFileRoute("/api/public/webhooks/diggion/$secret")({
             hasSignatureHeader: Boolean(signatureHeader),
             error: signatureError,
           }, signatureError);
+          const { auditLog } = await import("@/lib/audit.functions");
+          await auditLog(supabaseAdmin, {
+            eventType: "PAYMENT_WEBHOOK_INVALID",
+            module: "webhooks",
+            severity: "critical",
+            title: "Webhook Diggion rejeitado por assinatura inválida",
+            message: signatureError ?? "invalid_signature",
+            metadata: { ip, headers },
+          });
           return new Response("invalid signature", { status: 401 });
         }
 
