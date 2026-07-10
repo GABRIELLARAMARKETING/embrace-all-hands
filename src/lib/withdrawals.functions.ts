@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { auditLog } from "./audit.functions";
+
 
 const withdrawInput = z.object({
   amount: z.number().int().positive(),
