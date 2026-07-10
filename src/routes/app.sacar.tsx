@@ -122,8 +122,8 @@ function SacarPage() {
             Saques processados em até 24h úteis.
           </div>
 
-          <GradientButton type="submit" className="mt-5">
-            Solicitar Saque
+          <GradientButton type="submit" disabled={mutation.isPending} className="mt-5">
+            {mutation.isPending ? "Enviando..." : "Solicitar Saque"}
           </GradientButton>
         </PlayerCard>
       </form>
