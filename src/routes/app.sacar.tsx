@@ -92,14 +92,29 @@ function SacarPage() {
             <span className="font-bold text-white">{formatCurrency(balance)}</span>
           </div>
 
-          <div className="mt-4 space-y-3">
-            <Field label="R$" error={errors.amount?.message}>
-              <input
-                type="number"
-                step="0.01"
-                inputMode="decimal"
-                placeholder="Mínimo R$20,00"
-                {...register("amount", { valueAsNumber: true })}
+          {rules && (
+            <div
+              className={
+                "mt-3 rounded-2xl border px-4 py-3 text-xs " +
+                (canWithdraw
+                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
+                  : "border-amber-500/40 bg-amber-500/10 text-amber-100")
+              }
+            >
+              {!rules.has_deposit ? (
+                <>Faça um depósito confirmado para desbloquear saques.</>
+              ) : canWithdraw ? (
+                <>Você já atingiu o mínimo de {formatCurrency((minCents ?? 0) / 100)}. Pode sacar.</>
+              ) : (
+                <>
+                  Saque mínimo: <b>{formatCurrency((minCents ?? 0) / 100)}</b>. Faltam{" "}
+                  <b>{formatCurrency((missingCents ?? 0) / 100)}</b> para liberar.
+                </>
+              )}
+            </div>
+          )}
+
+
                 className="w-full bg-transparent text-white outline-none placeholder:text-white/40"
               />
             </Field>
