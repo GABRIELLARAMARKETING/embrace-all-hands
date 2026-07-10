@@ -45,6 +45,7 @@ import { Route as AdminNetworkRouteImport } from './routes/admin.network'
 import { Route as AdminManagersRouteImport } from './routes/admin.managers'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminKycRouteImport } from './routes/admin.kyc'
+import { Route as AdminIntegrationsRouteImport } from './routes/admin.integrations'
 import { Route as AdminHelixAuditRouteImport } from './routes/admin.helix-audit'
 import { Route as AdminHelixRouteImport } from './routes/admin.helix'
 import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
@@ -238,6 +239,11 @@ const AdminKycRoute = AdminKycRouteImport.update({
   path: '/kyc',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminIntegrationsRoute = AdminIntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminHelixAuditRoute = AdminHelixAuditRouteImport.update({
   id: '/helix-audit',
   path: '/helix-audit',
@@ -318,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/helix-audit': typeof AdminHelixAuditRoute
+  '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/kyc': typeof AdminKycRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
@@ -367,6 +374,7 @@ export interface FileRoutesByTo {
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/helix-audit': typeof AdminHelixAuditRoute
+  '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/kyc': typeof AdminKycRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
@@ -418,6 +426,7 @@ export interface FileRoutesById {
   '/admin/finance': typeof AdminFinanceRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/helix-audit': typeof AdminHelixAuditRoute
+  '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/kyc': typeof AdminKycRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
@@ -470,6 +479,7 @@ export interface FileRouteTypes {
     | '/admin/finance'
     | '/admin/helix'
     | '/admin/helix-audit'
+    | '/admin/integrations'
     | '/admin/kyc'
     | '/admin/login'
     | '/admin/managers'
@@ -519,6 +529,7 @@ export interface FileRouteTypes {
     | '/admin/finance'
     | '/admin/helix'
     | '/admin/helix-audit'
+    | '/admin/integrations'
     | '/admin/kyc'
     | '/admin/login'
     | '/admin/managers'
@@ -569,6 +580,7 @@ export interface FileRouteTypes {
     | '/admin/finance'
     | '/admin/helix'
     | '/admin/helix-audit'
+    | '/admin/integrations'
     | '/admin/kyc'
     | '/admin/login'
     | '/admin/managers'
@@ -869,6 +881,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminKycRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/integrations': {
+      id: '/admin/integrations'
+      path: '/integrations'
+      fullPath: '/admin/integrations'
+      preLoaderRoute: typeof AdminIntegrationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/helix-audit': {
       id: '/admin/helix-audit'
       path: '/helix-audit'
@@ -967,6 +986,7 @@ interface AdminRouteChildren {
   AdminFinanceRoute: typeof AdminFinanceRoute
   AdminHelixRoute: typeof AdminHelixRoute
   AdminHelixAuditRoute: typeof AdminHelixAuditRoute
+  AdminIntegrationsRoute: typeof AdminIntegrationsRoute
   AdminKycRoute: typeof AdminKycRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminManagersRoute: typeof AdminManagersRoute
@@ -992,6 +1012,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminFinanceRoute: AdminFinanceRoute,
   AdminHelixRoute: AdminHelixRoute,
   AdminHelixAuditRoute: AdminHelixAuditRoute,
+  AdminIntegrationsRoute: AdminIntegrationsRoute,
   AdminKycRoute: AdminKycRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminManagersRoute: AdminManagersRoute,
