@@ -114,10 +114,18 @@ function SacarPage() {
             </div>
           )}
 
-
+          <div className="mt-4 space-y-3">
+            <Field label="R$" error={errors.amount?.message}>
+              <input
+                type="number"
+                step="0.01"
+                inputMode="decimal"
+                placeholder={minCents ? `Mínimo ${formatCurrency(minCents / 100)}` : "Mínimo R$20,00"}
+                {...register("amount", { valueAsNumber: true })}
                 className="w-full bg-transparent text-white outline-none placeholder:text-white/40"
               />
             </Field>
+
 
             <Field label="PIX" error={errors.pixKey?.message}>
               <input
