@@ -311,8 +311,8 @@ export type WithdrawalAuditEntry = {
   actor_id: string | null;
   actor_name: string | null;
   reason: string | null;
-  old_value: unknown;
-  new_value: unknown;
+  old_value: unknown | null;
+  new_value: unknown | null;
   created_at: string;
 };
 
