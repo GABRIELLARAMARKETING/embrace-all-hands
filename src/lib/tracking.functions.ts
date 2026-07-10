@@ -251,16 +251,37 @@ export const convertReferralClick = createServerFn({ method: "POST" })
     z.object({ trackingId: z.string().min(6).max(64) }).parse(raw),
   )
   .handler(async ({ context, data }) => {
-    const { userId } = context;
-    // A política de UPDATE restringe a admin — usamos service role aqui.
-    // A operação é segura: só marca cliques do próprio tid do cookie que
-    // ainda não foram convertidos, e amarra ao userId autenticado.
+    const { userId, supabase } = context;
+    const { auditLog } = await import("./audit.functions");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
+    const { data: updated, error } = await supabaseAdmin
       .from("referral_clicks")
       .update({ converted_user_id: userId, converted_at: new Date().toISOString() })
       .eq("tracking_id", data.trackingId)
-      .is("converted_user_id", null);
-    if (error) throw new Error(error.message);
-    return { ok: true };
+      .is("converted_user_id", null)
+      .select("id");
+    if (error) {
+      await auditLog(supabase, {
+        eventType: "REFERRAL_CONVERT_FAILED",
+        module: "tracking",
+        severity: "error",
+        title: "Falha ao converter clique de referral",
+        message: error.message,
+        userId,
+        entityType: "referral_click",
+        entityId: data.trackingId,
+      });
+      throw new Error(error.message);
+    }
+    await auditLog(supabase, {
+      eventType: "REFERRAL_CONVERTED",
+      module: "tracking",
+      severity: "success",
+      title: "Clique de referral convertido",
+      userId,
+      entityType: "referral_click",
+      entityId: data.trackingId,
+      metadata: { matched: updated?.length ?? 0 },
+    });
+    return { ok: true, matched: updated?.length ?? 0 };
   });

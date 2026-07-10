@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { auditLog } from "./audit.functions";
+
 
 const withdrawInput = z.object({
   amount: z.number().int().positive(),
@@ -45,12 +47,24 @@ export const requestAffiliateWithdrawal = createServerFn({ method: "POST" })
       .eq("id", userId);
     if (updateError) throw new Error(updateError.message);
 
+    await auditLog(supabase, {
+      eventType: "WITHDRAWAL_REQUESTED",
+      module: "withdrawals",
+      severity: "info",
+      title: "Saque de afiliado solicitado",
+      userId,
+      entityType: "affiliate_withdrawal",
+      entityId: withdrawal.id,
+      metadata: { amount: data.amount, balance_after: newBalance },
+    });
+
     return {
       withdrawal,
       affiliateBalance: newBalance,
       totalReceived: profile.total_received ?? 0,
     };
   });
+
 
 export type WithdrawalHistoryItem = {
   id: string;
@@ -214,6 +228,16 @@ export const approveWithdrawal = createServerFn({ method: "POST" })
       newValue: { status: "approved" },
       reason: data.note,
     });
+    await auditLog(supabase, {
+      eventType: "WITHDRAWAL_APPROVED",
+      module: "withdrawals",
+      severity: "success",
+      title: "Saque aprovado",
+      userId,
+      entityType: "affiliate_withdrawal",
+      entityId: data.withdrawalId,
+      metadata: { amount: current.amount, target_user: current.user_id },
+    });
     return { ok: true };
   });
 
@@ -263,6 +287,17 @@ export const rejectWithdrawal = createServerFn({ method: "POST" })
       newValue: { status: "rejected", balance_after: newBalance },
       reason: data.reason,
     });
+    await auditLog(supabase, {
+      eventType: "WITHDRAWAL_REJECTED",
+      module: "withdrawals",
+      severity: "warning",
+      title: "Saque rejeitado (saldo devolvido)",
+      message: data.reason,
+      userId,
+      entityType: "affiliate_withdrawal",
+      entityId: data.withdrawalId,
+      metadata: { amount: current.amount, target_user: current.user_id, refunded_to: newBalance },
+    });
     return { ok: true };
   });
 
@@ -301,6 +336,15 @@ export const markWithdrawalPaid = createServerFn({ method: "POST" })
       oldValue: { status: current.status },
       newValue: { status: "paid" },
       reason: data.note,
+    });
+    await auditLog(supabase, {
+      eventType: "WITHDRAWAL_PAID",
+      module: "withdrawals",
+      severity: "success",
+      title: "Saque marcado como pago",
+      userId,
+      entityType: "affiliate_withdrawal",
+      entityId: data.withdrawalId,
     });
     return { ok: true };
   });
