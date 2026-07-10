@@ -14,7 +14,8 @@ export function useAdminRealtime(opts: {
     | "deposits"
     | "wallet_transactions"
     | "transactions"
-    | "payment_webhook_logs";
+    | "payment_webhook_logs"
+    | "referral_clicks";
 
   invalidateKeys: Array<readonly unknown[]>;
   toastOnInsert?: (payload: Record<string, unknown>) => string | null;

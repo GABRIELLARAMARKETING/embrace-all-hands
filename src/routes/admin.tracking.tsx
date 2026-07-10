@@ -205,11 +205,11 @@ function TrackingPage() {
               header: "Evento",
               render: (r) =>
                 r.convertedUserId ? (
-                  <Badge tone="success">
+                  <Badge tone="green">
                     <UserPlus size={12} /> Cadastro
                   </Badge>
                 ) : (
-                  <Badge tone="info">
+                  <Badge tone="blue">
                     <MousePointerClick size={12} /> Clique
                   </Badge>
                 ),
