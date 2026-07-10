@@ -212,12 +212,16 @@ function Page() {
                 occurredAt: payload.occurredAt,
               },
             })
+          }
+        />
+      )}
       {historyRow && (
         <HistoryModal row={historyRow} onClose={() => setHistoryRow(null)} />
       )}
     </div>
   );
 }
+
 
 function HistoryModal({ row, onClose }: { row: CommissionRow; onClose: () => void }) {
   const { data: rows = [], isLoading, error } = useQuery({
