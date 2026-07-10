@@ -26,10 +26,12 @@ function JogarPage() {
   
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  const selectedMap = useMemo(
-    () => MAP_OPTIONS.find((m) => m.id === selectedMapId) ?? MAP_OPTIONS[0],
-    [selectedMapId],
+  // Apenas o mapa clássico está disponível nesta rota.
+  const availableMaps = useMemo(
+    () => MAP_OPTIONS.filter((m) => m.id === "classico"),
+    [],
   );
+  const selectedMap = availableMaps[0];
   // Regra oficial (backend): saque mínimo = 5x o valor do depósito.
   // R$5→R$25 · R$10→R$50 · R$20→R$100 · R$30→R$150 · R$50→R$250 · R$100→R$500
   const minWithdraw = value ? value * 5 : 0;
