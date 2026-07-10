@@ -17,6 +17,7 @@ import { useGameSession } from "@/hooks/useGameSession";
 import { useThemePreload } from "@/hooks/useThemePreload";
 import { useHelixDifficultyLoader } from "@/hooks/useHelixDifficultyLoader";
 import { LogoHelix } from "@/components/LogoHelix";
+import helixClassicMap from "@/assets/helix-classic-map.png.asset.json";
 
 
 export const Route = createFileRoute("/game")({
@@ -96,9 +97,16 @@ function GamePage() {
             transition={{ duration: 0.5 }}
             className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-fuchsia-950"
           >
-            <div className="flex flex-col items-center text-center">
-              <LogoHelix className="w-[140px] sm:w-[170px]" />
-              <div className="mt-4 text-2xl sm:text-3xl font-black tracking-tight text-white">
+            <div className="flex flex-col items-center text-center px-6">
+              <div className="relative w-[220px] sm:w-[260px] aspect-[4/5] overflow-hidden rounded-[28px] border border-pink-300/30 shadow-[0_25px_80px_-20px_rgba(236,72,153,0.65)]">
+                <img
+                  src={helixClassicMap.url}
+                  alt="Helix Fast"
+                  className="h-full w-full object-cover"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+              </div>
+              <div className="mt-6 text-2xl sm:text-3xl font-black tracking-tight text-white">
                 HELIX{" "}
                 <span className="bg-gradient-to-br from-amber-300 to-fuchsia-400 bg-clip-text text-transparent">
                   FAST
