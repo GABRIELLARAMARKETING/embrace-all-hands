@@ -38,14 +38,9 @@ const BADGE_COLORS: Record<string, string> = {
 };
 
 // Mesmo mapa do backend (helix_payout_cents)
-const PAYOUT_PER_PLATFORM: Record<number, number> = {
-  5: 0.5,
-  10: 1,
-  20: 2,
-  30: 3,
-  50: 5,
-  100: 10,
-};
+const PAYOUT_PER_PLATFORM: Record<number, number> = Object.fromEntries(
+  HELIX_DEPOSIT_RULES.map((r) => [r.amount, r.payoutPerPlatform]),
+);
 
 const kycSchema = z.object({
   fullName: z.string().trim().min(3, "Nome completo obrigatório").max(120),
