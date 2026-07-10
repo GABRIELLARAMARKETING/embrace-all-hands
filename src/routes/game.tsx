@@ -84,7 +84,7 @@ function GamePage() {
 
       <PauseMenu open={gameState === "paused"} />
       <GameOverModal open={gameState === "gameOver"} />
-      <VictoryModal open={gameState === "victory"} />
+      
       <ThemeSelector open={themesOpen} onClose={() => setThemesOpen(false)} />
       <SkinShop open={skinsOpen} onClose={() => setSkinsOpen(false)} />
 
