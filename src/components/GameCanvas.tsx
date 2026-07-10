@@ -368,7 +368,6 @@ function GameLogic({
             dangerHitFrames.current += 1;
             if (dangerHitFrames.current >= CONSTANTS.DANGER_CONFIRM_FRAMES) {
               cameraShake.current = 0.6;
-              SFX.lose();
               loseGame();
               return;
             }
