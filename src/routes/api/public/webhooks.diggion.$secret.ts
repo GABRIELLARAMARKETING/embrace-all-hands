@@ -101,6 +101,15 @@ export const Route = createFileRoute("/api/public/webhooks/diggion/$secret")({
             hasSignatureHeader: Boolean(signatureHeader),
             error: signatureError,
           }, signatureError);
+          const { auditLog } = await import("@/lib/audit.functions");
+          await auditLog(supabaseAdmin, {
+            eventType: "PAYMENT_WEBHOOK_INVALID",
+            module: "webhooks",
+            severity: "critical",
+            title: "Webhook Diggion rejeitado por assinatura inválida",
+            message: signatureError ?? "invalid_signature",
+            metadata: { ip, headers },
+          });
           return new Response("invalid signature", { status: 401 });
         }
 
@@ -217,6 +226,19 @@ export const Route = createFileRoute("/api/public/webhooks/diggion/$secret")({
               result: credited,
               userId: dep.user_id,
             }, ok ? null : (credited as any)?.reason ?? null);
+            const { auditLog } = await import("@/lib/audit.functions");
+            await auditLog(supabaseAdmin, {
+              eventType: ok ? "DEPOSIT_PAID" : "DEPOSIT_CREDIT_SKIPPED",
+              module: "deposits",
+              severity: ok ? "success" : "warning",
+              title: ok
+                ? `Depósito confirmado (R$ ${expectedAmount.toFixed(2)})`
+                : `Crédito de depósito ignorado: ${(credited as any)?.reason ?? "unknown"}`,
+              metadata: { providerTxId, amount: expectedAmount },
+              entityType: "deposit",
+              entityId: dep.id,
+              userId: dep.user_id,
+            });
           } else if (["expired", "canceled", "refunded", "chargeback"].includes(normalized)) {
             await supabaseAdmin
               .from("deposits")
@@ -249,6 +271,15 @@ export const Route = createFileRoute("/api/public/webhooks/diggion/$secret")({
             .update({ processed: false, processing_error: msg })
             .eq("id", logRow!.id);
           await audit("webhook.error", providerTxId, { message: msg }, "processing_error");
+          const { auditLog } = await import("@/lib/audit.functions");
+          await auditLog(supabaseAdmin, {
+            eventType: "PAYMENT_WEBHOOK_ERROR",
+            module: "webhooks",
+            severity: "error",
+            title: "Erro processando webhook Diggion",
+            message: msg,
+            metadata: { providerTxId },
+          });
           return new Response("ok", { status: 200 });
         }
 

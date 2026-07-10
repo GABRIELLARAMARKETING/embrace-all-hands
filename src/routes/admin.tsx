@@ -56,6 +56,7 @@ export const useAdminPanelUI = () => useContext(AdminPanelUIContext);
 
 const NAV = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/admin/auditoria", label: "Central de Auditoria", icon: ShieldAlert },
   { to: "/admin/managers", label: "Gerentes", icon: UserCog },
   { to: "/admin/affiliates", label: "Afiliados", icon: Users },
   { to: "/admin/users", label: "Usuários / Acessos", icon: Users },
