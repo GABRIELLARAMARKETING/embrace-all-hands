@@ -365,9 +365,13 @@ function GameLogic({
           }
 
           if (sector === "danger") {
-            // Modo infinito: setor perigoso não encerra o jogo,
-            // apenas causa um tranco na câmera e trata como bounce normal.
-            cameraShake.current = 0.4;
+            dangerHitFrames.current += 1;
+            if (dangerHitFrames.current >= CONSTANTS.DANGER_CONFIRM_FRAMES) {
+              cameraShake.current = 0.6;
+              SFX.lose();
+              loseGame();
+              return;
+            }
           }
 
 
