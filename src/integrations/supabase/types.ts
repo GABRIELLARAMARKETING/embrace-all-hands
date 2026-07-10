@@ -425,6 +425,86 @@ export type Database = {
         }
         Relationships: []
       }
+      invite_code_audit: {
+        Row: {
+          action: string
+          actor_id: string | null
+          code: string
+          code_id: string | null
+          created_at: string
+          detail: Json | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          code: string
+          code_id?: string | null
+          created_at?: string
+          detail?: Json | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          code?: string
+          code_id?: string | null
+          created_at?: string
+          detail?: Json | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invite_code_audit_code_id_fkey"
+            columns: ["code_id"]
+            isOneToOne: false
+            referencedRelation: "invite_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invite_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          kind: Database["public"]["Enums"]["invite_code_kind"]
+          max_uses: number | null
+          notes: string | null
+          status: Database["public"]["Enums"]["invite_code_status"]
+          updated_at: string
+          uses: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          kind: Database["public"]["Enums"]["invite_code_kind"]
+          max_uses?: number | null
+          notes?: string | null
+          status?: Database["public"]["Enums"]["invite_code_status"]
+          updated_at?: string
+          uses?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["invite_code_kind"]
+          max_uses?: number | null
+          notes?: string | null
+          status?: Database["public"]["Enums"]["invite_code_status"]
+          updated_at?: string
+          uses?: number
+        }
+        Relationships: []
+      }
       live_matches: {
         Row: {
           created_at: string
@@ -1089,6 +1169,7 @@ export type Database = {
         }
         Returns: Json
       }
+      expire_invite_codes: { Args: never; Returns: number }
       generate_affiliate_code: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -1132,6 +1213,8 @@ export type Database = {
         | "failed"
         | "waiting_payment"
         | "expired"
+      invite_code_kind: "referral" | "affiliate" | "manager" | "invite"
+      invite_code_status: "active" | "inactive" | "expired"
       risk_alert_status: "open" | "reviewing" | "resolved" | "ignored"
       risk_severity: "low" | "medium" | "high" | "critical"
       transaction_type:
@@ -1297,6 +1380,8 @@ export const Constants = {
         "waiting_payment",
         "expired",
       ],
+      invite_code_kind: ["referral", "affiliate", "manager", "invite"],
+      invite_code_status: ["active", "inactive", "expired"],
       risk_alert_status: ["open", "reviewing", "resolved", "ignored"],
       risk_severity: ["low", "medium", "high", "critical"],
       transaction_type: [
