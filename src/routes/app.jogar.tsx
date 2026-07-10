@@ -23,7 +23,7 @@ function JogarPage() {
   const setSelectedMap = usePlayerStore((s) => s.setSelectedMap);
   const value = usePlayerStore((s) => s.selectedPlayValue);
   const setValue = usePlayerStore((s) => s.setSelectedPlayValue);
-  const [custom, setCustom] = useState("");
+  
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const selectedMap = useMemo(
