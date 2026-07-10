@@ -30,7 +30,10 @@ function JogarPage() {
     () => MAP_OPTIONS.find((m) => m.id === selectedMapId) ?? MAP_OPTIONS[0],
     [selectedMapId],
   );
-  const reward = value ? value * 0 : 0;
+  // Regra oficial (backend): saque mínimo = 5x o valor do depósito.
+  // R$5→R$25 · R$10→R$50 · R$20→R$100 · R$30→R$150 · R$50→R$250 · R$100→R$500
+  const minWithdraw = value ? value * 5 : 0;
+
 
   const scroll = (dir: -1 | 1) => {
     carouselRef.current?.scrollBy({ left: dir * 100, behavior: "smooth" });
