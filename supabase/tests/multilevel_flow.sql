@@ -20,7 +20,7 @@
 -- =============================================================================
 BEGIN;
 
-CREATE TEMP FUNCTION _test_signup(_id uuid, _display text, _ref text DEFAULT NULL)
+CREATE OR REPLACE FUNCTION pg_temp._test_signup(_id uuid, _display text, _ref text DEFAULT NULL)
 RETURNS void LANGUAGE plpgsql AS $fn$
 DECLARE
   default_theme_id uuid;
