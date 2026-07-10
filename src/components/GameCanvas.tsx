@@ -365,11 +365,9 @@ function GameLogic({
           }
 
           if (sector === "danger") {
-            if (isFever) continue;
-            cameraShake.current = 0.6;
-            finishedRef.current = true;
-            loseGame();
-            return;
+            // Modo infinito: setor perigoso não encerra o jogo,
+            // apenas causa um tranco na câmera e trata como bounce normal.
+            cameraShake.current = 0.4;
           }
 
 
