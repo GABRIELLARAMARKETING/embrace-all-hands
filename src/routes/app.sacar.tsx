@@ -10,10 +10,12 @@ import { toast } from "sonner";
 import { AppLayout, GradientButton, PlayerCard } from "@/components/player/AppLayout";
 import { getMyProfile } from "@/lib/profile.functions";
 import { requestAffiliateWithdrawal } from "@/lib/withdrawals.functions";
+import { getHelixWithdrawalRules } from "@/lib/helix-withdrawal.functions";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { makeWithdrawSchema, type WithdrawFormValues } from "@/utils/playerValidators";
 import { maskCpf } from "@/utils/cpfMask";
 const helixLogo = "/images/helixfast-logo.png";
+
 
 export const Route = createFileRoute("/app/sacar")({
   head: () => ({
@@ -29,14 +31,24 @@ function SacarPage() {
   const qc = useQueryClient();
   const profileFn = useServerFn(getMyProfile);
   const requestFn = useServerFn(requestAffiliateWithdrawal);
+  const rulesFn = useServerFn(getHelixWithdrawalRules);
   const { data: profile } = useQuery({
     queryKey: ["my-profile"],
     queryFn: () => profileFn({}),
     staleTime: 30_000,
   });
+  const { data: rules } = useQuery({
+    queryKey: ["helix-withdrawal-rules"],
+    queryFn: () => rulesFn({}),
+    staleTime: 15_000,
+  });
   const balance = profile?.affiliateBalance ?? 0;
+  const canWithdraw = rules?.can_withdraw ?? false;
+  const minCents = rules?.minimum_withdraw_cents ?? null;
+  const missingCents = rules?.missing_to_withdraw_cents ?? null;
   const [done, setDone] = useState(false);
   const schema = useMemo(() => makeWithdrawSchema(balance), [balance]);
+
 
   const {
     register,
@@ -59,6 +71,8 @@ function SacarPage() {
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["my-profile"] });
+      qc.invalidateQueries({ queryKey: ["helix-withdrawal-rules"] });
+
       setDone(true);
       reset({ amount: undefined as unknown as number, pixKey: "", cpf: "" });
     },
@@ -80,17 +94,40 @@ function SacarPage() {
             <span className="font-bold text-white">{formatCurrency(balance)}</span>
           </div>
 
+          {rules && (
+            <div
+              className={
+                "mt-3 rounded-2xl border px-4 py-3 text-xs " +
+                (canWithdraw
+                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
+                  : "border-amber-500/40 bg-amber-500/10 text-amber-100")
+              }
+            >
+              {!rules.has_deposit ? (
+                <>Faça um depósito confirmado para desbloquear saques.</>
+              ) : canWithdraw ? (
+                <>Você já atingiu o mínimo de {formatCurrency((minCents ?? 0) / 100)}. Pode sacar.</>
+              ) : (
+                <>
+                  Saque mínimo: <b>{formatCurrency((minCents ?? 0) / 100)}</b>. Faltam{" "}
+                  <b>{formatCurrency((missingCents ?? 0) / 100)}</b> para liberar.
+                </>
+              )}
+            </div>
+          )}
+
           <div className="mt-4 space-y-3">
             <Field label="R$" error={errors.amount?.message}>
               <input
                 type="number"
                 step="0.01"
                 inputMode="decimal"
-                placeholder="Mínimo R$20,00"
+                placeholder={minCents ? `Mínimo ${formatCurrency(minCents / 100)}` : "Mínimo R$20,00"}
                 {...register("amount", { valueAsNumber: true })}
                 className="w-full bg-transparent text-white outline-none placeholder:text-white/40"
               />
             </Field>
+
 
             <Field label="PIX" error={errors.pixKey?.message}>
               <input
@@ -122,9 +159,20 @@ function SacarPage() {
             Saques processados em até 24h úteis.
           </div>
 
-          <GradientButton type="submit" disabled={mutation.isPending} className="mt-5">
-            {mutation.isPending ? "Enviando..." : "Solicitar Saque"}
+          <GradientButton
+            type="submit"
+            disabled={mutation.isPending || !canWithdraw}
+            className="mt-5"
+          >
+            {mutation.isPending
+              ? "Enviando..."
+              : !rules?.has_deposit
+                ? "Faça um depósito para sacar"
+                : !canWithdraw
+                  ? `Faltam ${formatCurrency((missingCents ?? 0) / 100)}`
+                  : "Solicitar Saque"}
           </GradientButton>
+
         </PlayerCard>
       </form>
 
