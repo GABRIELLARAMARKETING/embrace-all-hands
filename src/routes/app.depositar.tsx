@@ -82,7 +82,13 @@ function DepositarPage() {
   });
   const amount = watch("amount");
 
-  const onSubmit = () => setConfirmOpen(true);
+  const onSubmit = () => {
+    if (!isAllowedDepositAmount(amount)) {
+      toast.error("Selecione um valor permitido: R$ 5, 10, 20, 30, 50 ou 100.");
+      return;
+    }
+    setConfirmOpen(true);
+  };
 
   return (
     <AppLayout title="Depositar via PIX">
