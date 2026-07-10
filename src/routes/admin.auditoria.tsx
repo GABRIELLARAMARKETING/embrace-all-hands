@@ -75,7 +75,21 @@ function severityStyle(sev: AuditSeverity) {
 function AuditoriaGeralPage() {
   const listFn = useServerFn(listAuditEvents);
   const resolveFn = useServerFn(resolveAuditEvent);
+  const emitTestFn = useServerFn(emitAuditTestEvents);
   const qc = useQueryClient();
+  const [emitting, setEmitting] = useState(false);
+
+  async function onEmitTest() {
+    setEmitting(true);
+    try {
+      const res = await emitTestFn({ data: {} });
+      toast.success(`3 eventos de teste emitidos (${res.correlationId})`);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setEmitting(false);
+    }
+  }
 
   const [severity, setSeverity] = useState<AuditSeverity | "all">("all");
   const [module, setModule] = useState<(typeof MODULES)[number]>("all");
