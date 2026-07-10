@@ -40,6 +40,7 @@ import { Route as AdminTrackingRouteImport } from './routes/admin.tracking'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRiskAlertsRouteImport } from './routes/admin.risk-alerts'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminNetworkRouteImport } from './routes/admin.network'
 import { Route as AdminManagersRouteImport } from './routes/admin.managers'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
@@ -212,6 +213,11 @@ const AdminReportsRoute = AdminReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminNetworkRoute = AdminNetworkRouteImport.update({
   id: '/network',
   path: '/network',
@@ -316,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
   '/admin/network': typeof AdminNetworkRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -364,6 +371,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
   '/admin/network': typeof AdminNetworkRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -414,6 +422,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
   '/admin/network': typeof AdminNetworkRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -465,6 +474,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/managers'
     | '/admin/network'
+    | '/admin/notifications'
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
@@ -513,6 +523,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/managers'
     | '/admin/network'
+    | '/admin/notifications'
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
@@ -562,6 +573,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/managers'
     | '/admin/network'
+    | '/admin/notifications'
     | '/admin/reports'
     | '/admin/risk-alerts'
     | '/admin/settings'
@@ -822,6 +834,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReportsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/network': {
       id: '/admin/network'
       path: '/network'
@@ -952,6 +971,7 @@ interface AdminRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AdminManagersRoute: typeof AdminManagersRoute
   AdminNetworkRoute: typeof AdminNetworkRoute
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminRiskAlertsRoute: typeof AdminRiskAlertsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -976,6 +996,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AdminManagersRoute: AdminManagersRoute,
   AdminNetworkRoute: AdminNetworkRoute,
+  AdminNotificationsRoute: AdminNotificationsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminRiskAlertsRoute: AdminRiskAlertsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
