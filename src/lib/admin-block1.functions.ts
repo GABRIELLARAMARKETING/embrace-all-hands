@@ -52,7 +52,7 @@ export const getAdminDashboardExtras = createServerFn({ method: "GET" })
       supabaseAdmin.from("deposits").select("amount").in("status", ["paid", "approved"]),
       supabaseAdmin.from("deposits").select("amount").in("status", ["paid", "approved"]).gte("credited_at", todayStart.toISOString()),
       supabaseAdmin.from("commissions").select("amount").eq("status", "paid"),
-      supabaseAdmin.from("affiliate_withdrawals").select("amount").eq("status", "paid"),
+      supabaseAdmin.from("affiliate_withdrawals").select("amount").eq("status", "paid" as any),
       supabaseAdmin.from("payment_webhook_logs").select("id", { count: "exact", head: true }),
       supabaseAdmin.from("payment_webhook_logs").select("id", { count: "exact", head: true }).eq("processed", true).is("processing_error", null),
       supabaseAdmin.from("payment_webhook_logs").select("id", { count: "exact", head: true }).not("processing_error", "is", null),
