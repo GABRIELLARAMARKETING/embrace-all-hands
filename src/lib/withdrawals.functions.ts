@@ -337,6 +337,15 @@ export const markWithdrawalPaid = createServerFn({ method: "POST" })
       newValue: { status: "paid" },
       reason: data.note,
     });
+    await auditLog(supabase, {
+      eventType: "WITHDRAWAL_PAID",
+      module: "withdrawals",
+      severity: "success",
+      title: "Saque marcado como pago",
+      userId,
+      entityType: "affiliate_withdrawal",
+      entityId: data.withdrawalId,
+    });
     return { ok: true };
   });
 
