@@ -387,6 +387,16 @@ export const updateCommissionSettings = createServerFn({ method: "POST" })
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
     await audit(context, "commission_settings_updated", "manager_profiles", userId, data);
+    await auditLog(supabase, {
+      eventType: "COMMISSION_SETTINGS_UPDATED",
+      module: "commissions",
+      severity: "warning",
+      title: "Percentuais de comissão atualizados",
+      userId,
+      entityType: "manager_profiles",
+      entityId: userId,
+      metadata: { ...data, total_budget: budget, sum },
+    });
     return { ok: true };
   });
 
