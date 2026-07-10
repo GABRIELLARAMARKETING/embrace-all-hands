@@ -38,6 +38,7 @@ import { Route as AdminWebhooksRouteImport } from './routes/admin.webhooks'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTrackingRouteImport } from './routes/admin.tracking'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminRolesRouteImport } from './routes/admin.roles'
 import { Route as AdminRiskAlertsRouteImport } from './routes/admin.risk-alerts'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
@@ -204,6 +205,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRolesRoute = AdminRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminRiskAlertsRoute = AdminRiskAlertsRouteImport.update({
   id: '/risk-alerts',
   path: '/risk-alerts',
@@ -332,6 +338,7 @@ export interface FileRoutesByFullPath {
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
+  '/admin/roles': typeof AdminRolesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
@@ -382,6 +389,7 @@ export interface FileRoutesByTo {
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
+  '/admin/roles': typeof AdminRolesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
@@ -434,6 +442,7 @@ export interface FileRoutesById {
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
+  '/admin/roles': typeof AdminRolesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
@@ -487,6 +496,7 @@ export interface FileRouteTypes {
     | '/admin/notifications'
     | '/admin/reports'
     | '/admin/risk-alerts'
+    | '/admin/roles'
     | '/admin/settings'
     | '/admin/tracking'
     | '/admin/users'
@@ -537,6 +547,7 @@ export interface FileRouteTypes {
     | '/admin/notifications'
     | '/admin/reports'
     | '/admin/risk-alerts'
+    | '/admin/roles'
     | '/admin/settings'
     | '/admin/tracking'
     | '/admin/users'
@@ -588,6 +599,7 @@ export interface FileRouteTypes {
     | '/admin/notifications'
     | '/admin/reports'
     | '/admin/risk-alerts'
+    | '/admin/roles'
     | '/admin/settings'
     | '/admin/tracking'
     | '/admin/users'
@@ -832,6 +844,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/roles': {
+      id: '/admin/roles'
+      path: '/roles'
+      fullPath: '/admin/roles'
+      preLoaderRoute: typeof AdminRolesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/risk-alerts': {
       id: '/admin/risk-alerts'
       path: '/risk-alerts'
@@ -994,6 +1013,7 @@ interface AdminRouteChildren {
   AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminRiskAlertsRoute: typeof AdminRiskAlertsRoute
+  AdminRolesRoute: typeof AdminRolesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTrackingRoute: typeof AdminTrackingRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -1020,6 +1040,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminNotificationsRoute: AdminNotificationsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminRiskAlertsRoute: AdminRiskAlertsRoute,
+  AdminRolesRoute: AdminRolesRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTrackingRoute: AdminTrackingRoute,
   AdminUsersRoute: AdminUsersRoute,
