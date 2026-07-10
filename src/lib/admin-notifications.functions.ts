@@ -7,7 +7,7 @@ export type AdminNotification = {
   severity: "info" | "success" | "warning" | "error" | "critical";
   title: string;
   message: string | null;
-  payload: unknown;
+  payload: any;
   audit_event_id: string | null;
   read_at: string | null;
   created_at: string;
