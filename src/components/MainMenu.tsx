@@ -129,19 +129,6 @@ export function MainMenu(_props: { onOpenThemes?: () => void; onOpenSkins?: () =
             </motion.p>
           </div>
 
-          <div className="w-full">
-            {isLoading && (
-              <div className="grid h-[260px] sm:h-[340px] place-items-center text-white/60">Carregando tema…</div>
-            )}
-            {error && (
-              <div className="grid h-[260px] sm:h-[340px] place-items-center text-red-300">
-                Erro ao carregar tema
-              </div>
-            )}
-            {themes && themes.length > 0 && (
-              <ThemeCarousel themes={themes} index={index} onChange={handleChange} />
-            )}
-          </div>
 
 
           <div className="flex w-full flex-col items-center gap-3 pb-3">
