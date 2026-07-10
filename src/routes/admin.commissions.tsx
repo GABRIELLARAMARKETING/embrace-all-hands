@@ -304,11 +304,7 @@ function actionTone(action: string) {
   if (action.startsWith("commission.status.")) return "border-cyan-400/30 bg-cyan-500/10 text-cyan-200";
   return "border-white/10 bg-white/5 text-white/70";
 }
-        />
-      )}
-    </div>
-  );
-}
+
 
 function SettleModal({
   row,
