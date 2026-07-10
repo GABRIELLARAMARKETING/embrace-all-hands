@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
-import { Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { useMemo } from "react";
+import { Play } from "lucide-react";
 import { AppLayout } from "@/components/player/AppLayout";
 import { PLAYER_MOCK, MAP_OPTIONS } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
@@ -20,12 +20,9 @@ export const Route = createFileRoute("/app/jogar")({
 
 function JogarPage() {
   const navigate = useNavigate();
-  const selectedMapId = usePlayerStore((s) => s.selectedMapId);
   const setSelectedMap = usePlayerStore((s) => s.setSelectedMap);
   const value = usePlayerStore((s) => s.selectedPlayValue);
   const setValue = usePlayerStore((s) => s.setSelectedPlayValue);
-  
-  const carouselRef = useRef<HTMLDivElement>(null);
 
   // Apenas o mapa clássico está disponível nesta rota.
   const availableMaps = useMemo(
@@ -34,13 +31,8 @@ function JogarPage() {
   );
   const selectedMap = availableMaps[0];
   // Regra oficial (backend): saque mínimo = 5x o valor do depósito.
-  // R$5→R$25 · R$10→R$50 · R$20→R$100 · R$30→R$150 · R$50→R$250 · R$100→R$500
   const minWithdraw = value ? value * 5 : 0;
 
-
-  const scroll = (dir: -1 | 1) => {
-    carouselRef.current?.scrollBy({ left: dir * 100, behavior: "smooth" });
-  };
 
   return (
     <AppLayout>
