@@ -10,10 +10,12 @@ import { toast } from "sonner";
 import { AppLayout, GradientButton, PlayerCard } from "@/components/player/AppLayout";
 import { getMyProfile } from "@/lib/profile.functions";
 import { requestAffiliateWithdrawal } from "@/lib/withdrawals.functions";
+import { getHelixWithdrawalRules } from "@/lib/helix-withdrawal.functions";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { makeWithdrawSchema, type WithdrawFormValues } from "@/utils/playerValidators";
 import { maskCpf } from "@/utils/cpfMask";
 const helixLogo = "/images/helixfast-logo.png";
+
 
 export const Route = createFileRoute("/app/sacar")({
   head: () => ({
