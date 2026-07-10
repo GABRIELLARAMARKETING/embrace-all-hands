@@ -21,7 +21,7 @@ export type AuditEventRow = {
   method: string | null;
   status_code: number | null;
   correlation_id: string | null;
-  metadata: Record<string, unknown>;
+  metadata: Record<string, any>;
   resolved_at: string | null;
   resolution_note: string | null;
   created_at: string;
