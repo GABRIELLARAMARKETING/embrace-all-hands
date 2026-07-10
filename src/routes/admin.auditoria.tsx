@@ -180,14 +180,24 @@ function AuditoriaGeralPage() {
             sessões Helix, webhooks, erros e alertas críticos.
           </p>
         </div>
-        <button
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm hover:bg-white/[0.08] disabled:opacity-60"
-        >
-          <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-          Recarregar
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onEmitTest}
+            disabled={emitting}
+            className="flex items-center gap-2 rounded-lg border border-cyan-400/40 bg-cyan-500/10 px-4 py-2 text-sm text-cyan-200 hover:bg-cyan-500/20 disabled:opacity-60"
+          >
+            <Activity className={`h-4 w-4 ${emitting ? "animate-pulse" : ""}`} />
+            {emitting ? "Emitindo…" : "Emitir eventos de teste"}
+          </button>
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm hover:bg-white/[0.08] disabled:opacity-60"
+          >
+            <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+            Recarregar
+          </button>
+        </div>
       </header>
 
       {/* Cards resumo */}
