@@ -1288,6 +1288,10 @@ export type Database = {
         Args: { _reason?: string; _session_id: string }
         Returns: Json
       }
+      helix_minimum_withdraw_cents: {
+        Args: { _deposit_amount_cents: number }
+        Returns: number
+      }
       helix_payout_cents: { Args: { _amount_cents: number }; Returns: number }
       helix_register_platform: {
         Args: {
@@ -1298,6 +1302,7 @@ export type Database = {
         }
         Returns: Json
       }
+      helix_withdrawal_rules: { Args: never; Returns: Json }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       process_deposit_commissions: {
         Args: { _deposit_id: string }
