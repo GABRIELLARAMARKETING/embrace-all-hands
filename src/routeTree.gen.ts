@@ -47,6 +47,7 @@ import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
 import { Route as AdminDepositsRouteImport } from './routes/admin.deposits'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
+import { Route as AdminCodesRouteImport } from './routes/admin.codes'
 import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
 import { Route as AdminAffiliatesRouteImport } from './routes/admin.affiliates'
 import { Route as ApiPublicRCodeRouteImport } from './routes/api/public/r.$code'
@@ -242,6 +243,11 @@ const AdminCommissionsRoute = AdminCommissionsRouteImport.update({
   path: '/commissions',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCodesRoute = AdminCodesRouteImport.update({
+  id: '/codes',
+  path: '/codes',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAuditLogsRoute = AdminAuditLogsRouteImport.update({
   id: '/audit-logs',
   path: '/audit-logs',
@@ -274,6 +280,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/admin/affiliates': typeof AdminAffiliatesRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/codes': typeof AdminCodesRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/deposits': typeof AdminDepositsRoute
@@ -317,6 +324,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin/affiliates': typeof AdminAffiliatesRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/codes': typeof AdminCodesRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/deposits': typeof AdminDepositsRoute
@@ -362,6 +370,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/admin/affiliates': typeof AdminAffiliatesRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/codes': typeof AdminCodesRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/deposits': typeof AdminDepositsRoute
@@ -408,6 +417,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/affiliates'
     | '/admin/audit-logs'
+    | '/admin/codes'
     | '/admin/commissions'
     | '/admin/dashboard'
     | '/admin/deposits'
@@ -451,6 +461,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/affiliates'
     | '/admin/audit-logs'
+    | '/admin/codes'
     | '/admin/commissions'
     | '/admin/dashboard'
     | '/admin/deposits'
@@ -495,6 +506,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/affiliates'
     | '/admin/audit-logs'
+    | '/admin/codes'
     | '/admin/commissions'
     | '/admin/dashboard'
     | '/admin/deposits'
@@ -810,6 +822,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCommissionsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/codes': {
+      id: '/admin/codes'
+      path: '/codes'
+      fullPath: '/admin/codes'
+      preLoaderRoute: typeof AdminCodesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/audit-logs': {
       id: '/admin/audit-logs'
       path: '/audit-logs'
@@ -844,6 +863,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAffiliatesRoute: typeof AdminAffiliatesRoute
   AdminAuditLogsRoute: typeof AdminAuditLogsRoute
+  AdminCodesRoute: typeof AdminCodesRoute
   AdminCommissionsRoute: typeof AdminCommissionsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminDepositsRoute: typeof AdminDepositsRoute
@@ -864,6 +884,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAffiliatesRoute: AdminAffiliatesRoute,
   AdminAuditLogsRoute: AdminAuditLogsRoute,
+  AdminCodesRoute: AdminCodesRoute,
   AdminCommissionsRoute: AdminCommissionsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminDepositsRoute: AdminDepositsRoute,
