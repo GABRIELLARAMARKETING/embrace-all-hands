@@ -124,7 +124,11 @@ export type Database = {
           id: string
           level: number | null
           manager_id: string | null
+          notes: string | null
+          paid_amount: number | null
+          paid_at: string | null
           percentage: number
+          reversed_at: string | null
           source_user_id: string | null
           status: Database["public"]["Enums"]["commission_status"]
           updated_at: string
@@ -139,7 +143,11 @@ export type Database = {
           id?: string
           level?: number | null
           manager_id?: string | null
+          notes?: string | null
+          paid_amount?: number | null
+          paid_at?: string | null
           percentage: number
+          reversed_at?: string | null
           source_user_id?: string | null
           status?: Database["public"]["Enums"]["commission_status"]
           updated_at?: string
@@ -154,7 +162,11 @@ export type Database = {
           id?: string
           level?: number | null
           manager_id?: string | null
+          notes?: string | null
+          paid_amount?: number | null
+          paid_at?: string | null
           percentage?: number
+          reversed_at?: string | null
           source_user_id?: string | null
           status?: Database["public"]["Enums"]["commission_status"]
           updated_at?: string
@@ -1204,6 +1216,8 @@ export type Database = {
         | "canceled"
         | "available"
         | "disputed"
+        | "paid"
+        | "reversed"
       deposit_status:
         | "pending"
         | "approved"
@@ -1369,6 +1383,8 @@ export const Constants = {
         "canceled",
         "available",
         "disputed",
+        "paid",
+        "reversed",
       ],
       deposit_status: [
         "pending",
