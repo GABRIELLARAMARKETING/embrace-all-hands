@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notifications: {
+        Row: {
+          audit_event_id: string | null
+          created_at: string
+          id: string
+          message: string | null
+          payload: Json
+          read_at: string | null
+          severity: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          audit_event_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          payload?: Json
+          read_at?: string | null
+          severity?: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          audit_event_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          payload?: Json
+          read_at?: string | null
+          severity?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_notifications_audit_event_id_fkey"
+            columns: ["audit_event_id"]
+            isOneToOne: false
+            referencedRelation: "audit_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       affiliate_withdrawals: {
         Row: {
           admin_notes: string | null
@@ -65,6 +112,99 @@ export type Database = {
           status?: Database["public"]["Enums"]["withdrawal_status"]
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      audit_events: {
+        Row: {
+          admin_user_id: string | null
+          affiliate_user_id: string | null
+          correlation_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          event_type: string
+          id: string
+          ip_hash: string | null
+          manager_user_id: string | null
+          message: string | null
+          metadata: Json
+          method: string | null
+          module: string
+          request_id: string | null
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by_admin_id: string | null
+          route: string | null
+          severity: string
+          stack_trace: string | null
+          status: string | null
+          status_code: number | null
+          technical_message: string | null
+          title: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          admin_user_id?: string | null
+          affiliate_user_id?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type: string
+          id?: string
+          ip_hash?: string | null
+          manager_user_id?: string | null
+          message?: string | null
+          metadata?: Json
+          method?: string | null
+          module: string
+          request_id?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by_admin_id?: string | null
+          route?: string | null
+          severity?: string
+          stack_trace?: string | null
+          status?: string | null
+          status_code?: number | null
+          technical_message?: string | null
+          title: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          admin_user_id?: string | null
+          affiliate_user_id?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type?: string
+          id?: string
+          ip_hash?: string | null
+          manager_user_id?: string | null
+          message?: string | null
+          metadata?: Json
+          method?: string | null
+          module?: string
+          request_id?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by_admin_id?: string | null
+          route?: string | null
+          severity?: string
+          stack_trace?: string | null
+          status?: string | null
+          status_code?: number | null
+          technical_message?: string | null
+          title?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1304,6 +1444,23 @@ export type Database = {
       }
       helix_withdrawal_rules: { Args: never; Returns: Json }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      log_audit_event: {
+        Args: {
+          _correlation_id?: string
+          _entity_id?: string
+          _entity_type?: string
+          _event_type: string
+          _message?: string
+          _metadata?: Json
+          _module: string
+          _severity: string
+          _status?: string
+          _technical_message?: string
+          _title: string
+          _user_id?: string
+        }
+        Returns: string
+      }
       process_deposit_commissions: {
         Args: { _deposit_id: string }
         Returns: undefined
