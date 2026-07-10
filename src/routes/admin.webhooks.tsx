@@ -218,12 +218,24 @@ function AdminWebhooksPage() {
                   )}
                 </td>
                 <td className="px-3 py-2 text-right">
-                  <button
-                    onClick={() => setSelected(r)}
-                    className="rounded-md border border-white/10 px-2 py-1 text-xs hover:bg-white/5"
-                  >
-                    Ver
-                  </button>
+                  <div className="flex justify-end gap-1">
+                    {r.provider === "diggion" && r.provider_transaction_id && (
+                      <button
+                        onClick={() => reprocessMut.mutate(r.id)}
+                        disabled={reprocessMut.isPending}
+                        className="rounded-md border border-cyan-400/30 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200 hover:bg-cyan-500/20 disabled:opacity-40"
+                        title="Reconsultar Diggion e creditar se aprovado"
+                      >
+                        Reprocessar
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setSelected(r)}
+                      className="rounded-md border border-white/10 px-2 py-1 text-xs hover:bg-white/5"
+                    >
+                      Ver
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
