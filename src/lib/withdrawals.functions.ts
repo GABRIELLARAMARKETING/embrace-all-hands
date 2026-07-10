@@ -228,6 +228,16 @@ export const approveWithdrawal = createServerFn({ method: "POST" })
       newValue: { status: "approved" },
       reason: data.note,
     });
+    await auditLog(supabase, {
+      eventType: "WITHDRAWAL_APPROVED",
+      module: "withdrawals",
+      severity: "success",
+      title: "Saque aprovado",
+      userId,
+      entityType: "affiliate_withdrawal",
+      entityId: data.withdrawalId,
+      metadata: { amount: current.amount, target_user: current.user_id },
+    });
     return { ok: true };
   });
 
