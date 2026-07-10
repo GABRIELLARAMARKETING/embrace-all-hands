@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 const helixLogo = "/images/helixfast-logo.png";
 import { createDiggionDeposit, getDepositStatus } from "@/lib/deposits.functions";
 import { getMyProfile } from "@/lib/profile.functions";
+import { HELIX_DEPOSIT_RULES, isAllowedDepositAmount } from "@/lib/helix-rules";
 
 export const Route = createFileRoute("/app/depositar")({
   head: () => ({
