@@ -508,21 +508,29 @@ function GameLogic({
       <Clouds count={8} />
 
       <group ref={towerGroup}>
-        <TowerCore height={generated.totalHeight + 4} themeId={themeId} />
-        {generated.rings.map((ring, i) => {
-          if (brokenRingsRef.current.has(i)) return null;
-          const breakingSince = breakingRings.get(i) ?? null;
-          return (
-            <PlatformRing
-              key={i}
-              ring={ring}
-              themeId={themeId}
-              breakingSince={breakingSince}
-            />
-          );
-        })}
-        {/* moedas removidas do jogo */}
-
+        {/* Torre "infinita" visualmente: altura grande cobre qualquer profundidade real. */}
+        <TowerCore height={100000} themeId={themeId} />
+        {/*
+          Renderiza apenas rings vivos (não reciclados, não quebrados).
+          `ringsVersion` na key do fragment garante que o React re-renderize
+          quando novos rings spawnam ou rings antigos são liberados.
+        */}
+        <group key={`rv-${ringsVersion}`}>
+          {manager.rings.map((ring, i) => {
+            if (!ring) return null;
+            if (i < manager.firstAliveIdx) return null;
+            if (brokenRingsRef.current.has(i)) return null;
+            const breakingSince = breakingRings.get(i) ?? null;
+            return (
+              <PlatformRing
+                key={i}
+                ring={ring}
+                themeId={themeId}
+                breakingSince={breakingSince}
+              />
+            );
+          })}
+        </group>
       </group>
 
       <Ball ref={ballRef} ballTheme={theme.ball} fever={fever} />
@@ -536,7 +544,7 @@ function GameLogic({
         towerRotationRef={currentRotation}
       />
       <SectorDebugBridge
-        rings={generated.rings}
+        rings={manager.rings.filter((r): r is RingData => !!r)}
         ballRef={ballRef}
         towerRotationRef={currentRotation}
       />
