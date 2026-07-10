@@ -4,6 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, UserPlus, Loader2, ChevronLeft, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { convertReferralClick } from "@/lib/tracking.functions";
+
+function readCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const m = document.cookie.match(new RegExp("(?:^|;\\s*)" + name + "=([^;]+)"));
+  return m ? decodeURIComponent(m[1]) : null;
+}
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
