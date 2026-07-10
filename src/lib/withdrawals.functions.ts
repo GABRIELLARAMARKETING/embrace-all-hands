@@ -406,8 +406,8 @@ export const getWithdrawalDetail = createServerFn({ method: "GET" })
         actor_id: a.actor_id,
         actor_name: a.actor_id ? actorNames[a.actor_id] ?? null : null,
         reason: a.reason,
-        old_value: a.old_value,
-        new_value: a.new_value,
+        old_value: a.old_value == null ? null : JSON.stringify(a.old_value),
+        new_value: a.new_value == null ? null : JSON.stringify(a.new_value),
         created_at: a.created_at,
       })),
       userHistory: (history ?? []).map((r) => ({
