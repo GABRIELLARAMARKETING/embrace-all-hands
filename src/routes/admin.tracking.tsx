@@ -223,24 +223,24 @@ function TrackingPage() {
             },
             {
               key: "owner",
-              header: "Dono do link",
-              render: (r) => (
-                <div className="flex flex-col">
-                  <span className="text-white">{r.ownerName ?? "—"}</span>
-                  <span className="text-[11px] uppercase tracking-wider text-white/40">
-                    {r.ownerType}
-                  </span>
-                </div>
-              ),
+              header: "Dono do link (comissão)",
+              render: (r) => <PartyCell party={r.owner} fallbackType={r.ownerType} />,
             },
             {
               key: "convertedTo",
-              header: "Novo usuário",
+              header: "Quem clicou / cadastrou",
               render: (r) =>
-                r.convertedName ? (
-                  <span className="text-white">{r.convertedName}</span>
+                r.convertedUser ? (
+                  <PartyCell party={r.convertedUser} fallbackType="usuario" />
                 ) : (
-                  <span className="text-white/40">—</span>
+                  <span className="text-xs text-white/40">
+                    Ainda sem cadastro
+                    {r.ipHash ? (
+                      <div className="mt-0.5 font-mono text-[10px] text-white/30">
+                        IP: {r.ipHash.slice(0, 10)}…
+                      </div>
+                    ) : null}
+                  </span>
                 ),
             },
             {
