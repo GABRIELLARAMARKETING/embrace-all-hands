@@ -60,9 +60,24 @@ function statusBadge(s: string) {
 }
 
 function Page() {
+  const [tab, setTab] = useState<"list" | "divergences">("list");
   const [status, setStatus] = useState("all");
   const [search, setSearch] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
+
+  const fetchDivs = useServerFn(getPaymentDivergences);
+  const genAlerts = useServerFn(generateDivergenceAlerts);
+  const { data: divs = [], refetch: refetchDivs, isFetching: divFetching } = useQuery({
+    queryKey: ["admin", "payment-divergences"],
+    queryFn: () => fetchDivs(),
+    staleTime: 30_000,
+    enabled: tab === "divergences",
+  });
+  const alertsMut = useMutation({
+    mutationFn: () => genAlerts(),
+    onSuccess: (r) => setMsg(`${r.created} alerta(s) criados a partir das divergências`),
+    onError: (e: any) => setMsg(`Erro: ${e?.message ?? e}`),
+  });
 
   const qc = useQueryClient();
   const { data, isFetching, refetch } = useQuery(depositsQuery(status, search));
