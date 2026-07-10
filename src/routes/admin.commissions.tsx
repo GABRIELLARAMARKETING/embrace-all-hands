@@ -52,11 +52,13 @@ function Page() {
   const settleFn = useServerFn(settleCommission);
 
   const [modal, setModal] = useState<{ row: CommissionRow; action: "pay" | "reverse" } | null>(null);
+  const [historyRow, setHistoryRow] = useState<CommissionRow | null>(null);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["admin", "commissions"] });
     qc.invalidateQueries({ queryKey: ["admin", "dashboard-summary"] });
     qc.invalidateQueries({ queryKey: ["admin", "audit-logs"] });
+    qc.invalidateQueries({ queryKey: ["admin", "commission-audit"] });
   };
 
   const update = useMutation({
