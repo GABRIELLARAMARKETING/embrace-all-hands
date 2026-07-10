@@ -98,6 +98,20 @@ export const getTrackingOverview = createServerFn({ method: "GET" })
     };
   });
 
+export type TrackingParty = {
+  userId: string;
+  displayName: string | null;
+  fullName: string | null;
+  email: string | null;
+  cpf: string | null;
+  phone: string | null;
+  pixKey: string | null;
+  affiliateCode: string | null;
+  role: "gerente" | "afiliado" | "usuario" | "admin" | "unknown";
+  isInfluencer: boolean;
+  affiliateBalance: number;
+};
+
 export type TrackingEvent = {
   id: string;
   createdAt: string;
@@ -105,9 +119,11 @@ export type TrackingEvent = {
   ownerType: string;
   ownerUserId: string | null;
   ownerName: string | null;
+  owner: TrackingParty | null;
   convertedUserId: string | null;
   convertedName: string | null;
   convertedAt: string | null;
+  convertedUser: TrackingParty | null;
   utmSource: string | null;
   utmCampaign: string | null;
   ipHash: string | null;
@@ -149,34 +165,80 @@ export const listTrackingEvents = createServerFn({ method: "POST" })
       if (r.owner_user_id) ids.add(r.owner_user_id);
       if (r.converted_user_id) ids.add(r.converted_user_id);
     }
-    const nameMap = new Map<string, string>();
+
+    const partyMap = new Map<string, TrackingParty>();
     if (ids.size) {
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, display_name")
-        .in("id", Array.from(ids));
-      for (const p of (profs ?? []) as Array<{ id: string; display_name: string | null }>) {
-        nameMap.set(p.id, p.display_name ?? "—");
+      const idArr = Array.from(ids);
+      const [profRes, rolesRes, pixRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select(
+            "id, display_name, full_name, email, cpf, phone, affiliate_code, is_influencer, affiliate_balance",
+          )
+          .in("id", idArr),
+        supabase.from("user_roles").select("user_id, role").in("user_id", idArr),
+        supabase
+          .from("affiliate_withdrawals")
+          .select("user_id, pix_key, created_at")
+          .in("user_id", idArr)
+          .order("created_at", { ascending: false }),
+      ]);
+
+      const roleByUser = new Map<string, Set<string>>();
+      for (const r of (rolesRes.data ?? []) as Array<{ user_id: string; role: string }>) {
+        if (!roleByUser.has(r.user_id)) roleByUser.set(r.user_id, new Set());
+        roleByUser.get(r.user_id)!.add(r.role);
+      }
+
+      const pixByUser = new Map<string, string>();
+      for (const p of (pixRes.data ?? []) as Array<{ user_id: string; pix_key: string | null }>) {
+        if (p.pix_key && !pixByUser.has(p.user_id)) pixByUser.set(p.user_id, p.pix_key);
+      }
+
+      for (const p of (profRes.data ?? []) as Array<Record<string, unknown>>) {
+        const uid = p.id as string;
+        const roles = roleByUser.get(uid) ?? new Set<string>();
+        let role: TrackingParty["role"] = "usuario";
+        if (roles.has("super_admin") || roles.has("admin")) role = "admin";
+        else if (roles.has("gerente")) role = "gerente";
+        else if (roles.has("afiliado") || p.is_influencer) role = "afiliado";
+        partyMap.set(uid, {
+          userId: uid,
+          displayName: (p.display_name as string) ?? null,
+          fullName: (p.full_name as string) ?? null,
+          email: (p.email as string) ?? null,
+          cpf: (p.cpf as string) ?? null,
+          phone: (p.phone as string) ?? null,
+          pixKey: pixByUser.get(uid) ?? null,
+          affiliateCode: (p.affiliate_code as string) ?? null,
+          role,
+          isInfluencer: Boolean(p.is_influencer),
+          affiliateBalance: Number(p.affiliate_balance ?? 0),
+        });
       }
     }
 
-    return (rows ?? []).map((r) => ({
-      id: r.id as string,
-      createdAt: r.created_at as string,
-      code: r.code as string,
-      ownerType: (r.owner_type as string) ?? "unknown",
-      ownerUserId: (r.owner_user_id as string) ?? null,
-      ownerName: r.owner_user_id ? nameMap.get(r.owner_user_id as string) ?? null : null,
-      convertedUserId: (r.converted_user_id as string) ?? null,
-      convertedName: r.converted_user_id
-        ? nameMap.get(r.converted_user_id as string) ?? null
-        : null,
-      convertedAt: (r.converted_at as string) ?? null,
-      utmSource: (r.utm_source as string) ?? null,
-      utmCampaign: (r.utm_campaign as string) ?? null,
-      ipHash: (r.ip_hash as string) ?? null,
-      landingPage: (r.landing_page as string) ?? null,
-    }));
+    return (rows ?? []).map((r) => {
+      const ownerId = (r.owner_user_id as string) ?? null;
+      const convId = (r.converted_user_id as string) ?? null;
+      return {
+        id: r.id as string,
+        createdAt: r.created_at as string,
+        code: r.code as string,
+        ownerType: (r.owner_type as string) ?? "unknown",
+        ownerUserId: ownerId,
+        ownerName: ownerId ? partyMap.get(ownerId)?.displayName ?? null : null,
+        owner: ownerId ? partyMap.get(ownerId) ?? null : null,
+        convertedUserId: convId,
+        convertedName: convId ? partyMap.get(convId)?.displayName ?? null : null,
+        convertedAt: (r.converted_at as string) ?? null,
+        convertedUser: convId ? partyMap.get(convId) ?? null : null,
+        utmSource: (r.utm_source as string) ?? null,
+        utmCampaign: (r.utm_campaign as string) ?? null,
+        ipHash: (r.ip_hash as string) ?? null,
+        landingPage: (r.landing_page as string) ?? null,
+      };
+    });
   });
 
 /**
