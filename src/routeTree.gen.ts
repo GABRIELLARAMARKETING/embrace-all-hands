@@ -38,20 +38,27 @@ import { Route as AdminWebhooksRouteImport } from './routes/admin.webhooks'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTrackingRouteImport } from './routes/admin.tracking'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminRolesRouteImport } from './routes/admin.roles'
 import { Route as AdminRiskAlertsRouteImport } from './routes/admin.risk-alerts'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminNetworkRouteImport } from './routes/admin.network'
 import { Route as AdminManagersRouteImport } from './routes/admin.managers'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminKycRouteImport } from './routes/admin.kyc'
+import { Route as AdminIntegrationsRouteImport } from './routes/admin.integrations'
 import { Route as AdminHelixAuditRouteImport } from './routes/admin.helix-audit'
 import { Route as AdminHelixRouteImport } from './routes/admin.helix'
+import { Route as AdminHealthRouteImport } from './routes/admin.health'
 import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
 import { Route as AdminDepositsRouteImport } from './routes/admin.deposits'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
 import { Route as AdminCodesRouteImport } from './routes/admin.codes'
+import { Route as AdminBackupsRouteImport } from './routes/admin.backups'
 import { Route as AdminAuditoriaRouteImport } from './routes/admin.auditoria'
 import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
+import { Route as AdminApiKeysRouteImport } from './routes/admin.api-keys'
 import { Route as AdminAffiliatesRouteImport } from './routes/admin.affiliates'
 import { Route as ApiPublicRCodeRouteImport } from './routes/api/public/r.$code'
 import { Route as ApiPublicWebhooksDiggionSecretRouteImport } from './routes/api/public/webhooks.diggion.$secret'
@@ -201,6 +208,11 @@ const AdminSettingsRoute = AdminSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRolesRoute = AdminRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminRiskAlertsRoute = AdminRiskAlertsRouteImport.update({
   id: '/risk-alerts',
   path: '/risk-alerts',
@@ -209,6 +221,11 @@ const AdminRiskAlertsRoute = AdminRiskAlertsRouteImport.update({
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminNetworkRoute = AdminNetworkRouteImport.update({
@@ -226,6 +243,16 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminKycRoute = AdminKycRouteImport.update({
+  id: '/kyc',
+  path: '/kyc',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminIntegrationsRoute = AdminIntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminHelixAuditRoute = AdminHelixAuditRouteImport.update({
   id: '/helix-audit',
   path: '/helix-audit',
@@ -234,6 +261,11 @@ const AdminHelixAuditRoute = AdminHelixAuditRouteImport.update({
 const AdminHelixRoute = AdminHelixRouteImport.update({
   id: '/helix',
   path: '/helix',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHealthRoute = AdminHealthRouteImport.update({
+  id: '/health',
+  path: '/health',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminFinanceRoute = AdminFinanceRouteImport.update({
@@ -261,6 +293,11 @@ const AdminCodesRoute = AdminCodesRouteImport.update({
   path: '/codes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminBackupsRoute = AdminBackupsRouteImport.update({
+  id: '/backups',
+  path: '/backups',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAuditoriaRoute = AdminAuditoriaRouteImport.update({
   id: '/auditoria',
   path: '/auditoria',
@@ -269,6 +306,11 @@ const AdminAuditoriaRoute = AdminAuditoriaRouteImport.update({
 const AdminAuditLogsRoute = AdminAuditLogsRouteImport.update({
   id: '/audit-logs',
   path: '/audit-logs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminApiKeysRoute = AdminApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAffiliatesRoute = AdminAffiliatesRouteImport.update({
@@ -297,20 +339,27 @@ export interface FileRoutesByFullPath {
   '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
   '/admin/affiliates': typeof AdminAffiliatesRoute
+  '/admin/api-keys': typeof AdminApiKeysRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
+  '/admin/backups': typeof AdminBackupsRoute
   '/admin/codes': typeof AdminCodesRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/deposits': typeof AdminDepositsRoute
   '/admin/finance': typeof AdminFinanceRoute
+  '/admin/health': typeof AdminHealthRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/helix-audit': typeof AdminHelixAuditRoute
+  '/admin/integrations': typeof AdminIntegrationsRoute
+  '/admin/kyc': typeof AdminKycRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
   '/admin/network': typeof AdminNetworkRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
+  '/admin/roles': typeof AdminRolesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
@@ -344,20 +393,27 @@ export interface FileRoutesByTo {
   '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
   '/admin/affiliates': typeof AdminAffiliatesRoute
+  '/admin/api-keys': typeof AdminApiKeysRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
+  '/admin/backups': typeof AdminBackupsRoute
   '/admin/codes': typeof AdminCodesRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/deposits': typeof AdminDepositsRoute
   '/admin/finance': typeof AdminFinanceRoute
+  '/admin/health': typeof AdminHealthRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/helix-audit': typeof AdminHelixAuditRoute
+  '/admin/integrations': typeof AdminIntegrationsRoute
+  '/admin/kyc': typeof AdminKycRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
   '/admin/network': typeof AdminNetworkRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
+  '/admin/roles': typeof AdminRolesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
@@ -393,20 +449,27 @@ export interface FileRoutesById {
   '/gerente': typeof GerenteRouteWithChildren
   '/login': typeof LoginRoute
   '/admin/affiliates': typeof AdminAffiliatesRoute
+  '/admin/api-keys': typeof AdminApiKeysRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
+  '/admin/backups': typeof AdminBackupsRoute
   '/admin/codes': typeof AdminCodesRoute
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/deposits': typeof AdminDepositsRoute
   '/admin/finance': typeof AdminFinanceRoute
+  '/admin/health': typeof AdminHealthRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/helix-audit': typeof AdminHelixAuditRoute
+  '/admin/integrations': typeof AdminIntegrationsRoute
+  '/admin/kyc': typeof AdminKycRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/managers': typeof AdminManagersRoute
   '/admin/network': typeof AdminNetworkRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/risk-alerts': typeof AdminRiskAlertsRoute
+  '/admin/roles': typeof AdminRolesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
@@ -443,20 +506,27 @@ export interface FileRouteTypes {
     | '/gerente'
     | '/login'
     | '/admin/affiliates'
+    | '/admin/api-keys'
     | '/admin/audit-logs'
     | '/admin/auditoria'
+    | '/admin/backups'
     | '/admin/codes'
     | '/admin/commissions'
     | '/admin/dashboard'
     | '/admin/deposits'
     | '/admin/finance'
+    | '/admin/health'
     | '/admin/helix'
     | '/admin/helix-audit'
+    | '/admin/integrations'
+    | '/admin/kyc'
     | '/admin/login'
     | '/admin/managers'
     | '/admin/network'
+    | '/admin/notifications'
     | '/admin/reports'
     | '/admin/risk-alerts'
+    | '/admin/roles'
     | '/admin/settings'
     | '/admin/tracking'
     | '/admin/users'
@@ -490,20 +560,27 @@ export interface FileRouteTypes {
     | '/gerente'
     | '/login'
     | '/admin/affiliates'
+    | '/admin/api-keys'
     | '/admin/audit-logs'
     | '/admin/auditoria'
+    | '/admin/backups'
     | '/admin/codes'
     | '/admin/commissions'
     | '/admin/dashboard'
     | '/admin/deposits'
     | '/admin/finance'
+    | '/admin/health'
     | '/admin/helix'
     | '/admin/helix-audit'
+    | '/admin/integrations'
+    | '/admin/kyc'
     | '/admin/login'
     | '/admin/managers'
     | '/admin/network'
+    | '/admin/notifications'
     | '/admin/reports'
     | '/admin/risk-alerts'
+    | '/admin/roles'
     | '/admin/settings'
     | '/admin/tracking'
     | '/admin/users'
@@ -538,20 +615,27 @@ export interface FileRouteTypes {
     | '/gerente'
     | '/login'
     | '/admin/affiliates'
+    | '/admin/api-keys'
     | '/admin/audit-logs'
     | '/admin/auditoria'
+    | '/admin/backups'
     | '/admin/codes'
     | '/admin/commissions'
     | '/admin/dashboard'
     | '/admin/deposits'
     | '/admin/finance'
+    | '/admin/health'
     | '/admin/helix'
     | '/admin/helix-audit'
+    | '/admin/integrations'
+    | '/admin/kyc'
     | '/admin/login'
     | '/admin/managers'
     | '/admin/network'
+    | '/admin/notifications'
     | '/admin/reports'
     | '/admin/risk-alerts'
+    | '/admin/roles'
     | '/admin/settings'
     | '/admin/tracking'
     | '/admin/users'
@@ -796,6 +880,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/roles': {
+      id: '/admin/roles'
+      path: '/roles'
+      fullPath: '/admin/roles'
+      preLoaderRoute: typeof AdminRolesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/risk-alerts': {
       id: '/admin/risk-alerts'
       path: '/risk-alerts'
@@ -808,6 +899,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/admin/reports'
       preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/network': {
@@ -831,6 +929,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/kyc': {
+      id: '/admin/kyc'
+      path: '/kyc'
+      fullPath: '/admin/kyc'
+      preLoaderRoute: typeof AdminKycRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/integrations': {
+      id: '/admin/integrations'
+      path: '/integrations'
+      fullPath: '/admin/integrations'
+      preLoaderRoute: typeof AdminIntegrationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/helix-audit': {
       id: '/admin/helix-audit'
       path: '/helix-audit'
@@ -843,6 +955,13 @@ declare module '@tanstack/react-router' {
       path: '/helix'
       fullPath: '/admin/helix'
       preLoaderRoute: typeof AdminHelixRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/health': {
+      id: '/admin/health'
+      path: '/health'
+      fullPath: '/admin/health'
+      preLoaderRoute: typeof AdminHealthRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/finance': {
@@ -880,6 +999,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCodesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/backups': {
+      id: '/admin/backups'
+      path: '/backups'
+      fullPath: '/admin/backups'
+      preLoaderRoute: typeof AdminBackupsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/auditoria': {
       id: '/admin/auditoria'
       path: '/auditoria'
@@ -892,6 +1018,13 @@ declare module '@tanstack/react-router' {
       path: '/audit-logs'
       fullPath: '/admin/audit-logs'
       preLoaderRoute: typeof AdminAuditLogsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/api-keys': {
+      id: '/admin/api-keys'
+      path: '/api-keys'
+      fullPath: '/admin/api-keys'
+      preLoaderRoute: typeof AdminApiKeysRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/affiliates': {
@@ -920,20 +1053,27 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAffiliatesRoute: typeof AdminAffiliatesRoute
+  AdminApiKeysRoute: typeof AdminApiKeysRoute
   AdminAuditLogsRoute: typeof AdminAuditLogsRoute
   AdminAuditoriaRoute: typeof AdminAuditoriaRoute
+  AdminBackupsRoute: typeof AdminBackupsRoute
   AdminCodesRoute: typeof AdminCodesRoute
   AdminCommissionsRoute: typeof AdminCommissionsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminDepositsRoute: typeof AdminDepositsRoute
   AdminFinanceRoute: typeof AdminFinanceRoute
+  AdminHealthRoute: typeof AdminHealthRoute
   AdminHelixRoute: typeof AdminHelixRoute
   AdminHelixAuditRoute: typeof AdminHelixAuditRoute
+  AdminIntegrationsRoute: typeof AdminIntegrationsRoute
+  AdminKycRoute: typeof AdminKycRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminManagersRoute: typeof AdminManagersRoute
   AdminNetworkRoute: typeof AdminNetworkRoute
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminRiskAlertsRoute: typeof AdminRiskAlertsRoute
+  AdminRolesRoute: typeof AdminRolesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTrackingRoute: typeof AdminTrackingRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -943,20 +1083,27 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAffiliatesRoute: AdminAffiliatesRoute,
+  AdminApiKeysRoute: AdminApiKeysRoute,
   AdminAuditLogsRoute: AdminAuditLogsRoute,
   AdminAuditoriaRoute: AdminAuditoriaRoute,
+  AdminBackupsRoute: AdminBackupsRoute,
   AdminCodesRoute: AdminCodesRoute,
   AdminCommissionsRoute: AdminCommissionsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminDepositsRoute: AdminDepositsRoute,
   AdminFinanceRoute: AdminFinanceRoute,
+  AdminHealthRoute: AdminHealthRoute,
   AdminHelixRoute: AdminHelixRoute,
   AdminHelixAuditRoute: AdminHelixAuditRoute,
+  AdminIntegrationsRoute: AdminIntegrationsRoute,
+  AdminKycRoute: AdminKycRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminManagersRoute: AdminManagersRoute,
   AdminNetworkRoute: AdminNetworkRoute,
+  AdminNotificationsRoute: AdminNotificationsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminRiskAlertsRoute: AdminRiskAlertsRoute,
+  AdminRolesRoute: AdminRolesRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTrackingRoute: AdminTrackingRoute,
   AdminUsersRoute: AdminUsersRoute,
