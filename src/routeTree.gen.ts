@@ -48,6 +48,7 @@ import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
 import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
 import { Route as AdminAffiliatesRouteImport } from './routes/admin.affiliates'
+import { Route as ApiPublicRCodeRouteImport } from './routes/api/public/r.$code'
 import { Route as ApiPublicWebhooksDiggionSecretRouteImport } from './routes/api/public/webhooks.diggion.$secret'
 
 const LoginRoute = LoginRouteImport.update({
@@ -245,6 +246,11 @@ const AdminAffiliatesRoute = AdminAffiliatesRouteImport.update({
   path: '/affiliates',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicRCodeRoute = ApiPublicRCodeRouteImport.update({
+  id: '/api/public/r/$code',
+  path: '/api/public/r/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicWebhooksDiggionSecretRoute =
   ApiPublicWebhooksDiggionSecretRouteImport.update({
     id: '/api/public/webhooks/diggion/$secret',
@@ -292,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/app/': typeof AppIndexRoute
+  '/api/public/r/$code': typeof ApiPublicRCodeRoute
   '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
 }
 export interface FileRoutesByTo {
@@ -333,6 +340,7 @@ export interface FileRoutesByTo {
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/app': typeof AppIndexRoute
+  '/api/public/r/$code': typeof ApiPublicRCodeRoute
   '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
 }
 export interface FileRoutesById {
@@ -376,6 +384,7 @@ export interface FileRoutesById {
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/app/': typeof AppIndexRoute
+  '/api/public/r/$code': typeof ApiPublicRCodeRoute
   '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
 }
 export interface FileRouteTypes {
@@ -420,6 +429,7 @@ export interface FileRouteTypes {
     | '/gerente/painel'
     | '/gerente/saques'
     | '/app/'
+    | '/api/public/r/$code'
     | '/api/public/webhooks/diggion/$secret'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -461,6 +471,7 @@ export interface FileRouteTypes {
     | '/gerente/painel'
     | '/gerente/saques'
     | '/app'
+    | '/api/public/r/$code'
     | '/api/public/webhooks/diggion/$secret'
   id:
     | '__root__'
@@ -503,6 +514,7 @@ export interface FileRouteTypes {
     | '/gerente/painel'
     | '/gerente/saques'
     | '/app/'
+    | '/api/public/r/$code'
     | '/api/public/webhooks/diggion/$secret'
   fileRoutesById: FileRoutesById
 }
@@ -514,6 +526,7 @@ export interface RootRouteChildren {
   GameRoute: typeof GameRoute
   GerenteRoute: typeof GerenteRouteWithChildren
   LoginRoute: typeof LoginRoute
+  ApiPublicRCodeRoute: typeof ApiPublicRCodeRoute
   ApiPublicWebhooksDiggionSecretRoute: typeof ApiPublicWebhooksDiggionSecretRoute
 }
 
@@ -792,6 +805,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAffiliatesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/r/$code': {
+      id: '/api/public/r/$code'
+      path: '/api/public/r/$code'
+      fullPath: '/api/public/r/$code'
+      preLoaderRoute: typeof ApiPublicRCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/webhooks/diggion/$secret': {
       id: '/api/public/webhooks/diggion/$secret'
       path: '/api/public/webhooks/diggion/$secret'
@@ -899,6 +919,7 @@ const rootRouteChildren: RootRouteChildren = {
   GameRoute: GameRoute,
   GerenteRoute: GerenteRouteWithChildren,
   LoginRoute: LoginRoute,
+  ApiPublicRCodeRoute: ApiPublicRCodeRoute,
   ApiPublicWebhooksDiggionSecretRoute: ApiPublicWebhooksDiggionSecretRoute,
 }
 export const routeTree = rootRouteImport

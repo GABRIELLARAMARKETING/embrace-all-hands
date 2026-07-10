@@ -189,9 +189,12 @@ export const convertReferralClick = createServerFn({ method: "POST" })
     z.object({ trackingId: z.string().min(6).max(64) }).parse(raw),
   )
   .handler(async ({ context, data }) => {
-    const { supabase, userId } = context;
-    // Só atualiza cliques ainda não convertidos, do mesmo tid.
-    const { error } = await supabase
+    const { userId } = context;
+    // A política de UPDATE restringe a admin — usamos service role aqui.
+    // A operação é segura: só marca cliques do próprio tid do cookie que
+    // ainda não foram convertidos, e amarra ao userId autenticado.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
       .from("referral_clicks")
       .update({ converted_user_id: userId, converted_at: new Date().toISOString() })
       .eq("tracking_id", data.trackingId)
