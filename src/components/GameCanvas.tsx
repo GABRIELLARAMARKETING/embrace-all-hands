@@ -302,7 +302,8 @@ function GameLogic({
                 continue;
               breakingRingsRef.current.set(k, now);
               playSound("platform_break");
-              const kRing = generated.rings[k];
+              const kRing = manager.rings[k];
+              if (!kRing) continue;
               burstRef.current?.burst(
                 0,
                 kRing.y + CONSTANTS.PLATFORM_HEIGHT / 2,
