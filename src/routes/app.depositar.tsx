@@ -45,7 +45,13 @@ const kycSchema = z.object({
 type KycValues = z.infer<typeof kycSchema>;
 
 function DepositarPage() {
-  const balance = usePlayerStore((s) => s.balance);
+  const profileFn = useServerFn(getMyProfile);
+  const { data: profile } = useQuery({
+    queryKey: ["my-profile"],
+    queryFn: () => profileFn({}),
+    staleTime: 30_000,
+  });
+  const balance = profile?.balance ?? 0;
   const [showCoupon, setShowCoupon] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [kycOpen, setKycOpen] = useState(false);
