@@ -127,6 +127,18 @@ export const createDiggionDeposit = createServerFn({ method: "POST" })
         .from("deposits")
         .update({ status: "failed", last_error: String(e?.message ?? e) })
         .eq("id", dep.id);
+      const { auditLog } = await import("./audit.functions");
+      await auditLog(supabaseAdmin, {
+        eventType: "DEPOSIT_FAILED",
+        module: "deposits",
+        severity: "error",
+        title: "Falha ao gerar PIX na Diggion",
+        message: String(e?.message ?? e).slice(0, 300),
+        metadata: { depositId: dep.id, amount: data.amount },
+        entityType: "deposit",
+        entityId: dep.id,
+        userId,
+      });
       throw new Error("Falha ao gerar PIX na Diggion. Tente novamente.");
     }
 
