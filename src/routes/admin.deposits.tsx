@@ -258,6 +258,72 @@ function Page() {
           </tbody>
         </table>
       </div>
+      </>
+      )}
+    </div>
+  );
+}
+
+function TabBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`-mb-px border-b-2 px-3 py-2 text-sm ${
+        active ? "border-cyan-400 text-white" : "border-transparent text-white/50 hover:text-white"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function DivergencesPanel({ rows, loading }: { rows: any[]; loading: boolean }) {
+  const kindLabel: Record<string, string> = {
+    paid_without_credit: "Pago sem crédito",
+    missing_wallet_tx: "Sem lançamento",
+    wallet_amount_mismatch: "Valor divergente",
+    webhook_paid_no_deposit: "Webhook s/ depósito",
+  };
+  return (
+    <div className="overflow-hidden rounded-xl border border-red-400/20 bg-red-500/[0.03]">
+      <div className="border-b border-red-400/20 bg-red-500/10 px-4 py-2 text-xs text-red-200">
+        <AlertTriangle className="mr-1 inline h-3.5 w-3.5" />
+        Divergências entre Diggion Pay, depósitos e carteira. Reprocessar em <b>Auditoria Webhooks</b>.
+      </div>
+      <table className="w-full text-sm">
+        <thead className="bg-white/[0.03] text-left text-xs uppercase text-white/50">
+          <tr>
+            <th className="px-4 py-2">Tipo</th>
+            <th className="px-4 py-2">Usuário</th>
+            <th className="px-4 py-2">Depósito / TX</th>
+            <th className="px-4 py-2 text-right">Esperado</th>
+            <th className="px-4 py-2 text-right">Real</th>
+            <th className="px-4 py-2">Detalhe</th>
+          </tr>
+        </thead>
+        <tbody>
+          {loading ? (
+            <tr><td colSpan={6} className="px-4 py-8 text-center text-white/40">Verificando…</td></tr>
+          ) : rows.length === 0 ? (
+            <tr><td colSpan={6} className="px-4 py-10 text-center text-emerald-300/70">✓ Nenhuma divergência detectada.</td></tr>
+          ) : rows.map((r, i) => (
+            <tr key={i} className="border-t border-white/5">
+              <td className="px-4 py-2">
+                <span className="rounded-full border border-red-400/30 bg-red-500/10 px-2 py-0.5 text-[11px] text-red-200">
+                  {kindLabel[r.kind] ?? r.kind}
+                </span>
+              </td>
+              <td className="px-4 py-2 text-white/80">{r.user_name ?? r.user_id?.slice(0, 8) ?? "—"}</td>
+              <td className="px-4 py-2 font-mono text-[11px] text-white/50">
+                {(r.deposit_id ?? r.provider_tx_id ?? "—").slice(0, 24)}
+              </td>
+              <td className="px-4 py-2 text-right font-mono text-white/80">{r.expected != null ? formatCurrency(r.expected) : "—"}</td>
+              <td className="px-4 py-2 text-right font-mono text-white/80">{r.actual != null ? formatCurrency(r.actual) : "—"}</td>
+              <td className="px-4 py-2 text-xs text-white/60">{r.detail}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
