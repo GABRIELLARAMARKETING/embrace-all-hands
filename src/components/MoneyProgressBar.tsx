@@ -76,7 +76,7 @@ export function MoneyProgressBar() {
 
   const handleGoToDashboard = () => {
     setShowRewardModal(false);
-    navigate({ to: "/gerente/painel" });
+    navigate({ to: "/app/jogar" });
   };
 
   const showBar = gameState === "playing" || gameState === "paused";
