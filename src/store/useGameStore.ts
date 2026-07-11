@@ -16,6 +16,7 @@ export type GameState = "menu" | "playing" | "paused" | "gameOver" | "victory";
 interface Store {
   gameState: GameState;
   // Session
+  sessionId: number; // increments on start/restart — used to reset engine caches
   score: number;
   coins: number; // coins collected this level
   combo: number;
