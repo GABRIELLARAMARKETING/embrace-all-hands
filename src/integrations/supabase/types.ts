@@ -994,6 +994,7 @@ export type Database = {
           coins: number
           cpf: string | null
           created_at: string
+          demo_balance: number
           display_name: string | null
           email: string | null
           full_name: string | null
@@ -1016,6 +1017,7 @@ export type Database = {
           coins?: number
           cpf?: string | null
           created_at?: string
+          demo_balance?: number
           display_name?: string | null
           email?: string | null
           full_name?: string | null
@@ -1038,6 +1040,7 @@ export type Database = {
           coins?: number
           cpf?: string | null
           created_at?: string
+          demo_balance?: number
           display_name?: string | null
           email?: string | null
           full_name?: string | null
@@ -1528,6 +1531,7 @@ export type Database = {
       }
       helix_withdrawal_rules: { Args: never; Returns: Json }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_demo_user: { Args: { _user_id: string }; Returns: boolean }
       log_audit_event: {
         Args: {
           _correlation_id?: string
@@ -1544,6 +1548,10 @@ export type Database = {
           _user_id?: string
         }
         Returns: string
+      }
+      manager_credit_demo_balance: {
+        Args: { _amount: number; _reason?: string; _target_user_id: string }
+        Returns: Json
       }
       process_deposit_commissions: {
         Args: { _deposit_id: string }
