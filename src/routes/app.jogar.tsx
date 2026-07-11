@@ -11,6 +11,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { cn } from "@/lib/utils";
 import helixClassicMap from "@/assets/helix-classic-map.png.asset.json";
 import { getPlayableDeposit, validatePlayValue } from "@/lib/helix-play.functions";
+import { useGameSession } from "@/hooks/useGameSession";
 
 export const Route = createFileRoute("/app/jogar")({
   head: () => ({
@@ -27,6 +28,7 @@ function JogarPage() {
   const setSelectedMap = usePlayerStore((s) => s.setSelectedMap);
   const value = usePlayerStore((s) => s.selectedPlayValue);
   const setValue = usePlayerStore((s) => s.setSelectedPlayValue);
+  const { startPaidSession } = useGameSession();
 
   // Fonte oficial: backend valida qual valor o usuário pode jogar (baseado no
   // último depósito pago e ainda não usado em uma sessão).
@@ -72,6 +74,16 @@ function JogarPage() {
             : res.reason === "deposit_already_used"
               ? "Este depósito já foi usado em uma partida."
               : "Depósito indisponível para jogar.",
+        );
+        await playable.refetch();
+        return;
+      }
+      const session = await startPaidSession(res.depositId);
+      if (!session.ok) {
+        toast.error(
+          session.reason === "deposit_already_used"
+            ? "Este depósito já foi usado em uma partida."
+            : "Não foi possível iniciar a partida.",
         );
         await playable.refetch();
         return;
