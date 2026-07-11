@@ -19,6 +19,7 @@ import { useThemePreload } from "@/hooks/useThemePreload";
 import { useHelixDifficultyLoader } from "@/hooks/useHelixDifficultyLoader";
 import { LogoHelix } from "@/components/LogoHelix";
 import { HELIX_ALLOWED_AMOUNTS } from "@/lib/helix-rules";
+import { supabase } from "@/integrations/supabase/client";
 
 
 export const Route = createFileRoute("/game")({
@@ -39,17 +40,36 @@ function GamePage() {
   // Guard: /game exige um valor de depósito válido selecionado em /app/jogar.
   const navigate = useNavigate();
   const selectedPlayValue = usePlayerStore((s) => s.selectedPlayValue);
-  useEffect(() => {
-    if (selectedPlayValue == null || !HELIX_ALLOWED_AMOUNTS.has(selectedPlayValue)) {
-      navigate({ to: "/app/jogar", replace: true });
-    }
-  }, [selectedPlayValue, navigate]);
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (selectedPlayValue != null && HELIX_ALLOWED_AMOUNTS.has(selectedPlayValue)) {
+    let mounted = true;
+    supabase.auth.getUser().then(({ data }) => {
+      if (mounted) setAuthenticated(!!data.user);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthenticated(!!session?.user);
+    });
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (
+      authenticated === true &&
+      (selectedPlayValue == null || !HELIX_ALLOWED_AMOUNTS.has(selectedPlayValue))
+    ) {
+      navigate({ to: "/app/jogar", replace: true });
+    }
+  }, [authenticated, selectedPlayValue, navigate]);
+
+  useEffect(() => {
+    if (authenticated === true && selectedPlayValue != null && HELIX_ALLOWED_AMOUNTS.has(selectedPlayValue)) {
       useGameStore.getState().startGame();
     }
-  }, [selectedPlayValue]);
+  }, [authenticated, selectedPlayValue]);
 
 
 
