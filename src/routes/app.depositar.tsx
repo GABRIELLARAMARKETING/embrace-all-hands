@@ -440,9 +440,7 @@ function PixQrModal({
     if (status?.status === "paid") {
       toast.success("Pagamento confirmado! Saldo creditado.");
       qc.invalidateQueries({ queryKey: ["my-profile"] });
-      qc.refetchQuery
-        ? qc.refetchQueries({ queryKey: ["my-profile"] })
-        : qc.invalidateQueries();
+      qc.refetchQueries({ queryKey: ["my-profile"] });
     } else if (status?.status === "expired") {
       toast.error("PIX expirado. Gere um novo depósito.");
     }
