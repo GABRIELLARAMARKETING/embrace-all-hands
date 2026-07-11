@@ -76,6 +76,31 @@ export function useGameSession() {
     }
   }, []);
 
+  const startDemoSession = useCallback(
+    async (amount: number, themeId: string | null = null) => {
+      startedAt = Date.now();
+      try {
+        const { data, error } = await supabase.rpc("helix_create_demo_session", {
+          _amount: amount,
+          _theme_id: themeId ?? undefined,
+        });
+        if (error) return { ok: false as const, reason: error.message };
+        const result = asHelixCreateSessionResult(data);
+        if (!result.ok || !result.session_id) {
+          return { ok: false as const, reason: result.reason ?? "session_not_created" };
+        }
+        setCurrentGameSession(result.session_id);
+        return { ok: true as const, sessionId: result.session_id };
+      } catch (error) {
+        return {
+          ok: false as const,
+          reason: error instanceof Error ? error.message : "session_not_created",
+        };
+      }
+    },
+    [],
+  );
+
   const finishSession = useCallback(
     async (data: { score: number; level_reached: number; status?: "finished" | "gameover" }) => {
       const id = currentSessionId;
