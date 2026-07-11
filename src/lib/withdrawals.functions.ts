@@ -43,6 +43,29 @@ export const requestAffiliateWithdrawal = createServerFn({ method: "POST" })
       .single();
     if (insertError) throw new Error(insertError.message);
 
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { error: notifyError } = await supabaseAdmin
+        .from("admin_notifications")
+        .insert({
+          type: "WITHDRAWAL_REQUESTED",
+          severity: "warning",
+          title: `Novo saque solicitado: R$ ${data.amount}`,
+          message: `Usuário ${userId} solicitou saque de R$ ${data.amount}.`,
+          payload: {
+            withdrawal_id: withdrawal.id,
+            user_id: userId,
+            amount: data.amount,
+            pix_key: data.pixKey ?? null,
+          },
+        });
+      if (notifyError) {
+        console.error("[withdrawals] failed to insert admin_notification", notifyError);
+      }
+    } catch (e) {
+      console.error("[withdrawals] admin_notification insert threw", e);
+    }
+
     const newBalance = balance - data.amount;
     const { error: updateError } = await supabase
       .from("profiles")
