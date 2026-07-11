@@ -335,10 +335,17 @@ export const updateAdminUser = createServerFn({ method: "POST" })
         throw new Error("Admin não pode remover o próprio acesso admin.");
       }
       // Clear existing role rows and insert new (except 'user' which is no row)
-      await supabaseAdmin.from("user_roles").delete().eq("user_id", data.id);
+      const { error: delErr } = await supabaseAdmin
+        .from("user_roles")
+        .delete()
+        .eq("user_id", data.id);
+      if (delErr) throw new Error(`Falha ao limpar papel anterior: ${delErr.message}`);
       if (data.role !== "user") {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await supabaseAdmin.from("user_roles").insert({ user_id: data.id, role: data.role } as any);
+        const { error: insErr } = await supabaseAdmin
+          .from("user_roles")
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .insert({ user_id: data.id, role: data.role } as any);
+        if (insErr) throw new Error(`Falha ao atribuir papel '${data.role}': ${insErr.message}`);
       }
     }
 
