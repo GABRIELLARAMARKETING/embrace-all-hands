@@ -5,6 +5,8 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { RewardClaimedModal } from "./RewardClaimedModal";
 import { HELIX_DEPOSIT_RULES } from "@/lib/helix-rules";
+import { useGameSession } from "@/hooks/useGameSession";
+
 
 export function MoneyProgressBar() {
   const selectedPlayValue = usePlayerStore((s) => s.selectedPlayValue);
