@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { noInput } from "@/lib/validation";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -35,6 +36,7 @@ export type HelixAuditResult = {
 
 export const auditHelixPayoutRules = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
+  .inputValidator(noInput)
   .handler(async ({ context }): Promise<HelixAuditResult> => {
     const { data: adm } = await context.supabase.rpc("is_admin", {
       _user_id: context.userId,

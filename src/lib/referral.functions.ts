@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { noInput } from "@/lib/validation";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type ReferralTier = "N1" | "N2" | "N3" | "TOTAL";
@@ -20,6 +21,7 @@ function getPublicBaseUrl(): string {
 
 export const getReferralStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
+  .inputValidator(noInput)
   .handler(async ({ context }): Promise<ReferralStatsPayload> => {
     const { supabase, userId } = context;
 
