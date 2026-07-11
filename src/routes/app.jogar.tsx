@@ -31,7 +31,7 @@ function JogarPage() {
   const value = usePlayerStore((s) => s.selectedPlayValue);
   const setValue = usePlayerStore((s) => s.setSelectedPlayValue);
   const startGame = useGameStore((s) => s.startGame);
-  const { startPaidSession } = useGameSession();
+  const { startPaidSession, startDemoSession } = useGameSession();
 
   // Fonte oficial: backend valida qual valor o usuário pode jogar (baseado no
   // último depósito pago e ainda não usado em uma sessão).
