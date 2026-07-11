@@ -122,7 +122,7 @@ export function MoneyProgressBar() {
             </div>
           </div>
 
-          {completed && (
+          {completed && !isDemo && (
             <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex w-full flex-col items-center justify-center px-6 pb-8 sm:pb-10">
               <button
                 type="button"
