@@ -129,7 +129,7 @@ export const createDiggionDeposit = createServerFn({ method: "POST" })
         productHash,
         productTitle: "Depósito Helix Fast",
         customer: {
-          name: data.fullName,
+          name: fullName,
           email: data.email,
           phone: data.phone,
           document: data.cpf,
