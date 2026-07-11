@@ -49,7 +49,7 @@ export const Route = createFileRoute("/app/perfil")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Meu Perfil — MultiHelixBr" },
+      { title: "Meu Perfil — HelixFast" },
       { name: "description", content: "Perfil do jogador." },
     ],
   }),

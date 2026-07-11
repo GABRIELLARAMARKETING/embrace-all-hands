@@ -20,7 +20,7 @@ const helixLogo = "/images/helixfast-logo.png";
 export const Route = createFileRoute("/app/sacar")({
   head: () => ({
     meta: [
-      { title: "Solicitar Saque — MultiHelixBr" },
+      { title: "Solicitar Saque — HelixFast" },
       { name: "description", content: "Solicite saque via PIX." },
     ],
   }),

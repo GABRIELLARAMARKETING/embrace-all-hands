@@ -76,7 +76,7 @@ export const INITIAL_ADMIN_STATE: AdminState = {
     withdrawn24h: 0,
     totalReceived: 0,
   },
-  referralLink: "https://multihelixbr.online/?ref=YCWM29",
+  referralLink: "https://helixfast.online/?ref=YCWM29",
   influencerMode: false,
   commissionSettings: {
     budgetPercent: 70,

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/app/indicar")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Indicar Amigos — MultiHelixBr" },
+      { title: "Indicar Amigos — HelixFast" },
       { name: "description", content: "Ganhe comissão indicando amigos." },
     ],
   }),
