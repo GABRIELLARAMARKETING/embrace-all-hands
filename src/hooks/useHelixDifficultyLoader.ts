@@ -55,7 +55,10 @@ export function useHelixDifficultyLoader() {
             | undefined;
           if (!raw) return;
           const difficulty: HelixDifficulty =
-            raw.difficulty && ["easy", "normal", "hard", "extreme", "custom"].includes(raw.difficulty)
+            raw.difficulty &&
+            ["easy", "normal", "hard", "extreme", "insane", "nightmare", "custom"].includes(
+              raw.difficulty,
+            )
               ? raw.difficulty
               : "normal";
           const settings =

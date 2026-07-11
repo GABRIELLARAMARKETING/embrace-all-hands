@@ -38,7 +38,15 @@ const settingsSchema = z.object({
     .max(HELIX_SETTINGS_RANGES.difficultyProgressionRate[1]),
 }) satisfies z.ZodType<HelixSettings>;
 
-const difficultySchema = z.enum(["easy", "normal", "hard", "extreme", "custom"]);
+const difficultySchema = z.enum([
+  "easy",
+  "normal",
+  "hard",
+  "extreme",
+  "insane",
+  "nightmare",
+  "custom",
+]);
 
 /**
  * Endpoint público — lido pelo jogo ao iniciar.

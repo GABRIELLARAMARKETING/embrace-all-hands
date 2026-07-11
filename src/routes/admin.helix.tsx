@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient, queryOptions } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   DEFAULT_HELIX_CONFIG,
@@ -43,8 +43,10 @@ function Page() {
   const [difficulty, setDifficulty] = useState<HelixDifficulty>(data?.difficulty ?? "normal");
   const [settings, setSettings] = useState<HelixSettings>(data?.settings ?? DEFAULT_HELIX_CONFIG.settings);
 
+  const hydrated = useRef(false);
   useEffect(() => {
-    if (data) {
+    if (data && !hydrated.current) {
+      hydrated.current = true;
       setDifficulty(data.difficulty);
       setSettings(data.settings);
     }
