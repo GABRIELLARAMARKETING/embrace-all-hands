@@ -186,8 +186,10 @@ export const getRecentActivity = createServerFn({ method: "GET" })
           .from("deposits")
           .select("id, amount, status, user_id, created_at, credited_at")
           .in("status", ["paid", "approved"])
+          .neq("provider", "admin_manual")
           .order("credited_at", { ascending: false })
           .limit(8),
+
         supabaseAdmin
           .from("affiliate_withdrawals")
           .select("id, amount, status, user_id, created_at")
