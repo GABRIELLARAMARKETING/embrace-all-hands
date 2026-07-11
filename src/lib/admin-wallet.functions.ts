@@ -16,10 +16,33 @@ type UserRow = {
   created_at: string;
 };
 
+type AdjustmentRow = {
+  id: string;
+  action: string;
+  amount: number;
+  balance_before: number;
+  balance_after: number;
+  reason: string;
+  note: string | null;
+  admin_user_id: string;
+  admin_display_name: string | null;
+  created_at: string;
+};
+
+type TransactionRow = {
+  id: string;
+  type: string;
+  amount: number;
+  balance_before: number;
+  balance_after: number;
+  description: string | null;
+  created_at: string;
+};
+
 type WalletHistory = {
   ok?: boolean;
-  adjustments: Array<Record<string, unknown>>;
-  transactions: Array<Record<string, unknown>>;
+  adjustments: AdjustmentRow[];
+  transactions: TransactionRow[];
 };
 
 // ------- Buscar usuários -------
