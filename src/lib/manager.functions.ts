@@ -128,8 +128,10 @@ export const getManagerReferralLink = createServerFn({ method: "GET" })
     if (ids.length) {
       const { data: dep } = await supabase
         .from("deposits").select("user_id")
-        .in("user_id", ids as any).in("status", ["approved", "paid"]);
+        .in("user_id", ids as any).in("status", ["approved", "paid"])
+        .neq("provider", "admin_manual");
       withDeposit = new Set((dep ?? []).map((d: any) => d.user_id)).size;
+
     }
 
     return {
