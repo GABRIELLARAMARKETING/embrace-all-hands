@@ -241,7 +241,7 @@ function LoginPage() {
 
           <button
             type="button"
-            onClick={() => navigate({ to: "/app/jogar" })}
+            onClick={() => navigate({ to: "/game" })}
             className="mt-4 flex w-full items-center justify-center gap-1 text-sm text-violet-100/50 hover:text-violet-200"
           >
             <ChevronLeft size={16} /> Voltar ao início
