@@ -174,17 +174,17 @@ function JogarPage() {
 
           {/* Play button */}
           <button
-            disabled={!value}
-            onClick={() => navigate({ to: "/game" })}
+            disabled={!canPlay}
+            onClick={() => canPlay && navigate({ to: "/game" })}
             className={cn(
               "mt-5 flex w-full items-center justify-center gap-2 rounded-full py-4 text-[15px] font-bold transition-all",
-              value
+              canPlay
                 ? "bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] text-white shadow-[0_10px_30px_-10px_rgba(236,95,163,0.7)] active:scale-[0.98]"
                 : "cursor-not-allowed border border-[#3a1d5a] bg-[#1a0c30] text-white/45",
             )}
           >
             <Play className="h-4 w-4 fill-current" />
-            JOGAR — {formatCurrency(value ?? 0)}
+            JOGAR — {formatCurrency(serverAmount ?? 0)}
           </button>
         </div>
       </div>
