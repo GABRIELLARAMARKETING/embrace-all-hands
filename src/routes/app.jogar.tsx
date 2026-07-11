@@ -55,6 +55,9 @@ function JogarPage() {
     refetchOnMount: "always",
   });
   const balance = profileQuery.data?.balance ?? 0;
+  const isDemo = !!profileQuery.data?.isDemo;
+  const demoBalance = profileQuery.data?.demoBalance ?? 0;
+  const effectiveBalance = isDemo ? demoBalance : balance;
 
 
   // Diagnóstico rápido no console — inspecionar em DevTools ao abrir /app/jogar.
