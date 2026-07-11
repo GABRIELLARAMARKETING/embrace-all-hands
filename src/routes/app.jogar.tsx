@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Play } from "lucide-react";
 import { AppLayout } from "@/components/player/AppLayout";
 import { PLAYER_MOCK, MAP_OPTIONS } from "@/data/playerMockData";
@@ -7,6 +9,7 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { cn } from "@/lib/utils";
 import helixClassicMap from "@/assets/helix-classic-map.png.asset.json";
+import { getPlayableDeposit } from "@/lib/helix-play.functions";
 
 export const Route = createFileRoute("/app/jogar")({
   head: () => ({
@@ -24,6 +27,24 @@ function JogarPage() {
   const value = usePlayerStore((s) => s.selectedPlayValue);
   const setValue = usePlayerStore((s) => s.setSelectedPlayValue);
 
+  // Fonte oficial: backend valida qual valor o usuário pode jogar (baseado no
+  // último depósito pago e ainda não usado em uma sessão).
+  const fetchPlayable = useServerFn(getPlayableDeposit);
+  const playable = useQuery({
+    queryKey: ["helix", "playable-deposit"],
+    queryFn: () => fetchPlayable(),
+    staleTime: 10_000,
+    refetchOnWindowFocus: true,
+  });
+  const serverAmount = playable.data?.ok ? playable.data.amount : null;
+
+  // Sincroniza store com o valor autoritativo do backend; rejeita divergências.
+  useEffect(() => {
+    if (serverAmount != null && value !== serverAmount) {
+      setValue(serverAmount);
+    }
+  }, [serverAmount, value, setValue]);
+
   // Apenas o mapa clássico está disponível nesta rota.
   const availableMaps = useMemo(
     () => MAP_OPTIONS.filter((m) => m.id === "classico"),
@@ -31,7 +52,10 @@ function JogarPage() {
   );
   const selectedMap = availableMaps[0];
   // Regra oficial (backend): saque mínimo = 5x o valor do depósito.
-  const minWithdraw = value ? value * 5 : 0;
+  const effectiveValue = serverAmount ?? value ?? null;
+  const minWithdraw = effectiveValue ? effectiveValue * 5 : 0;
+  const canPlay = !!serverAmount;
+
 
 
   return (
@@ -60,22 +84,27 @@ function JogarPage() {
             </div>
           </div>
 
-          {/* Valor de entrada */}
-          <div className="mt-6 text-[11px] font-bold tracking-widest text-[#B47CFF]">VALOR DE ENTRADA</div>
+          {/* Valor de entrada — travado no depósito real do usuário (backend) */}
+          <div className="mt-6 text-[11px] font-bold tracking-widest text-[#B47CFF]">
+            VALOR DE ENTRADA
+          </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {PLAYER_MOCK.playOptions.map((v) => {
-              const active = value === v;
+              const active = effectiveValue === v;
+              const allowed = serverAmount === v;
               return (
                 <button
                   key={v}
-                  onClick={() => {
-                    setValue(v);
-                  }}
+                  disabled={!allowed}
+                  title={allowed ? undefined : "Valor não corresponde ao seu depósito"}
+                  onClick={() => allowed && setValue(v)}
                   className={cn(
                     "rounded-full px-4 py-2 text-sm font-bold transition-all",
                     active
                       ? "bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] text-white shadow-[0_0_18px_rgba(168,85,247,0.55)]"
-                      : "border border-[#3a1d5a] bg-[#1a0c30] text-white hover:border-[#5b2e8a]",
+                      : allowed
+                        ? "border border-[#3a1d5a] bg-[#1a0c30] text-white hover:border-[#5b2e8a]"
+                        : "cursor-not-allowed border border-[#3a1d5a]/40 bg-[#1a0c30]/40 text-white/30",
                   )}
                 >
                   R${v}
@@ -83,6 +112,12 @@ function JogarPage() {
               );
             })}
           </div>
+          {!playable.isLoading && !serverAmount && (
+            <div className="mt-2 text-[11px] font-semibold text-amber-300/90">
+              Nenhum depósito disponível para jogar. Faça um depósito para liberar.
+            </div>
+          )}
+
 
 
 
@@ -95,14 +130,14 @@ function JogarPage() {
             <div className="mt-1 text-3xl font-black text-[#FFD600] drop-shadow-[0_0_14px_rgba(255,214,0,0.55)]">
               {formatCurrency(minWithdraw)}
             </div>
-            {value ? (
+            {effectiveValue ? (
               <div className="mt-1 text-[11px] text-white/55">
-                Depósito de {formatCurrency(value)} · sacar só ao atingir{" "}
+                Depósito de {formatCurrency(effectiveValue)} · sacar só ao atingir{" "}
                 {formatCurrency(minWithdraw)}
               </div>
             ) : (
               <div className="mt-1 text-[11px] text-white/45">
-                Escolha um valor de entrada para ver o mínimo
+                Faça um depósito para desbloquear o jogo
               </div>
             )}
           </div>
@@ -139,17 +174,17 @@ function JogarPage() {
 
           {/* Play button */}
           <button
-            disabled={!value}
-            onClick={() => navigate({ to: "/game" })}
+            disabled={!canPlay}
+            onClick={() => canPlay && navigate({ to: "/game" })}
             className={cn(
               "mt-5 flex w-full items-center justify-center gap-2 rounded-full py-4 text-[15px] font-bold transition-all",
-              value
+              canPlay
                 ? "bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] text-white shadow-[0_10px_30px_-10px_rgba(236,95,163,0.7)] active:scale-[0.98]"
                 : "cursor-not-allowed border border-[#3a1d5a] bg-[#1a0c30] text-white/45",
             )}
           >
             <Play className="h-4 w-4 fill-current" />
-            JOGAR — {formatCurrency(value ?? 0)}
+            JOGAR — {formatCurrency(serverAmount ?? 0)}
           </button>
         </div>
       </div>
