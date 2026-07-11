@@ -70,6 +70,7 @@ const NAV = [
   { to: "/admin/network", label: "Rede de Indicações", icon: Users },
   { to: "/admin/tracking", label: "Rastreamento", icon: Radar },
   { to: "/admin/withdrawals", label: "Saques", icon: Wallet },
+  { to: "/admin/wallet", label: "Gerenciar Saldo", icon: Wallet },
   { to: "/admin/finance", label: "Financeiro", icon: DollarSign },
   { to: "/admin/deposits", label: "Depósitos Diggion", icon: Landmark },
   { to: "/admin/webhooks", label: "Auditoria Webhooks", icon: ScrollText },
