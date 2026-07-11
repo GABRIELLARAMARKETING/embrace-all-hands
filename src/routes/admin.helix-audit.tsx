@@ -1,22 +1,64 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, XCircle, RefreshCw, ShieldAlert, Gamepad2 } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { toast } from "sonner";
+import { CheckCircle2, XCircle, RefreshCw, ShieldAlert, Gamepad2, AlertTriangle, Activity } from "lucide-react";
 import { auditHelixPayoutRules } from "@/lib/helix-audit.functions";
 import { HELIX_DEPOSIT_RULES } from "@/lib/helix-rules";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/helix-audit")({
   head: () => ({ meta: [{ title: "Auditoria Helix — Admin" }] }),
   component: HelixAuditPage,
 });
 
+const AUTO_REFRESH_MS = 15_000;
+
 function HelixAuditPage() {
   const auditFn = useServerFn(auditHelixPayoutRules);
-  const { data, isLoading, isFetching, refetch, error } = useQuery({
+  const { data, isLoading, isFetching, refetch, error, dataUpdatedAt } = useQuery({
     queryKey: ["helix-audit"],
     queryFn: () => auditFn({}),
+    refetchInterval: AUTO_REFRESH_MS,
+    refetchIntervalInBackground: true,
   });
+
+  // Realtime: reexecuta auditoria quando depósitos/sessões mudam
+  useEffect(() => {
+    const channel = supabase
+      .channel("helix-audit-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "deposits" }, () => refetch())
+      .on("postgres_changes", { event: "*", schema: "public", table: "game_sessions" }, () => refetch())
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
+
+  // Alertas: toast quando novas divergências aparecem
+  const prevCountsRef = useRef<{ rules: number; deps: number; sess: number } | null>(null);
+  useEffect(() => {
+    if (!data) return;
+    const rulesFail = data.rules.filter((r) => !r.ok).length;
+    const deps = data.invalidDeposits.length;
+    const sess = data.sessionMismatches.length;
+    const prev = prevCountsRef.current;
+    if (prev) {
+      if (deps > prev.deps) toast.error(`Novo depósito inválido detectado (${deps - prev.deps})`);
+      if (sess > prev.sess) toast.error(`Nova sessão com payout divergente (${sess - prev.sess})`);
+      if (rulesFail > prev.rules) toast.error(`Regra oficial de payout divergente no banco!`);
+    }
+    prevCountsRef.current = { rules: rulesFail, deps, sess };
+  }, [data]);
+
+  const totalIssues = data
+    ? data.invalidDeposits.length +
+      data.sessionMismatches.length +
+      data.rules.filter((r) => !r.ok).length
+    : 0;
+  const healthy = data && totalIssues === 0;
 
   return (
     <div className="space-y-6 text-white">
