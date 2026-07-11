@@ -38,8 +38,7 @@ export const createDiggionDeposit = createServerFn({ method: "POST" })
           .string()
           .transform(onlyDigits)
           .refine((v) => CPF_RE.test(v), "CPF inválido"),
-        fullName: z.string().trim().min(3).max(120),
-        email: z.string().trim().email().max(200),
+        email: z.string().trim().toLowerCase().email().max(200),
         phone: z
           .string()
           .transform(onlyDigits)
@@ -48,18 +47,34 @@ export const createDiggionDeposit = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    const { supabase, userId, claims } = context;
+
+    // Só aceita o e-mail cadastrado na conta.
+    const accountEmail = String((claims as { email?: string } | null)?.email ?? "").trim().toLowerCase();
+    if (!accountEmail || data.email !== accountEmail) {
+      throw new Error("Use o e-mail cadastrado na sua conta.");
+    }
+
+    // Deriva nome a partir do profile (nunca do cliente).
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("full_name, display_name")
+      .eq("id", userId)
+      .maybeSingle();
+    const fullName = String(prof?.full_name ?? prof?.display_name ?? accountEmail.split("@")[0] ?? "Jogador")
+      .trim()
+      .slice(0, 120) || "Jogador";
 
     // Persist KYC no profile (uma vez)
     await supabase
       .from("profiles")
       .update({
         cpf: data.cpf,
-        full_name: data.fullName,
         email: data.email,
         phone: data.phone,
       })
       .eq("id", userId);
+
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { DiggionPayService } = await import("./diggion.server");
