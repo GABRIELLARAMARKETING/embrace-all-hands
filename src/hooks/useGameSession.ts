@@ -32,6 +32,7 @@ function setCurrentGameSession(id: string | null) {
 }
 
 export function useGameSession() {
+  const queryClient = useQueryClient();
   const startSession = useCallback(async (themeId: string | null) => {
     startedAt = Date.now();
     try {
