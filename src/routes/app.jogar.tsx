@@ -58,6 +58,33 @@ function JogarPage() {
   const minWithdraw = effectiveValue ? effectiveValue * 5 : 0;
   const canPlay = !!serverAmount;
 
+  // Revalidação server-side no clique de JOGAR (defesa em profundidade).
+  const validateFn = useServerFn(validatePlayValue);
+  const [validating, setValidating] = useState(false);
+  const handlePlay = async () => {
+    if (!serverAmount || validating) return;
+    setValidating(true);
+    try {
+      const res = await validateFn({ data: { amount: serverAmount } });
+      if (!res.ok) {
+        toast.error(
+          res.reason === "amount_mismatch"
+            ? "Valor não corresponde ao seu depósito."
+            : res.reason === "deposit_already_used"
+              ? "Este depósito já foi usado em uma partida."
+              : "Depósito indisponível para jogar.",
+        );
+        await playable.refetch();
+        return;
+      }
+      navigate({ to: "/game" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao validar depósito.");
+    } finally {
+      setValidating(false);
+    }
+  };
+
 
 
   return (
