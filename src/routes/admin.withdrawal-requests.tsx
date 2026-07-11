@@ -202,9 +202,8 @@ function Page() {
             {rows.map((w) => {
               const open = expanded === w.id;
               return (
-                <>
+                <Fragment key={w.id}>
                   <tr
-                    key={w.id}
                     className="cursor-pointer border-t border-white/5 hover:bg-white/[0.03]"
                     onClick={() => setExpanded(open ? null : w.id)}
                   >
