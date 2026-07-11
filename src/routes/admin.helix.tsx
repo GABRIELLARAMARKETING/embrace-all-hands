@@ -43,8 +43,10 @@ function Page() {
   const [difficulty, setDifficulty] = useState<HelixDifficulty>(data?.difficulty ?? "normal");
   const [settings, setSettings] = useState<HelixSettings>(data?.settings ?? DEFAULT_HELIX_CONFIG.settings);
 
+  const hydrated = useRef(false);
   useEffect(() => {
-    if (data) {
+    if (data && !hydrated.current) {
+      hydrated.current = true;
       setDifficulty(data.difficulty);
       setSettings(data.settings);
     }
