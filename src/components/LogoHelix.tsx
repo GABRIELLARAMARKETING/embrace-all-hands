@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import logoAsset from "@/assets/helix-fast-logo.png.asset.json";
+const logoAsset = { url: "/images/helix-fast-logo.png" };
 
 interface Props {
   className?: string;
