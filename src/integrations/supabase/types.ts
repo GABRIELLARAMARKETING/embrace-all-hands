@@ -1568,6 +1568,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      test_demo_account_isolation: { Args: never; Returns: string }
       test_helix_flow: { Args: never; Returns: string }
       test_multilevel_flow: { Args: never; Returns: string }
     }
