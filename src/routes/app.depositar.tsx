@@ -55,7 +55,10 @@ function DepositarPage() {
   const { data: profile } = useQuery({
     queryKey: ["my-profile"],
     queryFn: () => profileFn({}),
-    staleTime: 30_000,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    refetchInterval: 5000,
   });
   const balance = profile?.balance ?? 0;
   const [showCoupon, setShowCoupon] = useState(false);
