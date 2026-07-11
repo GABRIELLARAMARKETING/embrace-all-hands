@@ -81,6 +81,7 @@ export const useGameStore = create<Store>((set, get) => ({
   startGame: (level) =>
     set((s) => ({
       gameState: "playing",
+      sessionId: s.sessionId + 1,
       score: 0,
       coins: 0,
       combo: 0,
@@ -91,14 +92,15 @@ export const useGameStore = create<Store>((set, get) => ({
   pauseGame: () => set({ gameState: "paused" }),
   resumeGame: () => set({ gameState: "playing" }),
   restartGame: () =>
-    set({
+    set((s) => ({
       gameState: "playing",
+      sessionId: s.sessionId + 1,
       score: 0,
       coins: 0,
       combo: 0,
       bestComboRun: 0,
       progress: 0,
-    }),
+    })),
   toMenu: () => set({ gameState: "menu" }),
 
   completeLevel: () => {
