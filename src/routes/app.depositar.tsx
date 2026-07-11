@@ -81,8 +81,7 @@ function getStatusInfo(status?: string) {
 }
 
 const kycSchema = z.object({
-  fullName: z.string().trim().min(3, "Nome completo obrigatório").max(120),
-  email: z.string().trim().email("E-mail inválido").max(200),
+  email: z.string().trim().toLowerCase().email("E-mail inválido").max(200),
   cpf: z.string().transform(cpfDigits).refine((v) => v.length === 11, "CPF inválido"),
   phone: z.string().transform((v) => v.replace(/\D/g, "")).refine((v) => v.length >= 10 && v.length <= 13, "Telefone inválido"),
 });
