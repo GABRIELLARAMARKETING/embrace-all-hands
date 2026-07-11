@@ -204,7 +204,30 @@ export const Route = createFileRoute("/api/public/webhooks/diggion/$secret")({
             .update({ webhook_payload: payload as any })
             .eq("id", dep.id);
 
+          if (normalized === "paid" && !signatureValid) {
+            await supabaseAdmin
+              .from("payment_webhook_logs")
+              .update({ processed: true, processing_error: "paid_without_valid_signature" })
+              .eq("id", logRow!.id);
+            await audit("webhook.credit_blocked_unsigned", dep.id, {
+              providerTxId,
+              providerStatus: tx.status,
+            }, "missing_or_invalid_signature");
+            const { auditLog } = await import("@/lib/audit.functions");
+            await auditLog(supabaseAdmin, {
+              eventType: "DEPOSIT_CREDIT_BLOCKED_UNSIGNED",
+              module: "webhooks",
+              severity: "critical",
+              title: `Crédito bloqueado: webhook 'paid' sem assinatura válida (${providerTxId})`,
+              metadata: { providerTxId, depositId: dep.id, headers, ip },
+              entityType: "deposit",
+              entityId: dep.id,
+              userId: dep.user_id,
+            });
+            return new Response("signature required for credit", { status: 401 });
+          }
           if (normalized === "paid") {
+
             const expectedAmount = (tx.amount ?? Math.round(Number(dep.amount) * 100)) / 100;
             const { data: credited, error: credErr } = await supabaseAdmin.rpc(
               "credit_deposit_atomic",

@@ -440,19 +440,27 @@ export const reprocessWebhookById = createServerFn({ method: "POST" })
     }
 
     if (normalized === "paid") {
-      const expectedAmount = (tx.amount ?? Math.round(Number(dep.amount) * 100)) / 100;
-      const { data: credited } = await supabaseAdmin.rpc("credit_deposit_atomic", {
-        _deposit_id: dep.id,
-        _expected_amount: expectedAmount,
-        _provider_tx_id: log.provider_transaction_id,
+      // SEGURANÇA: reprocesso manual NÃO credita. Apenas o webhook oficial
+      // assinado da Diggion pode chamar credit_deposit_atomic. Registramos
+      // a tentativa em auditoria para acompanhamento.
+      const { auditLog } = await import("./audit.functions");
+      await auditLog(supabaseAdmin, {
+        eventType: "DEPOSIT_RECONCILE_PAID_BLOCKED",
+        module: "deposits",
+        severity: "warning",
+        title: `Reprocesso admin viu 'paid' sem webhook — crédito bloqueado (${dep.id})`,
+        metadata: { depositId: dep.id, providerTx: log.provider_transaction_id, providerStatus: tx.status, webhookLogId: log.id },
+        entityType: "deposit",
+        entityId: dep.id,
+        userId: context.userId,
       });
-      const ok = (credited as any)?.ok === true;
       await supabaseAdmin
         .from("payment_webhook_logs")
-        .update({ processed: true, processing_error: ok ? null : (credited as any)?.reason ?? null })
+        .update({ processed: true, processing_error: "paid_awaiting_signed_webhook" })
         .eq("id", log.id);
-      return { ok, result: (credited as any)?.reason ?? "credited", provider_status: tx.status };
+      return { ok: false, result: "paid_awaiting_webhook", provider_status: tx.status };
     }
+
     if (["expired", "canceled", "refunded", "chargeback"].includes(normalized)) {
       await supabaseAdmin.from("deposits").update({ status: normalized as any }).eq("id", dep.id);
       await supabaseAdmin.from("payment_webhook_logs").update({ processed: true }).eq("id", log.id);

@@ -245,12 +245,21 @@ export const reconcilePendingDeposits = createServerFn({ method: "POST" })
         const tx = await DiggionPayService.getTransaction(d.external_id!);
         const normalized = DiggionPayService.normalizeStatus(tx.status);
         if (normalized === "paid") {
-          const { data: cred } = await supabaseAdmin.rpc("credit_deposit_atomic", {
-            _deposit_id: d.id,
-            _expected_amount: (tx.amount ?? d.amount * 100) / 100,
-            _provider_tx_id: tx.hash,
+          // SEGURANÇA: nunca creditar por reconciliação manual. Somente o
+          // webhook oficial assinado (`/api/public/webhooks/diggion/:secret`)
+          // pode chamar credit_deposit_atomic. Aqui apenas sinalizamos.
+          const { auditLog } = await import("./audit.functions");
+          await auditLog(supabaseAdmin, {
+            eventType: "DEPOSIT_RECONCILE_PAID_BLOCKED",
+            module: "deposits",
+            severity: "warning",
+            title: `Reconciliação viu 'paid' sem webhook — crédito bloqueado (${d.id})`,
+            metadata: { depositId: d.id, providerTx: tx.hash, providerStatus: tx.status },
+            entityType: "deposit",
+            entityId: d.id,
+            userId: context.userId,
           });
-          results.push({ id: d.id, result: (cred as any)?.reason ?? "credited" });
+          results.push({ id: d.id, result: "paid_awaiting_webhook" });
         } else if (["expired", "canceled", "refunded", "chargeback"].includes(normalized)) {
           await supabaseAdmin.from("deposits").update({ status: normalized as any }).eq("id", d.id);
           results.push({ id: d.id, result: normalized });
@@ -261,6 +270,7 @@ export const reconcilePendingDeposits = createServerFn({ method: "POST" })
         results.push({ id: d.id, result: `error:${String(e?.message ?? e).slice(0, 80)}` });
       }
     }
+
     return { checked: results.length, results };
   });
 
@@ -361,13 +371,21 @@ export const reconcileDepositById = createServerFn({ method: "POST" })
     const normalized = DiggionPayService.normalizeStatus(tx.status);
 
     if (normalized === "paid") {
-      const { data: cred } = await supabaseAdmin.rpc("credit_deposit_atomic", {
-        _deposit_id: d.id,
-        _expected_amount: (tx.amount ?? Number(d.amount) * 100) / 100,
-        _provider_tx_id: tx.hash,
+      // SEGURANÇA: crédito só ocorre pelo webhook oficial assinado.
+      const { auditLog } = await import("./audit.functions");
+      await auditLog(supabaseAdmin, {
+        eventType: "DEPOSIT_RECONCILE_PAID_BLOCKED",
+        module: "deposits",
+        severity: "warning",
+        title: `Admin viu 'paid' sem webhook — crédito bloqueado (${d.id})`,
+        metadata: { depositId: d.id, providerTx: tx.hash, providerStatus: tx.status },
+        entityType: "deposit",
+        entityId: d.id,
+        userId: context.userId,
       });
-      return { ok: true, result: (cred as any)?.reason ?? "credited", provider_status: tx.status };
+      return { ok: false, result: "paid_awaiting_webhook", provider_status: tx.status };
     }
+
     if (["expired", "canceled", "refunded", "chargeback"].includes(normalized)) {
       await supabaseAdmin.from("deposits").update({ status: normalized as any }).eq("id", d.id);
       return { ok: true, result: normalized, provider_status: tx.status };
