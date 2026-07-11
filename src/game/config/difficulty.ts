@@ -127,32 +127,6 @@ export const HELIX_DIFFICULTY_LABELS: Record<HelixDifficulty, string> = {
   custom: "Personalizado",
 };
 
-export const HELIX_SETTINGS_RANGES: Record<keyof HelixSettings, [number, number]> = {
-  ballSpeed: [0.5, 3.0],
-  towerRotationSpeed: [0.5, 3.0],
-  obstacleDensity: [0.0, 1.0],
-  obstacleFrequency: [0.5, 3.0],
-  gapSize: [0.4, 1.5],
-  gravity: [0.5, 3.0],
-  scoreMultiplier: [0.5, 5.0],
-  difficultyProgressionRate: [0.5, 3.0],
-};
-
-export const HELIX_DIFFICULTIES: HelixDifficulty[] = [
-  "easy",
-  "normal",
-  "hard",
-  "extreme",
-  "custom",
-];
-
-export const HELIX_DIFFICULTY_LABELS: Record<HelixDifficulty, string> = {
-  easy: "Fácil",
-  normal: "Normal",
-  hard: "Difícil",
-  extreme: "Extremo",
-  custom: "Personalizado",
-};
 
 export const HELIX_SETTINGS_LABELS: Record<keyof HelixSettings, string> = {
   ballSpeed: "Velocidade da bola",
