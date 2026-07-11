@@ -92,6 +92,11 @@ export const requestHelixWithdrawal = createServerFn({ method: "POST" })
       if (rulesError) throw new Error(rulesError.message);
       rules = rulesRaw as unknown as HelixWithdrawalRules;
 
+      if ((rules as any).reason === "demo_account") {
+        await logWithdrawalAttempt({ userId, amountCents: data.amountCents, pixKeyMasked, rules, result: "blocked", reason: "demo_account" });
+        throw new Error("DEMO_BALANCE_NOT_WITHDRAWABLE: Contas demo não podem sacar.");
+      }
+
       if (!rules.has_deposit || !rules.minimum_withdraw_cents) {
         const reason = "no_confirmed_deposit";
         await logWithdrawalAttempt({ userId, amountCents: data.amountCents, pixKeyMasked, rules, result: "blocked", reason });
