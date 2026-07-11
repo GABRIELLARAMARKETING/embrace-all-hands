@@ -69,11 +69,13 @@ function JogarPage() {
   }, [playable.data]);
 
   // Sincroniza store com o valor autoritativo do backend; rejeita divergências.
+  // Em modo demo, o usuário escolhe o valor livremente (dentro do demo_balance).
   useEffect(() => {
+    if (isDemo) return;
     if (serverAmount != null && value !== serverAmount) {
       setValue(serverAmount);
     }
-  }, [serverAmount, value, setValue]);
+  }, [isDemo, serverAmount, value, setValue]);
 
   // Apenas o mapa clássico está disponível nesta rota.
   const availableMaps = useMemo(
@@ -82,18 +84,46 @@ function JogarPage() {
   );
   const selectedMap = availableMaps[0];
   // Regra oficial (backend): saque mínimo = 5x o valor do depósito.
-  const effectiveValue = serverAmount ?? value ?? null;
+  const effectiveValue = isDemo ? value : (serverAmount ?? value ?? null);
   const minWithdraw = effectiveValue ? effectiveValue * 5 : 0;
-  // Só habilita JOGAR quando o backend confirmou um depósito jogável.
-  const canPlay = playable.isSuccess && !!serverAmount && !playable.isFetching;
+  // Habilita JOGAR: em modo demo, quando um valor válido está selecionado e cabe no demo_balance;
+  // em modo real, quando o backend confirmou um depósito jogável.
+  const canPlay = isDemo
+    ? effectiveValue != null && effectiveValue > 0 && demoBalance >= effectiveValue
+    : playable.isSuccess && !!serverAmount && !playable.isFetching;
 
   // Revalidação server-side no clique de JOGAR (defesa em profundidade).
   const validateFn = useServerFn(validatePlayValue);
   const [validating, setValidating] = useState(false);
   const handlePlay = async () => {
-    if (!serverAmount || validating) return;
+    if (validating) return;
     setValidating(true);
     try {
+      if (isDemo) {
+        if (!effectiveValue || demoBalance < effectiveValue) {
+          toast.error("Saldo demo insuficiente para esta entrada.");
+          return;
+        }
+        const session = await startDemoSession(effectiveValue);
+        if (!session.ok) {
+          toast.error(
+            session.reason === "insufficient_demo_balance"
+              ? "Saldo demo insuficiente."
+              : session.reason === "demo_session_already_active"
+                ? "Você já tem uma partida demo em andamento."
+                : session.reason === "unsupported_amount"
+                  ? "Valor de entrada não suportado."
+                  : "Não foi possível iniciar a partida demo.",
+          );
+          await profileQuery.refetch();
+          return;
+        }
+        startGame();
+        navigate({ to: "/game" });
+        return;
+      }
+
+      if (!serverAmount) return;
       const res = await validateFn({ data: { amount: serverAmount } });
       if (!res.ok) {
         toast.error(
@@ -124,6 +154,7 @@ function JogarPage() {
       setValidating(false);
     }
   };
+
 
 
 
