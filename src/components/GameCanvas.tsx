@@ -119,7 +119,10 @@ function GameLogic({
       hxGapSize: hx.gapSize,
       hxDifficultyProgressionRate: hx.difficultyProgressionRate,
     });
-  }, [level, helixConfig]);
+    // sessionId força reconstrução do manager em cada partida (start/restart),
+    // evitando "torre vazia" após game over (rings reciclados não voltam).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [level, helixConfig, sessionId]);
 
   // Bump para re-render sempre que a pool cria/recicla rings.
   const [ringsVersion, setRingsVersion] = useState(0);
