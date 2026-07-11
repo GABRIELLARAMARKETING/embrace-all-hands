@@ -15,6 +15,10 @@ function asHelixCreateSessionResult(value: unknown): HelixCreateSessionResult {
   return value && typeof value === "object" ? (value as HelixCreateSessionResult) : {};
 }
 
+export function hasCurrentGameSession() {
+  return currentSessionId !== null;
+}
+
 export function useGameSession() {
   const startSession = useCallback(async (themeId: string | null) => {
     startedAt = Date.now();
