@@ -365,12 +365,9 @@ function GameLogic({
           }
 
           if (sector === "danger") {
-            dangerHitFrames.current += 1;
-            if (dangerHitFrames.current >= CONSTANTS.DANGER_CONFIRM_FRAMES) {
-              cameraShake.current = 0.6;
-              loseGame();
-              return;
-            }
+            cameraShake.current = 0.6;
+            loseGame();
+            return;
           }
 
 
