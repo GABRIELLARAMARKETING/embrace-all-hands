@@ -429,23 +429,31 @@ export const resetCommissionSettings = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/* ============ DEMO ACCOUNTS ============ */
+/* ============ DEMO ACCOUNTS ============
+ * Contas demo agora são usuários reais em auth.users com profiles.is_demo=true.
+ * Saldo creditado pelo gerente vai para profiles.demo_balance (NÃO sacável).
+ * A tabela `demo_accounts` fica como espelho auxiliar (compat/painel).
+ */
 export const listDemoAccounts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await ensureManagerOrAdmin(context);
     const { supabase, userId } = context;
     const { data } = await supabase
-      .from("demo_accounts")
-      .select("id, display_name, phone, affiliate_code, balance, created_at")
-      .eq("manager_id", userId).order("created_at", { ascending: false }).limit(200);
+      .from("profiles")
+      .select("id, display_name, phone, affiliate_code, demo_balance, created_at")
+      .eq("manager_id", userId)
+      .eq("is_demo", true)
+      .order("created_at", { ascending: false })
+      .limit(200);
     return (data ?? []).map((a: any) => ({
       id: a.id,
       name: a.display_name,
-      phone: a.phone,
+      phone: a.phone ?? "",
       affiliateCode: a.affiliate_code,
-      balance: Number(a.balance || 0),
+      balance: Number(a.demo_balance || 0),
       createdAt: a.created_at,
+      withdrawable: false as const,
     }));
   });
 
@@ -456,12 +464,13 @@ export const createDemoAccounts = createServerFn({ method: "POST" })
       namePattern: z.string().trim().min(1).max(30),
       passwordPattern: z.string().trim().max(30).optional(),
       quantity: z.number().int().min(1).max(100),
-      initialBalance: z.number().min(0).max(1_000_000),
+      initialBalance: z.number().min(0).max(1000),
     }).parse(d),
   )
   .handler(async ({ context, data }) => {
     await ensureManagerOrAdmin(context);
     const { supabase, userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: batch, error: bErr } = await supabase
       .from("demo_account_batches")
@@ -475,39 +484,83 @@ export const createDemoAccounts = createServerFn({ method: "POST" })
       .select("id").maybeSingle();
     if (bErr) throw new Error(bErr.message);
 
-    // Buscar código de afiliado no servidor
-    const rows: any[] = [];
     const pwPat = data.passwordPattern?.trim() || data.namePattern;
     const nowMs = Date.now();
+    const created: Array<{
+      id: string; name: string; phone: string; email: string;
+      password: string; affiliateCode: string; balance: number;
+    }> = [];
+
     for (let i = 1; i <= data.quantity; i++) {
+      const name = `${data.namePattern} ${i}`;
+      const password = `${pwPat}@${i}`;
+      const email = `demo-${nowMs}-${i}-${userId.slice(0, 8)}@helix.demo`.toLowerCase();
+      const phone = `55${String(nowMs).slice(-9)}${String(i).padStart(3, "0")}`.slice(0, 13);
+
+      const { data: authUser, error: authErr } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { display_name: name, is_demo: true },
+      });
+      if (authErr || !authUser?.user) throw new Error(authErr?.message ?? "Falha ao criar demo");
+      const newId = authUser.user.id;
+
       const { data: code } = await supabase.rpc("generate_affiliate_code" as any);
-      rows.push({
+      const affiliateCode = (code as string) ?? `DM${nowMs.toString(36).slice(-4).toUpperCase()}${i}`;
+      const { error: upErr } = await supabaseAdmin
+        .from("profiles")
+        .update({
+          display_name: name,
+          phone,
+          is_demo: true,
+          manager_id: userId,
+          affiliate_code: affiliateCode,
+          demo_balance: 0,
+          balance: 0,
+        } as any)
+        .eq("id", newId);
+      if (upErr) throw new Error(upErr.message);
+
+      if (data.initialBalance > 0) {
+        const { data: creditRes, error: cErr } = await supabase.rpc(
+          "manager_credit_demo_balance" as any,
+          {
+            _target_user_id: newId,
+            _amount: data.initialBalance,
+            _reason: "Saldo inicial ao criar conta demo",
+          },
+        );
+        if (cErr) throw new Error(cErr.message);
+        if ((creditRes as any)?.ok !== true) {
+          throw new Error(`Falha ao creditar saldo demo: ${(creditRes as any)?.reason}`);
+        }
+      }
+
+      await supabaseAdmin.from("demo_accounts").insert({
         batch_id: batch?.id,
         manager_id: userId,
-        display_name: `${data.namePattern} ${i}`,
-        phone: `55${String(nowMs).slice(-9)}${String(i).padStart(3, "0")}`.slice(0, 13),
-        affiliate_code: (code as string) ?? `DM${nowMs.toString(36).slice(-4).toUpperCase()}${i}`,
+        display_name: name,
+        phone,
+        affiliate_code: affiliateCode,
         balance: data.initialBalance,
       });
+
+      created.push({
+        id: newId, name, phone, email, password,
+        affiliateCode, balance: data.initialBalance,
+      });
     }
-    const { data: created, error } = await supabase
-      .from("demo_accounts").insert(rows).select("*");
-    if (error) throw new Error(error.message);
+
     await audit(context, "demo_accounts_created", "demo_account_batches", batch?.id, {
-      quantity: data.quantity, initial_balance: data.initialBalance,
+      quantity: data.quantity,
+      initial_balance: data.initialBalance,
+      withdrawable: false,
     });
-    return {
-      created: created?.length ?? 0,
-      accounts: (created ?? []).map((a: any, idx: number) => ({
-        id: a.id,
-        name: a.display_name,
-        phone: a.phone,
-        password: `${pwPat}@${idx + 1}`,
-        affiliateCode: a.affiliate_code,
-        balance: Number(a.balance || 0),
-      })),
-    };
+
+    return { created: created.length, accounts: created };
   });
+
 
 /* ============ NETWORK WITHDRAWALS (read-only for manager) ============ */
 export const listNetworkWithdrawals = createServerFn({ method: "GET" })
