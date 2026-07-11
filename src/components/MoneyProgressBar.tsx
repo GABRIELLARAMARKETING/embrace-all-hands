@@ -73,8 +73,14 @@ export function MoneyProgressBar() {
     if (isClaimingReward) return;
     try {
       setIsClaimingReward(true);
-      // Simulated confirmation of the redeem flow.
-      await new Promise((r) => setTimeout(r, 250));
+      // Finaliza a sessão no backend: credita recompensa (game_reward) e
+      // libera o depósito para não ser marcado como abandonado (player_lost)
+      // pelo helix_abandon_active_sessions ao recarregar o perfil.
+      await finishSession({
+        score,
+        level_reached: currentLevel,
+        status: "finished",
+      });
       const rewardAmount = money;
       const newBalance = totalCoins + rewardAmount;
       setSnapshot({
@@ -90,6 +96,7 @@ export function MoneyProgressBar() {
       setIsClaimingReward(false);
     }
   };
+
 
   const handlePlayAgain = () => {
     setShowRewardModal(false);
