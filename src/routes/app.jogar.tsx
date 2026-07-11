@@ -84,22 +84,27 @@ function JogarPage() {
             </div>
           </div>
 
-          {/* Valor de entrada */}
-          <div className="mt-6 text-[11px] font-bold tracking-widest text-[#B47CFF]">VALOR DE ENTRADA</div>
+          {/* Valor de entrada — travado no depósito real do usuário (backend) */}
+          <div className="mt-6 text-[11px] font-bold tracking-widest text-[#B47CFF]">
+            VALOR DE ENTRADA
+          </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {PLAYER_MOCK.playOptions.map((v) => {
-              const active = value === v;
+              const active = effectiveValue === v;
+              const allowed = serverAmount === v;
               return (
                 <button
                   key={v}
-                  onClick={() => {
-                    setValue(v);
-                  }}
+                  disabled={!allowed}
+                  title={allowed ? undefined : "Valor não corresponde ao seu depósito"}
+                  onClick={() => allowed && setValue(v)}
                   className={cn(
                     "rounded-full px-4 py-2 text-sm font-bold transition-all",
                     active
                       ? "bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] text-white shadow-[0_0_18px_rgba(168,85,247,0.55)]"
-                      : "border border-[#3a1d5a] bg-[#1a0c30] text-white hover:border-[#5b2e8a]",
+                      : allowed
+                        ? "border border-[#3a1d5a] bg-[#1a0c30] text-white hover:border-[#5b2e8a]"
+                        : "cursor-not-allowed border border-[#3a1d5a]/40 bg-[#1a0c30]/40 text-white/30",
                   )}
                 >
                   R${v}
@@ -107,6 +112,12 @@ function JogarPage() {
               );
             })}
           </div>
+          {!playable.isLoading && !serverAmount && (
+            <div className="mt-2 text-[11px] font-semibold text-amber-300/90">
+              Nenhum depósito disponível para jogar. Faça um depósito para liberar.
+            </div>
+          )}
+
 
 
 
