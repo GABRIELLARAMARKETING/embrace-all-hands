@@ -71,7 +71,8 @@ function JogarPage() {
   // Regra oficial (backend): saque mínimo = 5x o valor do depósito.
   const effectiveValue = serverAmount ?? value ?? null;
   const minWithdraw = effectiveValue ? effectiveValue * 5 : 0;
-  const canPlay = !!serverAmount;
+  // Só habilita JOGAR quando o backend confirmou um depósito jogável.
+  const canPlay = playable.isSuccess && !!serverAmount && !playable.isFetching;
 
   // Revalidação server-side no clique de JOGAR (defesa em profundidade).
   const validateFn = useServerFn(validatePlayValue);
