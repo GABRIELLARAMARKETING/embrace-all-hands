@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
+import { noInput } from "@/lib/validation";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const getHealth = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
+  .inputValidator(noInput)
   .handler(async ({ context }) => {
     const t0 = Date.now();
     const { error } = await context.supabase.from("audit_events").select("id", { head: true, count: "exact" }).limit(1);

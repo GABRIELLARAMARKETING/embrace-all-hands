@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { noInput } from "@/lib/validation";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export interface ProfilePayload {
@@ -15,6 +16,7 @@ export interface ProfilePayload {
 
 export const getMyProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
+  .inputValidator(noInput)
   .handler(async ({ context }): Promise<ProfilePayload> => {
     const { supabase, userId, claims } = context;
 

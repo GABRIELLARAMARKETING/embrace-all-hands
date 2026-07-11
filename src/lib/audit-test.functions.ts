@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { noInput } from "@/lib/validation";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { auditLog } from "@/lib/audit.functions";
 
@@ -8,6 +9,7 @@ import { auditLog } from "@/lib/audit.functions";
  */
 export const emitAuditTestEvents = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
+  .inputValidator(noInput)
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
