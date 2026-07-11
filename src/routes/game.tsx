@@ -59,15 +59,21 @@ function GamePage() {
   useEffect(() => {
     if (
       authenticated === true &&
-      !hasCurrentGameSession() &&
-      (selectedPlayValue == null || !HELIX_ALLOWED_AMOUNTS.has(selectedPlayValue))
+      (!hasCurrentGameSession() ||
+        selectedPlayValue == null ||
+        !HELIX_ALLOWED_AMOUNTS.has(selectedPlayValue))
     ) {
       navigate({ to: "/app/jogar", replace: true });
     }
   }, [authenticated, selectedPlayValue, navigate]);
 
   useEffect(() => {
-    if (authenticated === true && selectedPlayValue != null && HELIX_ALLOWED_AMOUNTS.has(selectedPlayValue)) {
+    if (
+      authenticated === true &&
+      hasCurrentGameSession() &&
+      selectedPlayValue != null &&
+      HELIX_ALLOWED_AMOUNTS.has(selectedPlayValue)
+    ) {
       useGameStore.getState().startGame();
     }
   }, [authenticated, selectedPlayValue]);
