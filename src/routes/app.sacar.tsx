@@ -32,7 +32,7 @@ function SacarPage() {
   const profileFn = useServerFn(getMyProfile);
   const requestFn = useServerFn(requestAffiliateWithdrawal);
   const rulesFn = useServerFn(getHelixWithdrawalRules);
-  const { data: profile } = useQuery({
+  useQuery({
     queryKey: ["my-profile"],
     queryFn: () => profileFn({}),
     staleTime: 30_000,
