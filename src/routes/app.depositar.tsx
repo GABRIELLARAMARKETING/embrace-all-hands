@@ -318,11 +318,13 @@ function KycModal({
   open,
   onClose,
   amount,
+  accountEmail,
   onSuccess,
 }: {
   open: boolean;
   onClose: () => void;
   amount: number;
+  accountEmail: string;
   onSuccess: (res: {
     depositId: string;
     qrCode: string | null;
@@ -334,17 +336,22 @@ function KycModal({
 }) {
   const createFn = useServerFn(createDiggionDeposit);
   const [cpfMasked, setCpfMasked] = useState("");
+  const normalizedAccountEmail = accountEmail.trim().toLowerCase();
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<KycValues>({
     resolver: zodResolver(kycSchema),
+    defaultValues: { email: normalizedAccountEmail, cpf: "", phone: "" },
+    values: { email: normalizedAccountEmail, cpf: "", phone: "" },
   });
 
   const mutation = useMutation({
     mutationFn: async (v: KycValues) => {
+      if (v.email !== normalizedAccountEmail) {
+        throw new Error("Use o e-mail cadastrado na sua conta.");
+      }
       return createFn({
         data: {
           amount,
-          fullName: v.fullName,
           email: v.email,
           cpf: v.cpf,
           phone: v.phone,
@@ -394,11 +401,17 @@ function KycModal({
             </p>
 
             <div className="mt-4 space-y-2">
-              <Field label="Nome completo" error={errors.fullName?.message}>
-                <input {...register("fullName")} className="w-full rounded-xl bg-white/[0.05] px-3 py-2 text-sm text-white outline-none" />
-              </Field>
-              <Field label="E-mail" error={errors.email?.message}>
-                <input type="email" {...register("email")} className="w-full rounded-xl bg-white/[0.05] px-3 py-2 text-sm text-white outline-none" />
+              <Field label="E-mail da conta" error={errors.email?.message}>
+                <input
+                  type="email"
+                  readOnly
+                  value={normalizedAccountEmail}
+                  {...register("email")}
+                  className="w-full cursor-not-allowed rounded-xl bg-white/[0.03] px-3 py-2 text-sm text-white/70 outline-none"
+                />
+                <span className="mt-1 block text-[10px] text-white/40">
+                  Deve ser o mesmo e-mail usado no cadastro.
+                </span>
               </Field>
               <Field label="CPF" error={errors.cpf?.message as string}>
                 <input
@@ -421,6 +434,7 @@ function KycModal({
                 />
               </Field>
             </div>
+
 
             <GradientButton type="submit" disabled={mutation.isPending} className="mt-5 flex items-center justify-center gap-2">
               {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
