@@ -537,6 +537,7 @@ export type Database = {
           anti_fraud_score: number
           created_at: string
           credited_at: string | null
+          demo_stake_cents: number | null
           deposit_id: string | null
           duration_seconds: number
           expires_at: string | null
@@ -558,6 +559,7 @@ export type Database = {
           anti_fraud_score?: number
           created_at?: string
           credited_at?: string | null
+          demo_stake_cents?: number | null
           deposit_id?: string | null
           duration_seconds?: number
           expires_at?: string | null
@@ -579,6 +581,7 @@ export type Database = {
           anti_fraud_score?: number
           created_at?: string
           credited_at?: string | null
+          demo_stake_cents?: number | null
           deposit_id?: string | null
           duration_seconds?: number
           expires_at?: string | null
@@ -1505,6 +1508,10 @@ export type Database = {
       }
       helix_abandon_active_sessions: {
         Args: { _grace_seconds?: number }
+        Returns: Json
+      }
+      helix_create_demo_session: {
+        Args: { _amount: number; _theme_id?: string }
         Returns: Json
       }
       helix_create_session: {

@@ -97,3 +97,40 @@ export const validatePlayValue = createServerFn({ method: "POST" })
 
     return { ok: true as const, depositId: free.id, amount: data.amount };
   });
+
+/**
+ * Inicia uma partida em modo DEMO consumindo `demo_balance` como crédito.
+ * Só funciona para contas com `is_demo=true`. Nunca toca saldo real nem cria depósito.
+ */
+export const startDemoSessionFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z.object({
+      amount: z.number().positive(),
+      themeId: z.string().uuid().nullable().optional(),
+    }).parse(raw),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+
+    if (!HELIX_ALLOWED_AMOUNTS.has(data.amount)) {
+      return { ok: false as const, reason: "unsupported_amount" as const };
+    }
+
+    const { data: res, error } = await supabase.rpc("helix_create_demo_session", {
+      _amount: data.amount,
+      _theme_id: data.themeId ?? undefined,
+    });
+    if (error) return { ok: false as const, reason: error.message };
+
+    const parsed = (res ?? {}) as {
+      ok?: boolean;
+      session_id?: string;
+      reason?: string;
+    };
+    if (!parsed.ok || !parsed.session_id) {
+      return { ok: false as const, reason: parsed.reason ?? "session_not_created" };
+    }
+    return { ok: true as const, sessionId: parsed.session_id, amount: data.amount };
+  });
+
