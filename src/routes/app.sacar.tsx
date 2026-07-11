@@ -42,7 +42,7 @@ function SacarPage() {
     queryFn: () => rulesFn({}),
     staleTime: 15_000,
   });
-  const balance = profile?.affiliateBalance ?? 0;
+  const balance = (rules?.available_reward_cents ?? 0) / 100;
   const canWithdraw = rules?.can_withdraw ?? false;
   const minCents = rules?.minimum_withdraw_cents ?? null;
   const missingCents = rules?.missing_to_withdraw_cents ?? null;
