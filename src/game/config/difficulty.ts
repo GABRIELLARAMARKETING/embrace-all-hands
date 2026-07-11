@@ -1,7 +1,14 @@
 // Helix — configurações de dificuldade controladas pelo admin.
 // Estrutura única de referência. Persistido em platform_settings (key = helix_difficulty).
 
-export type HelixDifficulty = "easy" | "normal" | "hard" | "extreme" | "custom";
+export type HelixDifficulty =
+  | "easy"
+  | "normal"
+  | "hard"
+  | "extreme"
+  | "insane"
+  | "nightmare"
+  | "custom";
 
 export interface HelixSettings {
   ballSpeed: number;
