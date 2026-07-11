@@ -16,6 +16,14 @@ export const getMyProfile = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<ProfilePayload> => {
     const { supabase, userId, claims } = context;
 
+    // Auto-encerra sessões abandonadas (usuário jogou e fechou sem finalizar):
+    // debita o depósito como perda e zera o saldo jogável antes de responder.
+    try {
+      await supabase.rpc("helix_abandon_active_sessions", { _grace_seconds: 0 });
+    } catch {
+      /* não bloqueia o carregamento do perfil */
+    }
+
     const [{ data: profile, error: profileError }, { count, error: countError }] =
       await Promise.all([
         supabase
