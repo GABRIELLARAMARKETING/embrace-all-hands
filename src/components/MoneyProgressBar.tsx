@@ -44,18 +44,20 @@ export function MoneyProgressBar() {
 
   useEffect(() => {
     // Publica o depósito atual para GameCanvas emitir moedas com valor correto.
-    (window as unknown as { __helixDeposit?: number }).__helixDeposit =
-      selectedPlayValue ?? 5;
+    const w = window as unknown as { __helixDeposit?: number };
+    if (selectedPlayValue == null) delete w.__helixDeposit;
+    else w.__helixDeposit = selectedPlayValue;
   }, [selectedPlayValue]);
 
   useEffect(() => {
+    if (!rule) return;
     const onPop = () => {
       setMoney((m) => Math.round((m + PER_PLATFORM) * 100) / 100);
       setPlatforms((p) => p + 1);
     };
     window.addEventListener("coin-pop", onPop);
     return () => window.removeEventListener("coin-pop", onPop);
-  }, [PER_PLATFORM]);
+  }, [PER_PLATFORM, rule]);
 
   useEffect(() => {
     if (!claimError) return;
