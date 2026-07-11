@@ -16,6 +16,7 @@ export type GameState = "menu" | "playing" | "paused" | "gameOver" | "victory";
 interface Store {
   gameState: GameState;
   // Session
+  sessionId: number; // increments on start/restart — used to reset engine caches
   score: number;
   coins: number; // coins collected this level
   combo: number;
@@ -69,6 +70,7 @@ const initialPersisted = {
 
 export const useGameStore = create<Store>((set, get) => ({
   gameState: "menu",
+  sessionId: 0,
   score: 0,
   coins: 0,
   combo: 0,
@@ -79,6 +81,7 @@ export const useGameStore = create<Store>((set, get) => ({
   startGame: (level) =>
     set((s) => ({
       gameState: "playing",
+      sessionId: s.sessionId + 1,
       score: 0,
       coins: 0,
       combo: 0,
@@ -89,14 +92,15 @@ export const useGameStore = create<Store>((set, get) => ({
   pauseGame: () => set({ gameState: "paused" }),
   resumeGame: () => set({ gameState: "playing" }),
   restartGame: () =>
-    set({
+    set((s) => ({
       gameState: "playing",
+      sessionId: s.sessionId + 1,
       score: 0,
       coins: 0,
       combo: 0,
       bestComboRun: 0,
       progress: 0,
-    }),
+    })),
   toMenu: () => set({ gameState: "menu" }),
 
   completeLevel: () => {

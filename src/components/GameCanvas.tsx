@@ -73,7 +73,7 @@ function GameLogic({
   cameraDistance: number;
 }) {
   const currentLevel = useGameStore((s) => s.currentLevel);
-  
+  const sessionId = useGameStore((s) => s.sessionId);
   const selectedTheme = useGameStore((s) => s.selectedTheme);
   const gameState = useGameStore((s) => s.gameState);
   const setProgress = useGameStore((s) => s.setProgress);
@@ -119,7 +119,10 @@ function GameLogic({
       hxGapSize: hx.gapSize,
       hxDifficultyProgressionRate: hx.difficultyProgressionRate,
     });
-  }, [level, helixConfig]);
+    // sessionId força reconstrução do manager em cada partida (start/restart),
+    // evitando "torre vazia" após game over (rings reciclados não voltam).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [level, helixConfig, sessionId]);
 
   // Bump para re-render sempre que a pool cria/recicla rings.
   const [ringsVersion, setRingsVersion] = useState(0);
@@ -313,12 +316,15 @@ function GameLogic({
               cameraShake.current = Math.max(cameraShake.current, 0.45);
               addScore(1);
               // Valor da moeda vem do backend (HELIX_DEPOSIT_RULES via window.__helixDeposit).
+              // Sem depósito (modo teste grátis), usa a menor regra como demo
+              // para que a HUD (moeda + barra) apareça igual ao modo pago.
               import("@/components/CoinPopLayer").then((m) => {
                 import("@/lib/helix-rules").then(({ HELIX_DEPOSIT_RULES }) => {
                   const dep = (window as unknown as { __helixDeposit?: number })
                     .__helixDeposit;
-                  const rule = HELIX_DEPOSIT_RULES.find((r) => r.amount === dep);
-                  if (!rule) return; // sem depósito válido, não emite moeda
+                  const rule =
+                    HELIX_DEPOSIT_RULES.find((r) => r.amount === dep) ??
+                    HELIX_DEPOSIT_RULES[0];
                   m.spawnCoinPop(rule.payoutCents / 100);
                 });
               });

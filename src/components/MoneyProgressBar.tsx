@@ -8,15 +8,13 @@ import { HELIX_DEPOSIT_RULES } from "@/lib/helix-rules";
 
 export function MoneyProgressBar() {
   const selectedPlayValue = usePlayerStore((s) => s.selectedPlayValue);
-  // Fonte única: regras oficiais do backend (helix_payout_cents).
-  // Não usa fallback: /game já força redirect para /app/jogar se não houver valor.
-  const rule = useMemo(
-    () =>
-      selectedPlayValue == null
-        ? null
-        : HELIX_DEPOSIT_RULES.find((r) => r.amount === selectedPlayValue) ?? null,
-    [selectedPlayValue],
-  );
+  // Modo teste grátis (sem depósito) usa a menor regra apenas para exibir
+  // a HUD (moeda + barra). O botão de resgate fica oculto neste modo.
+  const isDemo = selectedPlayValue == null;
+  const rule = useMemo(() => {
+    if (selectedPlayValue == null) return HELIX_DEPOSIT_RULES[0] ?? null;
+    return HELIX_DEPOSIT_RULES.find((r) => r.amount === selectedPlayValue) ?? null;
+  }, [selectedPlayValue]);
   const PER_PLATFORM = rule ? rule.payoutCents / 100 : 0;
   const GOAL = rule ? rule.amount * 5 : 0;
   const gameState = useGameStore((s) => s.gameState);
@@ -124,7 +122,7 @@ export function MoneyProgressBar() {
             </div>
           </div>
 
-          {completed && (
+          {completed && !isDemo && (
             <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex w-full flex-col items-center justify-center px-6 pb-8 sm:pb-10">
               <button
                 type="button"
