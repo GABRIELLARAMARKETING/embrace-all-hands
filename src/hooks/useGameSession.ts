@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 // Module-scoped state so start/finish can happen from different components.
 let currentSessionId: string | null = null;
 let startedAt = 0;
+const SESSION_STORAGE_KEY = "helix:active-session-id";
 
 type HelixCreateSessionResult = {
   ok?: boolean;
@@ -16,7 +17,17 @@ function asHelixCreateSessionResult(value: unknown): HelixCreateSessionResult {
 }
 
 export function hasCurrentGameSession() {
+  if (currentSessionId) return true;
+  if (typeof window === "undefined") return false;
+  currentSessionId = window.sessionStorage.getItem(SESSION_STORAGE_KEY);
   return currentSessionId !== null;
+}
+
+function setCurrentGameSession(id: string | null) {
+  currentSessionId = id;
+  if (typeof window === "undefined") return;
+  if (id) window.sessionStorage.setItem(SESSION_STORAGE_KEY, id);
+  else window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
 }
 
 export function useGameSession() {
@@ -32,7 +43,7 @@ export function useGameSession() {
         .select("id")
         .single();
       if (error) return null;
-      currentSessionId = data.id;
+      setCurrentGameSession(data.id);
       return data.id;
     } catch {
       return null;
@@ -53,7 +64,7 @@ export function useGameSession() {
         return { ok: false as const, reason: result.reason ?? "session_not_created" };
       }
 
-      currentSessionId = result.session_id;
+      setCurrentGameSession(result.session_id);
       return { ok: true as const, sessionId: result.session_id };
     } catch (error) {
       return {
@@ -82,7 +93,7 @@ export function useGameSession() {
       } catch {
         /* swallow */
       }
-      currentSessionId = null;
+      setCurrentGameSession(null);
     },
     [],
   );
