@@ -14,7 +14,7 @@ import { LogoHelix } from "./LogoHelix";
 import { ThemeCarousel } from "./ThemeCarousel";
 import { PrimaryButton } from "./PrimaryButton";
 import { ThemeProvider } from "./ThemeProvider";
-const helixClassicMap = { url: "/images/helix-classic-map.png" };
+const helixClassicMap = { url: "/images/helix-map-card.png" };
 
 
 export function MainMenu(_props: { onOpenThemes?: () => void; onOpenSkins?: () => void }) {
