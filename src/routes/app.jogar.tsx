@@ -11,6 +11,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { cn } from "@/lib/utils";
 const helixClassicMap = { url: "/images/helix-classic-map.png" };
 import { getPlayableDeposit, validatePlayValue } from "@/lib/helix-play.functions";
+import { getMyProfile } from "@/lib/profile.functions";
 import { useGameSession } from "@/hooks/useGameSession";
 import { useGameStore } from "@/store/useGameStore";
 
