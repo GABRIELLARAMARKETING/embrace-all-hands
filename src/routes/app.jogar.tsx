@@ -17,7 +17,7 @@ import { useGameStore } from "@/store/useGameStore";
 export const Route = createFileRoute("/app/jogar")({
   head: () => ({
     meta: [
-      { title: "Jogar — MultiHelixBr" },
+      { title: "Jogar — HelixFast" },
       { name: "description", content: "Escolha seu mapa e valor de entrada para jogar." },
     ],
   }),

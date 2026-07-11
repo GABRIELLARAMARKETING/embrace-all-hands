@@ -5,7 +5,7 @@ export interface MapOption {
 }
 
 export const PLAYER_MOCK = {
-  userName: "MultiHelixBr",
+  userName: "HelixFast",
   userEmail: "ricardo350@demo.com",
   onlineUsers: 311,
   balance: 2390,
@@ -13,7 +13,7 @@ export const PLAYER_MOCK = {
   totalReceived: 0,
   matchesPlayed: 14,
   referralCode: "DMDU4E20",
-  referralUrl: "https://multihelixbr.online/?ref=DMDU4E20",
+  referralUrl: "https://helixfast.online/?ref=DMDU4E20",
   commissionPercent: 50,
   withdrawMin: 20,
   depositMin: 20,
