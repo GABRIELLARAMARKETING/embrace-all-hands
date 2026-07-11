@@ -42,6 +42,44 @@ const PAYOUT_PER_PLATFORM: Record<number, number> = Object.fromEntries(
   HELIX_DEPOSIT_RULES.map((r) => [r.amount, r.payoutPerPlatform]),
 );
 
+function getStatusInfo(status?: string) {
+  switch (status) {
+    case "paid":
+    case "approved":
+      return {
+        label: "PAGAMENTO CONFIRMADO",
+        className: "bg-emerald-500/15 text-emerald-300 border border-emerald-400/30",
+        dot: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.9)]",
+      };
+    case "failed":
+    case "canceled":
+      return {
+        label: "PAGAMENTO FALHOU",
+        className: "bg-red-500/15 text-red-300 border border-red-400/30",
+        dot: "bg-red-400",
+      };
+    case "expired":
+      return {
+        label: "PIX EXPIRADO",
+        className: "bg-orange-500/15 text-orange-300 border border-orange-400/30",
+        dot: "bg-orange-400",
+      };
+    case "waiting_payment":
+    case "pending":
+      return {
+        label: "AGUARDANDO PAGAMENTO",
+        className: "bg-amber-500/15 text-amber-200 border border-amber-400/30",
+        dot: "bg-amber-300 animate-pulse",
+      };
+    default:
+      return {
+        label: "CARREGANDO...",
+        className: "bg-white/5 text-white/60 border border-white/10",
+        dot: "bg-white/40 animate-pulse",
+      };
+  }
+}
+
 const kycSchema = z.object({
   fullName: z.string().trim().min(3, "Nome completo obrigatório").max(120),
   email: z.string().trim().email("E-mail inválido").max(200),
