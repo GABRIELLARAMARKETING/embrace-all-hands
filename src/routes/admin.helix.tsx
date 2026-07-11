@@ -44,21 +44,25 @@ function Page() {
 
   const [difficulty, setDifficulty] = useState<HelixDifficulty>(data?.difficulty ?? "normal");
   const [settings, setSettings] = useState<HelixSettings>(data?.settings ?? DEFAULT_HELIX_CONFIG.settings);
+  const dirty = useRef(false);
 
-  const hydrated = useRef(false);
+  // Sync from server whenever there are no unsaved local edits.
+  // This covers: first mount, post-refresh loader data, and background refetches.
   useEffect(() => {
-    if (data && !hydrated.current) {
-      hydrated.current = true;
-      setDifficulty(data.difficulty);
-      setSettings(data.settings);
-    }
+    if (!data || dirty.current) return;
+    setDifficulty(data.difficulty);
+    setSettings(data.settings);
   }, [data]);
 
   const mutation = useMutation({
     mutationFn: saveFn,
     onSuccess: (payload) => {
       toast.success("Dificuldade publicada — jogadores receberão em até 15s");
+      dirty.current = false;
+      setDifficulty(payload.difficulty);
+      setSettings(payload.settings);
       qc.setQueryData(["admin", "helix-difficulty"], payload);
+      qc.invalidateQueries({ queryKey: ["admin", "helix-difficulty"] });
       qc.invalidateQueries({ queryKey: ["helix", "difficulty"] });
     },
     onError: (e: Error) => toast.error(e.message),
