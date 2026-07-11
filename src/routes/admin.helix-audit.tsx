@@ -80,6 +80,38 @@ function HelixAuditPage() {
         </button>
       </header>
 
+      {/* Banner de saúde em tempo real */}
+      <div
+        className={`flex flex-wrap items-center gap-3 rounded-2xl border p-4 text-sm ${
+          healthy
+            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
+            : data
+              ? "border-red-500/30 bg-red-500/10 text-red-200"
+              : "border-white/10 bg-white/[0.03] text-white/60"
+        }`}
+      >
+        <Activity className={`h-5 w-5 ${isFetching ? "animate-pulse" : ""}`} />
+        <div className="flex-1">
+          <div className="font-semibold">
+            {healthy
+              ? "Sistema íntegro — nenhuma inconsistência de payout"
+              : data
+                ? `${totalIssues} inconsistência(s) ativa(s)`
+                : "Carregando status…"}
+          </div>
+          <div className="text-xs opacity-70">
+            Atualização em tempo real via Realtime + polling a cada {AUTO_REFRESH_MS / 1000}s
+            {dataUpdatedAt ? ` · última: ${new Date(dataUpdatedAt).toLocaleTimeString("pt-BR")}` : ""}
+          </div>
+        </div>
+        {data && !healthy && (
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" />
+            <span className="rounded-full bg-red-500/20 px-3 py-1 text-xs font-bold">{totalIssues}</span>
+          </div>
+        )}
+      </div>
+
       {error && (
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
           {(error as Error).message}
