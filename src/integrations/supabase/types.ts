@@ -14,6 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_balance_adjustments: {
+        Row: {
+          action: string
+          admin_user_id: string
+          amount: number
+          audit_event_id: string | null
+          balance_after: number
+          balance_before: number
+          created_at: string
+          id: string
+          idempotency_key: string | null
+          ip: string | null
+          note: string | null
+          reason: string
+          target_user_id: string
+          user_agent: string | null
+          wallet_tx_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id: string
+          amount: number
+          audit_event_id?: string | null
+          balance_after: number
+          balance_before: number
+          created_at?: string
+          id?: string
+          idempotency_key?: string | null
+          ip?: string | null
+          note?: string | null
+          reason: string
+          target_user_id: string
+          user_agent?: string | null
+          wallet_tx_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string
+          amount?: number
+          audit_event_id?: string | null
+          balance_after?: number
+          balance_before?: number
+          created_at?: string
+          id?: string
+          idempotency_key?: string | null
+          ip?: string | null
+          note?: string | null
+          reason?: string
+          target_user_id?: string
+          user_agent?: string | null
+          wallet_tx_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_balance_adjustments_wallet_tx_id_fkey"
+            columns: ["wallet_tx_id"]
+            isOneToOne: false
+            referencedRelation: "wallet_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_notifications: {
         Row: {
           audit_event_id: string | null
@@ -1401,6 +1463,24 @@ export type Database = {
       _test_signup: {
         Args: { _display: string; _id: string; _ref?: string }
         Returns: undefined
+      }
+      admin_adjust_balance: {
+        Args: {
+          _action: string
+          _amount?: number
+          _confirmation?: string
+          _idempotency_key?: string
+          _ip?: string
+          _note?: string
+          _reason?: string
+          _target_user_id: string
+          _user_agent?: string
+        }
+        Returns: Json
+      }
+      admin_wallet_history: {
+        Args: { _limit?: number; _target_user_id: string }
+        Returns: Json
       }
       assert_reconciliation: { Args: never; Returns: string }
       credit_deposit_atomic: {
