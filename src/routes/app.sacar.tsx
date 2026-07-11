@@ -32,7 +32,7 @@ function SacarPage() {
   const profileFn = useServerFn(getMyProfile);
   const requestFn = useServerFn(requestAffiliateWithdrawal);
   const rulesFn = useServerFn(getHelixWithdrawalRules);
-  const { data: profile } = useQuery({
+  useQuery({
     queryKey: ["my-profile"],
     queryFn: () => profileFn({}),
     staleTime: 30_000,
@@ -42,7 +42,7 @@ function SacarPage() {
     queryFn: () => rulesFn({}),
     staleTime: 15_000,
   });
-  const balance = profile?.affiliateBalance ?? 0;
+  const balance = (rules?.available_reward_cents ?? 0) / 100;
   const canWithdraw = rules?.can_withdraw ?? false;
   const minCents = rules?.minimum_withdraw_cents ?? null;
   const missingCents = rules?.missing_to_withdraw_cents ?? null;
