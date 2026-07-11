@@ -49,6 +49,7 @@ import { Route as AdminManagersRouteImport } from './routes/admin.managers'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminKycRouteImport } from './routes/admin.kyc'
 import { Route as AdminIntegrationsRouteImport } from './routes/admin.integrations'
+import { Route as AdminImpersonationRouteImport } from './routes/admin.impersonation'
 import { Route as AdminHelixAuditRouteImport } from './routes/admin.helix-audit'
 import { Route as AdminHelixRouteImport } from './routes/admin.helix'
 import { Route as AdminHealthRouteImport } from './routes/admin.health'
@@ -266,6 +267,11 @@ const AdminIntegrationsRoute = AdminIntegrationsRouteImport.update({
   path: '/integrations',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminImpersonationRoute = AdminImpersonationRouteImport.update({
+  id: '/impersonation',
+  path: '/impersonation',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminHelixAuditRoute = AdminHelixAuditRouteImport.update({
   id: '/helix-audit',
   path: '/helix-audit',
@@ -369,6 +375,7 @@ export interface FileRoutesByFullPath {
   '/admin/health': typeof AdminHealthRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/helix-audit': typeof AdminHelixAuditRoute
+  '/admin/impersonation': typeof AdminImpersonationRoute
   '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/kyc': typeof AdminKycRoute
   '/admin/login': typeof AdminLoginRoute
@@ -426,6 +433,7 @@ export interface FileRoutesByTo {
   '/admin/health': typeof AdminHealthRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/helix-audit': typeof AdminHelixAuditRoute
+  '/admin/impersonation': typeof AdminImpersonationRoute
   '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/kyc': typeof AdminKycRoute
   '/admin/login': typeof AdminLoginRoute
@@ -485,6 +493,7 @@ export interface FileRoutesById {
   '/admin/health': typeof AdminHealthRoute
   '/admin/helix': typeof AdminHelixRoute
   '/admin/helix-audit': typeof AdminHelixAuditRoute
+  '/admin/impersonation': typeof AdminImpersonationRoute
   '/admin/integrations': typeof AdminIntegrationsRoute
   '/admin/kyc': typeof AdminKycRoute
   '/admin/login': typeof AdminLoginRoute
@@ -545,6 +554,7 @@ export interface FileRouteTypes {
     | '/admin/health'
     | '/admin/helix'
     | '/admin/helix-audit'
+    | '/admin/impersonation'
     | '/admin/integrations'
     | '/admin/kyc'
     | '/admin/login'
@@ -602,6 +612,7 @@ export interface FileRouteTypes {
     | '/admin/health'
     | '/admin/helix'
     | '/admin/helix-audit'
+    | '/admin/impersonation'
     | '/admin/integrations'
     | '/admin/kyc'
     | '/admin/login'
@@ -660,6 +671,7 @@ export interface FileRouteTypes {
     | '/admin/health'
     | '/admin/helix'
     | '/admin/helix-audit'
+    | '/admin/impersonation'
     | '/admin/integrations'
     | '/admin/kyc'
     | '/admin/login'
@@ -993,6 +1005,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIntegrationsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/impersonation': {
+      id: '/admin/impersonation'
+      path: '/impersonation'
+      fullPath: '/admin/impersonation'
+      preLoaderRoute: typeof AdminImpersonationRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/helix-audit': {
       id: '/admin/helix-audit'
       path: '/helix-audit'
@@ -1122,6 +1141,7 @@ interface AdminRouteChildren {
   AdminHealthRoute: typeof AdminHealthRoute
   AdminHelixRoute: typeof AdminHelixRoute
   AdminHelixAuditRoute: typeof AdminHelixAuditRoute
+  AdminImpersonationRoute: typeof AdminImpersonationRoute
   AdminIntegrationsRoute: typeof AdminIntegrationsRoute
   AdminKycRoute: typeof AdminKycRoute
   AdminLoginRoute: typeof AdminLoginRoute
@@ -1154,6 +1174,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminHealthRoute: AdminHealthRoute,
   AdminHelixRoute: AdminHelixRoute,
   AdminHelixAuditRoute: AdminHelixAuditRoute,
+  AdminImpersonationRoute: AdminImpersonationRoute,
   AdminIntegrationsRoute: AdminIntegrationsRoute,
   AdminKycRoute: AdminKycRoute,
   AdminLoginRoute: AdminLoginRoute,

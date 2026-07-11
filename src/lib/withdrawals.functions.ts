@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { auditLog } from "./audit.functions";
+import { assertNotImpersonating } from "./impersonation.functions";
+
 
 
 const withdrawInput = z.object({
@@ -13,6 +15,7 @@ export const requestAffiliateWithdrawal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => withdrawInput.parse(data))
   .handler(async ({ data, context }) => {
+    await assertNotImpersonating(context, "withdrawal.request");
     const { supabase, userId } = context;
 
     const { data: profile, error: profileError } = await supabase
@@ -222,6 +225,7 @@ export const approveWithdrawal = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => actionInput.parse(raw))
   .handler(async ({ data, context }) => {
     await ensureAdmin(context);
+    await assertNotImpersonating(context, "withdrawal.approve");
     const { supabase, userId } = context;
 
     const { data: current, error: readErr } = await supabase
@@ -272,6 +276,7 @@ export const rejectWithdrawal = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => actionInput.extend({ reason: z.string().trim().min(3).max(500) }).parse(raw))
   .handler(async ({ data, context }) => {
     await ensureAdmin(context);
+    await assertNotImpersonating(context, "withdrawal.reject");
     const { supabase, userId } = context;
 
     const { data: current, error: readErr } = await supabase
@@ -332,6 +337,7 @@ export const markWithdrawalPaid = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => actionInput.parse(raw))
   .handler(async ({ data, context }) => {
     await ensureAdmin(context);
+    await assertNotImpersonating(context, "withdrawal.mark_paid");
     const { supabase, userId } = context;
 
     const { data: current, error: readErr } = await supabase

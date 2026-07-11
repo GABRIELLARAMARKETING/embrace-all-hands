@@ -732,6 +732,122 @@ export type Database = {
           },
         ]
       }
+      impersonation_audit_logs: {
+        Row: {
+          action: string
+          admin_user_id: string
+          block_reason: string | null
+          blocked: boolean
+          created_at: string
+          id: string
+          impersonation_session_id: string
+          ip: string | null
+          metadata: Json
+          method: string | null
+          route: string | null
+          status_code: number | null
+          target_user_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id: string
+          block_reason?: string | null
+          blocked?: boolean
+          created_at?: string
+          id?: string
+          impersonation_session_id: string
+          ip?: string | null
+          metadata?: Json
+          method?: string | null
+          route?: string | null
+          status_code?: number | null
+          target_user_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string
+          block_reason?: string | null
+          blocked?: boolean
+          created_at?: string
+          id?: string
+          impersonation_session_id?: string
+          ip?: string | null
+          metadata?: Json
+          method?: string | null
+          route?: string | null
+          status_code?: number | null
+          target_user_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "impersonation_audit_logs_impersonation_session_id_fkey"
+            columns: ["impersonation_session_id"]
+            isOneToOne: false
+            referencedRelation: "impersonation_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      impersonation_sessions: {
+        Row: {
+          admin_user_id: string
+          created_at: string
+          ended_at: string | null
+          expires_at: string
+          id: string
+          ip: string | null
+          metadata: Json
+          mode: string
+          reason: string
+          request_id: string | null
+          started_at: string
+          status: string
+          target_role: string | null
+          target_user_id: string
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          admin_user_id: string
+          created_at?: string
+          ended_at?: string | null
+          expires_at?: string
+          id?: string
+          ip?: string | null
+          metadata?: Json
+          mode?: string
+          reason: string
+          request_id?: string | null
+          started_at?: string
+          status?: string
+          target_role?: string | null
+          target_user_id: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          admin_user_id?: string
+          created_at?: string
+          ended_at?: string | null
+          expires_at?: string
+          id?: string
+          ip?: string | null
+          metadata?: Json
+          mode?: string
+          reason?: string
+          request_id?: string | null
+          started_at?: string
+          status?: string
+          target_role?: string | null
+          target_user_id?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       invite_code_audit: {
         Row: {
           action: string
@@ -1537,6 +1653,22 @@ export type Database = {
         Returns: Json
       }
       helix_withdrawal_rules: { Args: never; Returns: Json }
+      impersonation_start: {
+        Args: {
+          _confirmation: string
+          _ip?: string
+          _mode?: string
+          _reason: string
+          _target_user_id: string
+          _ttl_minutes?: number
+          _user_agent?: string
+        }
+        Returns: Json
+      }
+      impersonation_stop: {
+        Args: { _reason?: string; _session_id: string }
+        Returns: Json
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_demo_user: { Args: { _user_id: string }; Returns: boolean }
       log_audit_event: {
