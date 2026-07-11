@@ -5,6 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 let currentSessionId: string | null = null;
 let startedAt = 0;
 
+type HelixCreateSessionResult = {
+  ok?: boolean;
+  session_id?: string;
+  reason?: string;
+};
+
+function asHelixCreateSessionResult(value: unknown): HelixCreateSessionResult {
+  return value && typeof value === "object" ? (value as HelixCreateSessionResult) : {};
+}
+
 export function useGameSession() {
   const startSession = useCallback(async (themeId: string | null) => {
     startedAt = Date.now();
@@ -22,6 +32,30 @@ export function useGameSession() {
       return data.id;
     } catch {
       return null;
+    }
+  }, []);
+
+  const startPaidSession = useCallback(async (depositId: string, themeId: string | null = null) => {
+    startedAt = Date.now();
+    try {
+      const { data, error } = await supabase.rpc("helix_create_session", {
+        _deposit_id: depositId,
+        _theme_id: themeId ?? undefined,
+      });
+      if (error) return { ok: false as const, reason: error.message };
+
+      const result = asHelixCreateSessionResult(data);
+      if (!result.ok || !result.session_id) {
+        return { ok: false as const, reason: result.reason ?? "session_not_created" };
+      }
+
+      currentSessionId = result.session_id;
+      return { ok: true as const, sessionId: result.session_id };
+    } catch (error) {
+      return {
+        ok: false as const,
+        reason: error instanceof Error ? error.message : "session_not_created",
+      };
     }
   }, []);
 
@@ -49,5 +83,5 @@ export function useGameSession() {
     [],
   );
 
-  return { startSession, finishSession };
+  return { startSession, startPaidSession, finishSession };
 }
