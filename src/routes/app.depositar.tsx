@@ -486,11 +486,19 @@ function PixQrModal({
               </div>
             )}
 
-            <div className="mt-4 text-sm text-white/70">
-              Valor: <span className="font-bold text-white">{formatCurrency(data.amount)}</span>
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <span
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-black tracking-widest",
+                  statusInfo.className,
+                )}
+              >
+                <span className={cn("h-2 w-2 rounded-full", statusInfo.dot)} />
+                {statusInfo.label}
+              </span>
             </div>
-            <div className="mt-1 text-[11px] text-white/50">
-              Status: <span className="font-bold">{status?.status ?? "carregando..."}</span>
+            <div className="mt-2 text-sm text-white/70">
+              Valor: <span className="font-bold text-white">{formatCurrency(data.amount)}</span>
             </div>
 
             {status?.status === "paid" && (
