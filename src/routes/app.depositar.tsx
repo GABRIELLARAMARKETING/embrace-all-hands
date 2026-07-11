@@ -232,6 +232,7 @@ function DepositarPage() {
         open={kycOpen}
         onClose={() => setKycOpen(false)}
         amount={amount}
+        accountEmail={profile?.email ?? ""}
         onSuccess={(res) => {
           setKycOpen(false);
           setPending(res);
