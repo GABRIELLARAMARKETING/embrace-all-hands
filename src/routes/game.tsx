@@ -20,6 +20,7 @@ import { useHelixDifficultyLoader } from "@/hooks/useHelixDifficultyLoader";
 import { LogoHelix } from "@/components/LogoHelix";
 import { HELIX_ALLOWED_AMOUNTS } from "@/lib/helix-rules";
 import { supabase } from "@/integrations/supabase/client";
+import { hasCurrentGameSession } from "@/hooks/useGameSession";
 
 
 export const Route = createFileRoute("/game")({
@@ -59,6 +60,7 @@ function GamePage() {
   useEffect(() => {
     if (
       authenticated === true &&
+      !hasCurrentGameSession() &&
       (selectedPlayValue == null || !HELIX_ALLOWED_AMOUNTS.has(selectedPlayValue))
     ) {
       navigate({ to: "/app/jogar", replace: true });
