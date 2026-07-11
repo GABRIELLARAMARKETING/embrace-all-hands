@@ -60,8 +60,9 @@ function SignupPage() {
           ? new URLSearchParams(window.location.search).get("ref")?.trim().toUpperCase() || undefined
           : undefined;
       const ref = urlRef || readCookie("helix_ref")?.toUpperCase() || undefined;
-      const { error } = await supabase.auth.signUp({
-        email: phoneToEmail(phone),
+      const email = phoneToEmail(phone);
+      const { data: signUpData, error } = await supabase.auth.signUp({
+        email,
         password,
         options: {
           emailRedirectTo: window.location.origin,
@@ -69,6 +70,13 @@ function SignupPage() {
         },
       });
       if (error) throw error;
+
+      // Garante sessão ativa (caso confirmação de email esteja ativa ou conta já exista)
+      if (!signUpData.session) {
+        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInErr) throw signInErr;
+      }
+
       // vincula clique original ao novo usuário (best-effort)
       const tid = readCookie("helix_tid");
       if (tid) {
@@ -80,10 +88,11 @@ function SignupPage() {
       }
       setSuccess(true);
       toast.success("Conta criada!");
-      setTimeout(() => navigate({ to: "/app/jogar", replace: true }), 500);
+      navigate({ to: "/app/jogar", replace: true });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Falha ao criar conta";
       toast.error(msg);
+      setSuccess(false);
       setLoading(false);
     }
   }
