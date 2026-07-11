@@ -38,7 +38,11 @@ function JogarPage() {
   const playable = useQuery({
     queryKey: ["helix", "playable-deposit"],
     queryFn: () => fetchPlayable(),
-    staleTime: 10_000,
+    // Sempre revalida ao entrar na rota — o depósito jogável pode ter sido
+    // criado/consumido enquanto o usuário estava em outra tela.
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
     refetchOnWindowFocus: true,
   });
   const serverAmount = playable.data?.ok ? playable.data.amount : null;
