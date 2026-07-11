@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Play } from "lucide-react";
 import { AppLayout } from "@/components/player/AppLayout";
 import { PLAYER_MOCK, MAP_OPTIONS } from "@/data/playerMockData";
@@ -7,6 +9,7 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { cn } from "@/lib/utils";
 import helixClassicMap from "@/assets/helix-classic-map.png.asset.json";
+import { getPlayableDeposit } from "@/lib/helix-play.functions";
 
 export const Route = createFileRoute("/app/jogar")({
   head: () => ({
@@ -24,6 +27,24 @@ function JogarPage() {
   const value = usePlayerStore((s) => s.selectedPlayValue);
   const setValue = usePlayerStore((s) => s.setSelectedPlayValue);
 
+  // Fonte oficial: backend valida qual valor o usuário pode jogar (baseado no
+  // último depósito pago e ainda não usado em uma sessão).
+  const fetchPlayable = useServerFn(getPlayableDeposit);
+  const playable = useQuery({
+    queryKey: ["helix", "playable-deposit"],
+    queryFn: () => fetchPlayable(),
+    staleTime: 10_000,
+    refetchOnWindowFocus: true,
+  });
+  const serverAmount = playable.data?.ok ? playable.data.amount : null;
+
+  // Sincroniza store com o valor autoritativo do backend; rejeita divergências.
+  useEffect(() => {
+    if (serverAmount != null && value !== serverAmount) {
+      setValue(serverAmount);
+    }
+  }, [serverAmount, value, setValue]);
+
   // Apenas o mapa clássico está disponível nesta rota.
   const availableMaps = useMemo(
     () => MAP_OPTIONS.filter((m) => m.id === "classico"),
@@ -31,7 +52,10 @@ function JogarPage() {
   );
   const selectedMap = availableMaps[0];
   // Regra oficial (backend): saque mínimo = 5x o valor do depósito.
-  const minWithdraw = value ? value * 5 : 0;
+  const effectiveValue = serverAmount ?? value ?? null;
+  const minWithdraw = effectiveValue ? effectiveValue * 5 : 0;
+  const canPlay = !!serverAmount;
+
 
 
   return (
