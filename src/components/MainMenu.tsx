@@ -130,7 +130,7 @@ export function MainMenu(_props: { onOpenThemes?: () => void; onOpenSkins?: () =
                 <path fillRule="evenodd" d="M12 1.5 3 5v6c0 5 3.8 9.6 9 11 5.2-1.4 9-6 9-11V5l-9-3.5Zm4.28 8.03-5 5a.75.75 0 0 1-1.06 0l-2.5-2.5a.75.75 0 1 1 1.06-1.06L10.75 12.94l4.47-4.47a.75.75 0 1 1 1.06 1.06Z" clipRule="evenodd" />
               </svg>
               <span className="text-[12px] sm:text-[13px] font-semibold tracking-tight">
-                Jogo regularizado — comprovações disponíveis
+                Jogo regularizado
               </span>
             </motion.div>
 
