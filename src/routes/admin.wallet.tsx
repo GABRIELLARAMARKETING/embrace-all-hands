@@ -342,7 +342,21 @@ function AdjustModal({
           Saldo atual: <span className="font-mono">{BRL(currentBalance)}</span>
         </p>
 
+        {action === "credit" && (
+          <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-100">
+            Este valor será registrado como <b>crédito manual administrativo</b> e não será
+            contabilizado como depósito real do usuário no dashboard.
+          </div>
+        )}
+        {action === "debit" && (
+          <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-100">
+            Esta operação será registrada como <b>débito manual administrativo</b> e ficará
+            separada dos saques reais do usuário.
+          </div>
+        )}
+
         <div className="mt-4 space-y-3">
+
           {needAmount && (
             <div>
               <label className="mb-1 block text-xs text-white/60">Valor (R$)</label>

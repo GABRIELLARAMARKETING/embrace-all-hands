@@ -118,10 +118,13 @@ function AdminDashboard() {
     { label: "Afiliados ativos", value: data?.activeAffiliates ?? 0, icon: Users, tone: "emerald" },
     { label: "Contas bloqueadas", value: data?.blockedAccounts ?? 0, icon: Lock, tone: "slate" },
 
-    { label: "Depósitos recebidos", value: formatCurrency(extras?.totalDepositsPaid ?? 0), icon: ArrowDownCircle, tone: "emerald" },
+    { label: "Depósitos recebidos (reais)", value: formatCurrency(extras?.totalDepositsPaid ?? 0), icon: ArrowDownCircle, tone: "emerald" },
     { label: "Depósitos hoje", value: formatCurrency(extras?.depositsToday ?? 0), icon: CircleDollarSign, tone: "cyan" },
+    { label: "Créditos manuais (admin)", value: formatCurrency(extras?.totalAdminCredits ?? 0), icon: ArrowDownCircle, tone: "amber" },
+    { label: "Débitos manuais (admin)", value: formatCurrency(extras?.totalAdminDebits ?? 0), icon: ArrowUpCircle, tone: "amber" },
     { label: "Saques pagos", value: formatCurrency(extras?.totalWithdrawalsPaid ?? 0), icon: ArrowUpCircle, tone: "violet" },
     { label: "Comissões pagas", value: formatCurrency(extras?.totalCommissionsPaid ?? 0), icon: TrendingUp, tone: "emerald" },
+
 
     { label: "Saques pendentes", value: data?.pendingWithdrawals ?? 0, icon: Wallet, tone: "amber" },
     { label: "Pago no mês", value: formatCurrency(data?.paidWithdrawalsMonth ?? 0), icon: CircleDollarSign, tone: "emerald" },

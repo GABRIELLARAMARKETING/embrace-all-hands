@@ -22,13 +22,17 @@ export type DashboardExtras = {
   depositsToday: number;
   totalCommissionsPaid: number;
   totalWithdrawalsPaid: number;
+  totalAdminCredits: number;
+  totalAdminDebits: number;
+  totalManualAdjustments: number;
   webhooksTotal: number;
   webhooksProcessed: number;
   webhooksErrors: number;
   webhooksPending: number;
   divergencesCount: number;
-  netRevenue: number; // depósitos - saques - comissões pagas
+  netRevenue: number; // depósitos reais - saques - comissões pagas
 };
+
 
 export const getAdminDashboardExtras = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -44,15 +48,17 @@ export const getAdminDashboardExtras = createServerFn({ method: "GET" })
       { data: depsToday },
       { data: comms },
       { data: wds },
+      { data: adjTx },
       { count: whTotal },
       { count: whOk },
       { count: whErr },
       { count: whPending },
     ] = await Promise.all([
-      supabaseAdmin.from("deposits").select("amount").in("status", ["paid", "approved"]),
-      supabaseAdmin.from("deposits").select("amount").in("status", ["paid", "approved"]).gte("credited_at", todayStart.toISOString()),
+      supabaseAdmin.from("deposits").select("amount").in("status", ["paid", "approved"]).neq("provider", "admin_manual"),
+      supabaseAdmin.from("deposits").select("amount").in("status", ["paid", "approved"]).neq("provider", "admin_manual").gte("credited_at", todayStart.toISOString()),
       (supabaseAdmin.from("commissions") as any).select("amount").eq("status", "paid"),
       (supabaseAdmin.from("affiliate_withdrawals") as any).select("amount").eq("status", "paid"),
+      supabaseAdmin.from("wallet_transactions").select("amount").eq("type", "adjustment"),
       supabaseAdmin.from("payment_webhook_logs").select("id", { count: "exact", head: true }),
       supabaseAdmin.from("payment_webhook_logs").select("id", { count: "exact", head: true }).eq("processed", true).is("processing_error", null),
       supabaseAdmin.from("payment_webhook_logs").select("id", { count: "exact", head: true }).not("processing_error", "is", null),
@@ -66,6 +72,18 @@ export const getAdminDashboardExtras = createServerFn({ method: "GET" })
     const depositsToday = sum(depsToday as any[]);
     const totalCommissionsPaid = sum(comms as any[]);
     const totalWithdrawalsPaid = sum(wds as any[]);
+
+    // Ajustes manuais do admin: wallet_transactions.type='adjustment' com amount>0 (crédito) ou <0 (débito/reset).
+    const adjRows = (adjTx ?? []) as Array<{ amount: number | string }>;
+    const totalAdminCredits = adjRows.reduce((s, r) => {
+      const v = Number(r.amount ?? 0);
+      return v > 0 ? s + v : s;
+    }, 0);
+    const totalAdminDebits = adjRows.reduce((s, r) => {
+      const v = Number(r.amount ?? 0);
+      return v < 0 ? s + Math.abs(v) : s;
+    }, 0);
+    const totalManualAdjustments = totalAdminCredits + totalAdminDebits;
 
     // divergências: paid_without_credit + missing_wallet_tx (via função existente reconcile_payments)
     let divergencesCount = 0;
@@ -82,6 +100,9 @@ export const getAdminDashboardExtras = createServerFn({ method: "GET" })
       depositsToday,
       totalCommissionsPaid,
       totalWithdrawalsPaid,
+      totalAdminCredits,
+      totalAdminDebits,
+      totalManualAdjustments,
       webhooksTotal: whTotal ?? 0,
       webhooksProcessed: whOk ?? 0,
       webhooksErrors: whErr ?? 0,
@@ -90,6 +111,7 @@ export const getAdminDashboardExtras = createServerFn({ method: "GET" })
       netRevenue: totalDepositsPaid - totalWithdrawalsPaid - totalCommissionsPaid,
     };
   });
+
 
 /* ============================================================
  * SÉRIE TEMPORAL — depósitos por dia (últimos N dias)
@@ -114,7 +136,9 @@ export const getDepositsTimeSeries = createServerFn({ method: "GET" })
       .from("deposits")
       .select("amount, credited_at")
       .in("status", ["paid", "approved"])
+      .neq("provider", "admin_manual")
       .gte("credited_at", start.toISOString());
+
     if (error) throw new Error(error.message);
 
     // bucket por dia UTC
@@ -162,8 +186,10 @@ export const getRecentActivity = createServerFn({ method: "GET" })
           .from("deposits")
           .select("id, amount, status, user_id, created_at, credited_at")
           .in("status", ["paid", "approved"])
+          .neq("provider", "admin_manual")
           .order("credited_at", { ascending: false })
           .limit(8),
+
         supabaseAdmin
           .from("affiliate_withdrawals")
           .select("id, amount, status, user_id, created_at")
