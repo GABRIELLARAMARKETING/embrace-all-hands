@@ -22,13 +22,17 @@ export type DashboardExtras = {
   depositsToday: number;
   totalCommissionsPaid: number;
   totalWithdrawalsPaid: number;
+  totalAdminCredits: number;
+  totalAdminDebits: number;
+  totalManualAdjustments: number;
   webhooksTotal: number;
   webhooksProcessed: number;
   webhooksErrors: number;
   webhooksPending: number;
   divergencesCount: number;
-  netRevenue: number; // depósitos - saques - comissões pagas
+  netRevenue: number; // depósitos reais - saques - comissões pagas
 };
+
 
 export const getAdminDashboardExtras = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
