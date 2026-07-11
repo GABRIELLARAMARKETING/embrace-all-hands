@@ -290,7 +290,7 @@ function JogarPage() {
             )}
           >
             <Play className="h-4 w-4 fill-current" />
-            {validating ? "VALIDANDO..." : `JOGAR — ${formatCurrency(serverAmount ?? 0)}`}
+            {validating ? "VALIDANDO..." : `JOGAR — ${formatCurrency(effectiveValue ?? 0)}`}
           </button>
         </div>
       </div>
