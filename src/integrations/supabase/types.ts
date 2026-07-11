@@ -1582,6 +1582,7 @@ export type Database = {
         | "failed"
         | "waiting_payment"
         | "expired"
+        | "spent"
       invite_code_kind: "referral" | "affiliate" | "manager" | "invite"
       invite_code_status: "active" | "inactive" | "expired"
       risk_alert_status: "open" | "reviewing" | "resolved" | "ignored"
@@ -1750,6 +1751,7 @@ export const Constants = {
         "failed",
         "waiting_payment",
         "expired",
+        "spent",
       ],
       invite_code_kind: ["referral", "affiliate", "manager", "invite"],
       invite_code_status: ["active", "inactive", "expired"],
