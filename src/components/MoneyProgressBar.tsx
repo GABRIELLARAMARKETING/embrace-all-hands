@@ -97,9 +97,9 @@ export function MoneyProgressBar() {
     navigate({ to: "/app/jogar" });
   };
 
-  const showBar = gameState === "playing" || gameState === "paused";
-  const pct = Math.min(100, (money / GOAL) * 100);
-  const completed = money >= GOAL;
+  const showBar = !!rule && (gameState === "playing" || gameState === "paused");
+  const pct = GOAL > 0 ? Math.min(100, (money / GOAL) * 100) : 0;
+  const completed = GOAL > 0 && money >= GOAL;
 
   return (
     <>
