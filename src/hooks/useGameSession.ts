@@ -140,5 +140,5 @@ export function useGameSession() {
     [queryClient],
   );
 
-  return { startSession, startPaidSession, finishSession };
+  return { startSession, startPaidSession, startDemoSession, finishSession };
 }
