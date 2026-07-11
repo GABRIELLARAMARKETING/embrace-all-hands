@@ -161,9 +161,15 @@ export function MainMenu(_props: { onOpenThemes?: () => void; onOpenSkins?: () =
 
 
 
-            <PrimaryButton onClick={handlePlay} aria-label="Jogar grátis" disabled={!current}>
-              JOGAR GRATIS
-            </PrimaryButton>
+            {userEmail ? (
+              <PrimaryButton onClick={() => navigate({ to: "/app/jogar" })} aria-label="Jogar" disabled={!current}>
+                JOGAR
+              </PrimaryButton>
+            ) : (
+              <PrimaryButton onClick={handlePlay} aria-label="Jogar grátis" disabled={!current}>
+                JOGAR GRATIS
+              </PrimaryButton>
+            )}
 
             {userEmail ? (
               <div className="mx-auto mt-2 flex w-full max-w-[295px] items-center justify-between gap-3">
