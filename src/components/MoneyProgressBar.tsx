@@ -9,17 +9,16 @@ import { HELIX_DEPOSIT_RULES } from "@/lib/helix-rules";
 export function MoneyProgressBar() {
   const selectedPlayValue = usePlayerStore((s) => s.selectedPlayValue);
   // Fonte única: regras oficiais do backend (helix_payout_cents).
-  const rule = useMemo(() => {
-    const amount = selectedPlayValue ?? 5;
-    return (
-      HELIX_DEPOSIT_RULES.find((r) => r.amount === amount) ??
-      HELIX_DEPOSIT_RULES[0]
-    );
-  }, [selectedPlayValue]);
-  // Ganho por plataforma = payoutCents/100 (idêntico ao backend).
-  const PER_PLATFORM = rule.payoutCents / 100;
-  // Meta oficial de saque = 5× o depósito (regra atual da rota /app/jogar).
-  const GOAL = rule.amount * 5;
+  // Não usa fallback: /game já força redirect para /app/jogar se não houver valor.
+  const rule = useMemo(
+    () =>
+      selectedPlayValue == null
+        ? null
+        : HELIX_DEPOSIT_RULES.find((r) => r.amount === selectedPlayValue) ?? null,
+    [selectedPlayValue],
+  );
+  const PER_PLATFORM = rule ? rule.payoutCents / 100 : 0;
+  const GOAL = rule ? rule.amount * 5 : 0;
   const gameState = useGameStore((s) => s.gameState);
   const restartGame = useGameStore((s) => s.restartGame);
   const totalCoins = useGameStore((s) => s.totalCoins);
@@ -45,18 +44,20 @@ export function MoneyProgressBar() {
 
   useEffect(() => {
     // Publica o depósito atual para GameCanvas emitir moedas com valor correto.
-    (window as unknown as { __helixDeposit?: number }).__helixDeposit =
-      selectedPlayValue ?? 5;
+    const w = window as unknown as { __helixDeposit?: number };
+    if (selectedPlayValue == null) delete w.__helixDeposit;
+    else w.__helixDeposit = selectedPlayValue;
   }, [selectedPlayValue]);
 
   useEffect(() => {
+    if (!rule) return;
     const onPop = () => {
       setMoney((m) => Math.round((m + PER_PLATFORM) * 100) / 100);
       setPlatforms((p) => p + 1);
     };
     window.addEventListener("coin-pop", onPop);
     return () => window.removeEventListener("coin-pop", onPop);
-  }, [PER_PLATFORM]);
+  }, [PER_PLATFORM, rule]);
 
   useEffect(() => {
     if (!claimError) return;
@@ -96,9 +97,9 @@ export function MoneyProgressBar() {
     navigate({ to: "/app/jogar" });
   };
 
-  const showBar = gameState === "playing" || gameState === "paused";
-  const pct = Math.min(100, (money / GOAL) * 100);
-  const completed = money >= GOAL;
+  const showBar = !!rule && (gameState === "playing" || gameState === "paused");
+  const pct = GOAL > 0 ? Math.min(100, (money / GOAL) * 100) : 0;
+  const completed = GOAL > 0 && money >= GOAL;
 
   return (
     <>
