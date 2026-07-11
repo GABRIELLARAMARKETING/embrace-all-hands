@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.block_free_play_for_authenticated() FROM PUBLIC, anon, authenticated;
