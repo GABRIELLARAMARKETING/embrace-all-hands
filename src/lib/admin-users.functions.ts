@@ -346,6 +346,22 @@ export const updateAdminUser = createServerFn({ method: "POST" })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .insert({ user_id: data.id, role: data.role } as any);
         if (insErr) throw new Error(`Falha ao atribuir papel '${data.role}': ${insErr.message}`);
+
+        // Verificação pós-insert: confirma que a linha realmente existe.
+        const { data: verify, error: verifyErr } = await supabaseAdmin
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", data.id)
+          .eq("role", data.role)
+          .maybeSingle();
+        if (verifyErr) {
+          throw new Error(`Falha ao verificar papel '${data.role}': ${verifyErr.message}`);
+        }
+        if (!verify) {
+          throw new Error(
+            `Papel '${data.role}' não foi persistido em user_roles (verificação pós-insert vazia). Possível bloqueio de RLS/trigger.`,
+          );
+        }
       }
     }
 
