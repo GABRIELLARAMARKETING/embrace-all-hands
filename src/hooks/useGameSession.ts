@@ -24,6 +24,13 @@ export function hasCurrentGameSession() {
   return currentSessionId !== null;
 }
 
+export function getCurrentGameSessionId() {
+  if (currentSessionId) return currentSessionId;
+  if (typeof window === "undefined") return null;
+  currentSessionId = window.sessionStorage.getItem(SESSION_STORAGE_KEY);
+  return currentSessionId;
+}
+
 function setCurrentGameSession(id: string | null) {
   currentSessionId = id;
   if (typeof window === "undefined") return;
@@ -135,6 +142,7 @@ export function useGameSession() {
         queryClient.invalidateQueries({ queryKey: ["my-profile"] }),
         queryClient.invalidateQueries({ queryKey: ["my-deposits"] }),
         queryClient.invalidateQueries({ queryKey: ["helix", "playable-deposit"] }),
+        queryClient.invalidateQueries({ queryKey: ["helix-withdrawal-rules"] }),
       ]);
     },
     [queryClient],

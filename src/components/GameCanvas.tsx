@@ -23,6 +23,7 @@ import { SectorDebugBridge, SectorDebugPanel } from "@/components/SectorDebugOve
 import { useTowerControls } from "@/game/engine/useTowerControls";
 import { SFX, playSound } from "@/utils/sound";
 import { physicsDebug } from "@/game/engine/physicsDebug";
+import { registerHelixPlatform } from "@/lib/helix-platform-client";
 
 const SECTORS = CONSTANTS.SECTORS_PER_RING;
 const SECTOR_ANGLE = (Math.PI * 2) / SECTORS;
@@ -63,7 +64,6 @@ function resolveContactSector(
   if (left === "bonus" || right === "bonus") return "bonus";
   return "empty";
 }
-
 
 function GameLogic({
   onFirstInput,
@@ -315,6 +315,7 @@ function GameLogic({
               );
               cameraShake.current = Math.max(cameraShake.current, 0.45);
               addScore(1);
+              registerHelixPlatform(k + 1);
               // Valor da moeda vem do backend (HELIX_DEPOSIT_RULES via window.__helixDeposit).
               // Sem depósito (modo teste grátis), usa a menor regra como demo
               // para que a HUD (moeda + barra) apareça igual ao modo pago.

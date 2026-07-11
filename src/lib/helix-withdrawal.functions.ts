@@ -130,6 +130,30 @@ export const requestHelixWithdrawal = createServerFn({ method: "POST" })
         .single();
       if (insertError) throw new Error(insertError.message);
 
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { error: notifyError } = await supabaseAdmin
+          .from("admin_notifications")
+          .insert({
+            type: "WITHDRAWAL_REQUESTED",
+            severity: "warning",
+            title: `Novo saque solicitado: R$ ${amountReais}`,
+            message: `Usuário ${userId} solicitou saque Helix de R$ ${amountReais}.`,
+            payload: {
+              withdrawal_id: withdrawal.id,
+              user_id: userId,
+              amount: amountReais,
+              pix_key_masked: pixKeyMasked,
+              source: "helix",
+            },
+          });
+        if (notifyError) {
+          console.error("[helix-withdrawal] failed to insert admin_notification", notifyError);
+        }
+      } catch (e) {
+        console.error("[helix-withdrawal] admin_notification insert threw", e);
+      }
+
       const newBalanceReais = (rules.available_reward_cents - data.amountCents) / 100;
       const { error: updErr } = await supabase
         .from("profiles")

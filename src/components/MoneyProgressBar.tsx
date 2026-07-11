@@ -6,6 +6,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { RewardClaimedModal } from "./RewardClaimedModal";
 import { HELIX_DEPOSIT_RULES } from "@/lib/helix-rules";
 import { useGameSession } from "@/hooks/useGameSession";
+import { waitForPendingHelixPlatforms } from "@/lib/helix-platform-client";
 
 
 export function MoneyProgressBar() {
@@ -76,6 +77,7 @@ export function MoneyProgressBar() {
       // Finaliza a sessão no backend: credita recompensa (game_reward) e
       // libera o depósito para não ser marcado como abandonado (player_lost)
       // pelo helix_abandon_active_sessions ao recarregar o perfil.
+      await waitForPendingHelixPlatforms();
       await finishSession({
         score,
         level_reached: currentLevel,
