@@ -38,7 +38,11 @@ function JogarPage() {
   const playable = useQuery({
     queryKey: ["helix", "playable-deposit"],
     queryFn: () => fetchPlayable(),
-    staleTime: 10_000,
+    // Sempre revalida ao entrar na rota — o depósito jogável pode ter sido
+    // criado/consumido enquanto o usuário estava em outra tela.
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
     refetchOnWindowFocus: true,
   });
   const serverAmount = playable.data?.ok ? playable.data.amount : null;
@@ -67,7 +71,8 @@ function JogarPage() {
   // Regra oficial (backend): saque mínimo = 5x o valor do depósito.
   const effectiveValue = serverAmount ?? value ?? null;
   const minWithdraw = effectiveValue ? effectiveValue * 5 : 0;
-  const canPlay = !!serverAmount;
+  // Só habilita JOGAR quando o backend confirmou um depósito jogável.
+  const canPlay = playable.isSuccess && !!serverAmount && !playable.isFetching;
 
   // Revalidação server-side no clique de JOGAR (defesa em profundidade).
   const validateFn = useServerFn(validatePlayValue);
