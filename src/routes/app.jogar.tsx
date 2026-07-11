@@ -11,6 +11,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { cn } from "@/lib/utils";
 const helixClassicMap = { url: "/images/helix-classic-map.png" };
 import { getPlayableDeposit, validatePlayValue } from "@/lib/helix-play.functions";
+import { getMyProfile } from "@/lib/profile.functions";
 import { useGameSession } from "@/hooks/useGameSession";
 import { useGameStore } from "@/store/useGameStore";
 
@@ -46,6 +47,15 @@ function JogarPage() {
     refetchOnWindowFocus: true,
   });
   const serverAmount = playable.data?.ok ? playable.data.amount : null;
+
+  const fetchProfile = useServerFn(getMyProfile);
+  const profileQuery = useQuery({
+    queryKey: ["my-profile"],
+    queryFn: () => fetchProfile(),
+    refetchOnMount: "always",
+  });
+  const balance = profileQuery.data?.balance ?? 0;
+
 
   // Diagnóstico rápido no console — inspecionar em DevTools ao abrir /app/jogar.
   useEffect(() => {
@@ -147,15 +157,20 @@ function JogarPage() {
           <div className="mt-3 flex flex-wrap gap-2">
             {PLAYER_MOCK.playOptions.map((v) => {
               const active = effectiveValue === v;
+              const affordable = balance >= v;
               return (
                 <button
                   key={v}
-                  onClick={() => setValue(v)}
+                  disabled={!affordable}
+                  title={affordable ? undefined : "Saldo insuficiente"}
+                  onClick={() => affordable && setValue(v)}
                   className={cn(
                     "rounded-full px-4 py-2 text-sm font-bold transition-all",
                     active
                       ? "bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] text-white shadow-[0_0_18px_rgba(168,85,247,0.55)]"
-                      : "border border-[#3a1d5a] bg-[#1a0c30] text-white hover:border-[#5b2e8a]",
+                      : affordable
+                        ? "border border-[#3a1d5a] bg-[#1a0c30] text-white hover:border-[#5b2e8a]"
+                        : "cursor-not-allowed border border-[#3a1d5a]/40 bg-[#1a0c30]/40 text-white/30",
                   )}
                 >
                   R${v}
