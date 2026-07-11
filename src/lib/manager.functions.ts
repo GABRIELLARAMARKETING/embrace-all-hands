@@ -180,7 +180,8 @@ export const listManagerReferrals = createServerFn({ method: "GET" })
 
     const { data: deps } = await supabase
       .from("deposits").select("user_id, amount, status, confirmed_at")
-      .in("user_id", ids as any);
+      .in("user_id", ids as any).neq("provider", "admin_manual");
+
     const depsByUser = new Map<string, any[]>();
     (deps ?? []).forEach((d: any) => {
       const arr = depsByUser.get(d.user_id) ?? [];
