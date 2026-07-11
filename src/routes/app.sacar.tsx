@@ -40,7 +40,10 @@ function SacarPage() {
   const { data: rules } = useQuery({
     queryKey: ["helix-withdrawal-rules"],
     queryFn: () => rulesFn({}),
-    staleTime: 15_000,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    refetchInterval: 10_000,
   });
   const balance = (rules?.available_reward_cents ?? 0) / 100;
   const canWithdraw = rules?.can_withdraw ?? false;
