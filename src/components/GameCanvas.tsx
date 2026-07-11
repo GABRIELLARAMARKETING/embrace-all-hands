@@ -315,14 +315,10 @@ function GameLogic({
               // Valor da moeda vem do backend (HELIX_DEPOSIT_RULES via window.__helixDeposit).
               import("@/components/CoinPopLayer").then((m) => {
                 import("@/lib/helix-rules").then(({ HELIX_DEPOSIT_RULES }) => {
-                  const dep =
-                    (typeof window !== "undefined" &&
-                      (window as unknown as { __helixDeposit?: number })
-                        .__helixDeposit) ||
-                    5;
-                  const rule =
-                    HELIX_DEPOSIT_RULES.find((r) => r.amount === dep) ??
-                    HELIX_DEPOSIT_RULES[0];
+                  const dep = (window as unknown as { __helixDeposit?: number })
+                    .__helixDeposit;
+                  const rule = HELIX_DEPOSIT_RULES.find((r) => r.amount === dep);
+                  if (!rule) return; // sem depósito válido, não emite moeda
                   m.spawnCoinPop(rule.payoutCents / 100);
                 });
               });
