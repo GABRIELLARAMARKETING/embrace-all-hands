@@ -8,9 +8,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { AppLayout, GradientButton, PlayerCard } from "@/components/player/AppLayout";
-import { getMyProfile } from "@/lib/profile.functions";
-import { requestAffiliateWithdrawal } from "@/lib/withdrawals.functions";
-import { getHelixWithdrawalRules } from "@/lib/helix-withdrawal.functions";
+import { getHelixWithdrawalRules, requestHelixWithdrawal } from "@/lib/helix-withdrawal.functions";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { makeWithdrawSchema, type WithdrawFormValues } from "@/utils/playerValidators";
 import { maskCpf } from "@/utils/cpfMask";
@@ -29,14 +27,8 @@ export const Route = createFileRoute("/app/sacar")({
 
 function SacarPage() {
   const qc = useQueryClient();
-  const profileFn = useServerFn(getMyProfile);
-  const requestFn = useServerFn(requestAffiliateWithdrawal);
+  const requestFn = useServerFn(requestHelixWithdrawal);
   const rulesFn = useServerFn(getHelixWithdrawalRules);
-  useQuery({
-    queryKey: ["my-profile"],
-    queryFn: () => profileFn({}),
-    staleTime: 30_000,
-  });
   const { data: rules } = useQuery({
     queryKey: ["helix-withdrawal-rules"],
     queryFn: () => rulesFn({}),
@@ -68,7 +60,7 @@ function SacarPage() {
     mutationFn: (values: WithdrawFormValues) =>
       requestFn({
         data: {
-          amount: Math.round(values.amount),
+          amountCents: Math.round(values.amount * 100),
           pixKey: values.pixKey,
         },
       }),

@@ -9,6 +9,7 @@ import { THEMES } from "@/game/config/themes";
 import { generateLevel, type RingData, type SectorType } from "@/game/engine/levelGenerator";
 import { InfinitePlatformManager } from "@/game/engine/infinitePlatforms";
 import { helixRuntime } from "@/game/config/difficulty";
+import { supabase } from "@/integrations/supabase/client";
 
 import { useGameStore } from "@/store/useGameStore";
 import { PlatformRing } from "@/game/entities/PlatformRing";
@@ -23,6 +24,7 @@ import { SectorDebugBridge, SectorDebugPanel } from "@/components/SectorDebugOve
 import { useTowerControls } from "@/game/engine/useTowerControls";
 import { SFX, playSound } from "@/utils/sound";
 import { physicsDebug } from "@/game/engine/physicsDebug";
+import { getCurrentGameSessionId } from "@/hooks/useGameSession";
 
 const SECTORS = CONSTANTS.SECTORS_PER_RING;
 const SECTOR_ANGLE = (Math.PI * 2) / SECTORS;
@@ -62,6 +64,17 @@ function resolveContactSector(
   if (left === "solid" || right === "solid") return "solid";
   if (left === "bonus" || right === "bonus") return "bonus";
   return "empty";
+}
+
+function registerHelixPlatform(platformIndex: number) {
+  const sessionId = getCurrentGameSessionId();
+  if (!sessionId) return;
+  void supabase.rpc("helix_register_platform", {
+    _session_id: sessionId,
+    _platform_index: platformIndex,
+    _client_ts: Date.now(),
+    _event_hash: `${sessionId}:${platformIndex}`,
+  });
 }
 
 
@@ -315,6 +328,7 @@ function GameLogic({
               );
               cameraShake.current = Math.max(cameraShake.current, 0.45);
               addScore(1);
+              registerHelixPlatform(k + 1);
               // Valor da moeda vem do backend (HELIX_DEPOSIT_RULES via window.__helixDeposit).
               // Sem depósito (modo teste grátis), usa a menor regra como demo
               // para que a HUD (moeda + barra) apareça igual ao modo pago.
