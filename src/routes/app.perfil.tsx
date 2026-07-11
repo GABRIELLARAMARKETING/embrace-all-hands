@@ -18,6 +18,11 @@ const helixLogo = "/images/helixfast-logo.png";
 const myProfileQuery = queryOptions({
   queryKey: ["my-profile"],
   queryFn: () => getMyProfile(),
+  staleTime: 0,
+  gcTime: 0,
+  refetchOnMount: "always",
+  refetchOnWindowFocus: true,
+  refetchInterval: 5000,
 });
 
 const withdrawalsQuery = queryOptions({
@@ -33,7 +38,10 @@ const referralStatsQuery = queryOptions({
 const myDepositsQuery = queryOptions({
   queryKey: ["my-deposits"],
   queryFn: () => listMyRecentDeposits({ data: { limit: 8 } }),
-  staleTime: 15_000,
+  staleTime: 0,
+  gcTime: 0,
+  refetchOnMount: "always",
+  refetchOnWindowFocus: true,
 });
 
 

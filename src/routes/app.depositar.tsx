@@ -93,6 +93,7 @@ function DepositarPage() {
     queryKey: ["my-profile"],
     queryFn: () => profileFn({}),
     staleTime: 0,
+    gcTime: 0,
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
     refetchInterval: 5000,

@@ -11,7 +11,7 @@ export interface ProfilePayload {
   totalReceived: number;
 }
 
-export const getMyProfile = createServerFn({ method: "GET" })
+export const getMyProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<ProfilePayload> => {
     const { supabase, userId, claims } = context;

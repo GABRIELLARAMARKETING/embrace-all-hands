@@ -101,10 +101,16 @@ export function useGameSession() {
         /* swallow */
       }
       setCurrentGameSession(null);
-      // Refresca saldo/depósitos no frontend após finalizar a sessão no backend.
-      queryClient.invalidateQueries({ queryKey: ["my-profile"] });
-      queryClient.invalidateQueries({ queryKey: ["my-deposits"] });
-      queryClient.invalidateQueries({ queryKey: ["playable-deposit"] });
+      // Remove dados potencialmente stale e força as telas /app/depositar,
+      // /app/perfil e /app/jogar a buscarem o saldo/depósitos reais do backend.
+      queryClient.removeQueries({ queryKey: ["my-profile"] });
+      queryClient.removeQueries({ queryKey: ["my-deposits"] });
+      queryClient.removeQueries({ queryKey: ["helix", "playable-deposit"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["my-profile"] }),
+        queryClient.invalidateQueries({ queryKey: ["my-deposits"] }),
+        queryClient.invalidateQueries({ queryKey: ["helix", "playable-deposit"] }),
+      ]);
     },
     [queryClient],
   );
