@@ -70,6 +70,7 @@ const initialPersisted = {
 
 export const useGameStore = create<Store>((set, get) => ({
   gameState: "menu",
+  sessionId: 0,
   score: 0,
   coins: 0,
   combo: 0,
