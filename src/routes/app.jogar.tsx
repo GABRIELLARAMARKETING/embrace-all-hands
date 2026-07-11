@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Play } from "lucide-react";
+import { toast } from "sonner";
 import { AppLayout } from "@/components/player/AppLayout";
 import { PLAYER_MOCK, MAP_OPTIONS } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
@@ -10,8 +11,6 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { cn } from "@/lib/utils";
 import helixClassicMap from "@/assets/helix-classic-map.png.asset.json";
 import { getPlayableDeposit, validatePlayValue } from "@/lib/helix-play.functions";
-import { toast } from "sonner";
-import { useState } from "react";
 
 export const Route = createFileRoute("/app/jogar")({
   head: () => ({
