@@ -69,6 +69,7 @@ function Page() {
   });
 
   function selectDifficulty(next: HelixDifficulty) {
+    dirty.current = true;
     setDifficulty(next);
     if (next !== "custom") setSettings(settingsForDifficulty(next));
   }
@@ -76,10 +77,12 @@ function Page() {
   function updateField(k: keyof HelixSettings, raw: string) {
     const v = Number(raw);
     if (!Number.isFinite(v)) return;
+    dirty.current = true;
     setSettings((s) => ({ ...s, [k]: v }));
   }
 
   function restoreDefault() {
+    dirty.current = true;
     setDifficulty("normal");
     setSettings(HELIX_DIFFICULTY_PRESETS.normal);
   }
