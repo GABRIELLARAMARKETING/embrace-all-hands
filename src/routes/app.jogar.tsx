@@ -1,15 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Play } from "lucide-react";
+import { toast } from "sonner";
 import { AppLayout } from "@/components/player/AppLayout";
 import { PLAYER_MOCK, MAP_OPTIONS } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { cn } from "@/lib/utils";
 import helixClassicMap from "@/assets/helix-classic-map.png.asset.json";
-import { getPlayableDeposit } from "@/lib/helix-play.functions";
+import { getPlayableDeposit, validatePlayValue } from "@/lib/helix-play.functions";
 
 export const Route = createFileRoute("/app/jogar")({
   head: () => ({
@@ -55,6 +56,33 @@ function JogarPage() {
   const effectiveValue = serverAmount ?? value ?? null;
   const minWithdraw = effectiveValue ? effectiveValue * 5 : 0;
   const canPlay = !!serverAmount;
+
+  // Revalidação server-side no clique de JOGAR (defesa em profundidade).
+  const validateFn = useServerFn(validatePlayValue);
+  const [validating, setValidating] = useState(false);
+  const handlePlay = async () => {
+    if (!serverAmount || validating) return;
+    setValidating(true);
+    try {
+      const res = await validateFn({ data: { amount: serverAmount } });
+      if (!res.ok) {
+        toast.error(
+          res.reason === "amount_mismatch"
+            ? "Valor não corresponde ao seu depósito."
+            : res.reason === "deposit_already_used"
+              ? "Este depósito já foi usado em uma partida."
+              : "Depósito indisponível para jogar.",
+        );
+        await playable.refetch();
+        return;
+      }
+      navigate({ to: "/game" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao validar depósito.");
+    } finally {
+      setValidating(false);
+    }
+  };
 
 
 
@@ -174,17 +202,17 @@ function JogarPage() {
 
           {/* Play button */}
           <button
-            disabled={!canPlay}
-            onClick={() => canPlay && navigate({ to: "/game" })}
+            disabled={!canPlay || validating}
+            onClick={handlePlay}
             className={cn(
               "mt-5 flex w-full items-center justify-center gap-2 rounded-full py-4 text-[15px] font-bold transition-all",
-              canPlay
+              canPlay && !validating
                 ? "bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] text-white shadow-[0_10px_30px_-10px_rgba(236,95,163,0.7)] active:scale-[0.98]"
                 : "cursor-not-allowed border border-[#3a1d5a] bg-[#1a0c30] text-white/45",
             )}
           >
             <Play className="h-4 w-4 fill-current" />
-            JOGAR — {formatCurrency(serverAmount ?? 0)}
+            {validating ? "VALIDANDO..." : `JOGAR — ${formatCurrency(serverAmount ?? 0)}`}
           </button>
         </div>
       </div>
