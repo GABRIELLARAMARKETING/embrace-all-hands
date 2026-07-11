@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { GameCanvas } from "@/components/GameCanvas";
@@ -10,6 +10,7 @@ import { GameOverModal } from "@/components/GameOverModal";
 import { ThemeSelector } from "@/components/ThemeSelector";
 import { SkinShop } from "@/components/SkinShop";
 import { useGameStore } from "@/store/useGameStore";
+import { usePlayerStore } from "@/store/usePlayerStore";
 import { PhysicsDebugOverlay } from "@/components/PhysicsDebugOverlay";
 import { CoinPopLayer } from "@/components/CoinPopLayer";
 import { MoneyProgressBar } from "@/components/MoneyProgressBar";
@@ -17,6 +18,7 @@ import { useGameSession } from "@/hooks/useGameSession";
 import { useThemePreload } from "@/hooks/useThemePreload";
 import { useHelixDifficultyLoader } from "@/hooks/useHelixDifficultyLoader";
 import { LogoHelix } from "@/components/LogoHelix";
+import { HELIX_ALLOWED_AMOUNTS } from "@/lib/helix-rules";
 
 
 export const Route = createFileRoute("/game")({
@@ -33,6 +35,17 @@ function GamePage() {
   const { finishSession } = useGameSession();
   useThemePreload();
   useHelixDifficultyLoader();
+
+  // Guard: /game exige um valor de depósito válido selecionado em /app/jogar.
+  const navigate = useNavigate();
+  const selectedPlayValue = usePlayerStore((s) => s.selectedPlayValue);
+  useEffect(() => {
+    if (selectedPlayValue == null || !HELIX_ALLOWED_AMOUNTS.has(selectedPlayValue)) {
+      navigate({ to: "/app/jogar", replace: true });
+    }
+  }, [selectedPlayValue, navigate]);
+
+
 
   const score = useGameStore((s) => s.score);
   const currentLevel = useGameStore((s) => s.currentLevel);
