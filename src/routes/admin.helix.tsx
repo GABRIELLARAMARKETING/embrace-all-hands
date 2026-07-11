@@ -21,7 +21,9 @@ const helixQuery = () =>
   queryOptions({
     queryKey: ["admin", "helix-difficulty"],
     queryFn: () => getHelixDifficulty(),
-    staleTime: 15_000,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: false,
   });
 
 export const Route = createFileRoute("/admin/helix")({
