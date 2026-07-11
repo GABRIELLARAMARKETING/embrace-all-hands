@@ -86,6 +86,7 @@ const NAV = [
   { to: "/admin/notifications", label: "Notificações", icon: Bell },
   { to: "/admin/integrations", label: "Integrações", icon: Plug },
   { to: "/admin/roles", label: "Perfis & Permissões", icon: Lock },
+  { to: "/admin/impersonation", label: "Impersonação segura", icon: ShieldAlert },
   { to: "/admin/backups", label: "Backups", icon: DatabaseBackup },
   { to: "/admin/api-keys", label: "API Keys", icon: KeyRound },
   { to: "/admin/health", label: "Saúde do Sistema", icon: Activity },
