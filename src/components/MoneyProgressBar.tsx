@@ -4,15 +4,22 @@ import { useGameStore } from "@/store/useGameStore";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { RewardClaimedModal } from "./RewardClaimedModal";
+import { HELIX_DEPOSIT_RULES } from "@/lib/helix-rules";
 
 export function MoneyProgressBar() {
   const selectedPlayValue = usePlayerStore((s) => s.selectedPlayValue);
-  // Regra oficial: por plataforma = 10% do depósito; meta = 5x o depósito.
-  const PER_PLATFORM = useMemo(
-    () => Math.round((selectedPlayValue ?? 5) * 10) / 100,
-    [selectedPlayValue],
-  );
-  const GOAL = useMemo(() => (selectedPlayValue ?? 5) * 5, [selectedPlayValue]);
+  // Fonte única: regras oficiais do backend (helix_payout_cents).
+  const rule = useMemo(() => {
+    const amount = selectedPlayValue ?? 5;
+    return (
+      HELIX_DEPOSIT_RULES.find((r) => r.amount === amount) ??
+      HELIX_DEPOSIT_RULES[0]
+    );
+  }, [selectedPlayValue]);
+  // Ganho por plataforma = payoutCents/100 (idêntico ao backend).
+  const PER_PLATFORM = rule.payoutCents / 100;
+  // Meta oficial de saque = 5× o depósito (regra atual da rota /app/jogar).
+  const GOAL = rule.amount * 5;
   const gameState = useGameStore((s) => s.gameState);
   const restartGame = useGameStore((s) => s.restartGame);
   const totalCoins = useGameStore((s) => s.totalCoins);
