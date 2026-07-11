@@ -119,20 +119,8 @@ export function MainMenu(_props: { onOpenThemes?: () => void; onOpenSkins?: () =
               </span>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.4 }}
-              className="mx-auto flex w-[90%] max-w-[575px] items-center justify-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-1.5 text-emerald-100 backdrop-blur-md"
-              role="status"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 text-emerald-300" aria-hidden>
-                <path fillRule="evenodd" d="M12 1.5 3 5v6c0 5 3.8 9.6 9 11 5.2-1.4 9-6 9-11V5l-9-3.5Zm4.28 8.03-5 5a.75.75 0 0 1-1.06 0l-2.5-2.5a.75.75 0 1 1 1.06-1.06L10.75 12.94l4.47-4.47a.75.75 0 1 1 1.06 1.06Z" clipRule="evenodd" />
-              </svg>
-              <span className="text-[12px] sm:text-[13px] font-semibold tracking-tight">
-                Jogo regularizado
-              </span>
-            </motion.div>
+
+
 
             <motion.p
               initial={{ opacity: 0, y: -8 }}
