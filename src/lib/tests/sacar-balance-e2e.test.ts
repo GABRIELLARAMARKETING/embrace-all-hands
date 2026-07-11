@@ -161,4 +161,66 @@ describe("/app/sacar — saldo sacável (E2E)", () => {
     expect(rules.can_withdraw).toBe(false);
     expect((rules as any).reason).toBe("demo_account");
   });
+
+  it("resgates em sequência rápida — saldo sacável nunca trava em 0,00", async () => {
+    // Setup: admin credita R$100 e usuário acumula R$1500 sacáveis
+    store.adminDepositCents = 10000;
+    store.adminDepositStatus = "spent";
+    store.balanceCents = 150000;
+    store.rewardsCents = 150000;
+
+    const requestWithdraw = async (amountCents: number) => {
+      const current = await qc.fetchQuery(makeSacarQuery(store));
+      if (!current.can_withdraw) throw new Error("withdraw_blocked");
+      if (amountCents > current.available_reward_cents)
+        throw new Error("insufficient_balance");
+      store.balanceCents -= amountCents;
+      store.rewardsCents -= amountCents;
+      await qc.invalidateQueries({ queryKey: ["helix-withdrawal-rules"] });
+      return qc.fetchQuery(makeSacarQuery(store));
+    };
+
+    // Rajada: 3 saques de R$ 500 em paralelo
+    const results = await Promise.all([
+      requestWithdraw(50000),
+      requestWithdraw(50000),
+      requestWithdraw(50000),
+    ]);
+
+    for (const r of results) {
+      expect(r.available_reward_cents).toBeGreaterThanOrEqual(0);
+      expect(r.has_deposit).toBe(true);
+    }
+
+    // Estado final consistente: 150000 - 3*50000 = 0
+    const finalRules = await qc.fetchQuery(makeSacarQuery(store));
+    expect(store.balanceCents).toBe(0);
+    expect(finalRules.available_reward_cents).toBe(0);
+    // Regressão: mesmo com saldo 0, has_deposit permanece — não perde a
+    // referência do depósito nem trava a UI antes da hora.
+    expect(finalRules.has_deposit).toBe(true);
+    expect(finalRules.reference_deposit_cents).toBe(10000);
+  });
+
+  it("novos créditos em sequência rápida após saque nunca travam em 0,00", async () => {
+    store.adminDepositCents = 10000;
+    store.adminDepositStatus = "spent";
+    store.balanceCents = 0;
+    store.rewardsCents = 0;
+
+    let rules = await qc.fetchQuery(makeSacarQuery(store));
+    expect(rules.available_reward_cents).toBe(0);
+
+    // 3 recompensas rápidas de R$ 200
+    for (let i = 0; i < 3; i++) {
+      store.balanceCents += 20000;
+      store.rewardsCents += 20000;
+      await qc.invalidateQueries({ queryKey: ["helix-withdrawal-rules"] });
+      rules = await qc.fetchQuery(makeSacarQuery(store));
+      expect(rules.available_reward_cents).toBe(20000 * (i + 1));
+    }
+
+    expect(rules.available_reward_cents).toBe(60000);
+    expect(rules.can_withdraw).toBe(true);
+  });
 });
