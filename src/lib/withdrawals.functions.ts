@@ -17,12 +17,15 @@ export const requestAffiliateWithdrawal = createServerFn({ method: "POST" })
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("affiliate_balance, total_received")
+      .select("affiliate_balance, total_received, is_demo")
       .eq("id", userId)
       .maybeSingle();
 
     if (profileError) throw new Error(profileError.message);
     if (!profile) throw new Error("Perfil não encontrado.");
+    if ((profile as any).is_demo) {
+      throw new Error("DEMO_BALANCE_NOT_WITHDRAWABLE: Contas demo não podem sacar.");
+    }
 
     const balance = profile.affiliate_balance ?? 0;
     if (data.amount > balance) {
