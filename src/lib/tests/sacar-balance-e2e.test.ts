@@ -5,7 +5,8 @@
  *  1. Usuário começa com saldo zero e sem depósito → /app/sacar mostra R$ 0,00
  *     e bloqueia o saque (has_deposit=false).
  *  2. Admin credita R$ 100,00 na conta do usuário (via painel admin) →
- *     helix_withdrawal_rules passa a reconhecer o depósito de referência.
+ *     helix_withdrawal_rules passa a reconhecer o depósito de referência e
+ *     ainda bloqueia o saque porque o mínimo dessa faixa é R$ 500,00.
  *  3. Usuário joga e resgata R$ 500,00 em recompensas Helix →
  *     available_reward_cents = 50000 e can_withdraw = true.
  *  4. A queryFn usada por src/routes/app.sacar.tsx retorna o valor de 500,00
@@ -54,8 +55,17 @@ function helixWithdrawalRules(store: Store) {
     ["paid", "approved", "spent"].includes(store.adminDepositStatus);
   const referenceCents = hasDeposit ? store.adminDepositCents : undefined;
   const availableCents = store.balanceCents;
-  // regra usada em produção: mínimo = valor do depósito de referência
-  const minCents = hasDeposit ? store.adminDepositCents : null;
+  // Replica public.helix_minimum_withdraw_cents.
+  const minCents = hasDeposit
+    ? ({
+        500: 2500,
+        1000: 5000,
+        2000: 10000,
+        3000: 15000,
+        5000: 25000,
+        10000: 50000,
+      } as Record<number, number>)[store.adminDepositCents] ?? null
+    : null;
   const canWithdraw = hasDeposit && minCents !== null && availableCents >= minCents;
   const missing =
     hasDeposit && minCents !== null && availableCents < minCents
@@ -113,10 +123,11 @@ describe("/app/sacar — saldo sacável (E2E)", () => {
     rules = await qc.fetchQuery(makeSacarQuery(store));
     expect(rules.has_deposit).toBe(true);
     expect(rules.reference_deposit_cents).toBe(10000);
-    // ainda não jogou → recompensa disponível = 0
-    expect(rules.available_reward_cents).toBe(0);
+    // ainda não jogou → só existe o crédito jogável de entrada, abaixo do mínimo de saque
+    expect(rules.available_reward_cents).toBe(10000);
+    expect(rules.minimum_withdraw_cents).toBe(50000);
     expect(rules.can_withdraw).toBe(false);
-    expect(rules.missing_to_withdraw_cents).toBe(10000);
+    expect(rules.missing_to_withdraw_cents).toBe(40000);
 
     // 3) Usuário joga e resgata R$ 500,00 em recompensas Helix
     store.rewardsCents = 50000;
