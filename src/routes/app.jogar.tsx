@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import helixClassicMap from "@/assets/helix-classic-map.png.asset.json";
 import { getPlayableDeposit, validatePlayValue } from "@/lib/helix-play.functions";
 import { useGameSession } from "@/hooks/useGameSession";
+import { useGameStore } from "@/store/useGameStore";
 
 export const Route = createFileRoute("/app/jogar")({
   head: () => ({
@@ -28,6 +29,7 @@ function JogarPage() {
   const setSelectedMap = usePlayerStore((s) => s.setSelectedMap);
   const value = usePlayerStore((s) => s.selectedPlayValue);
   const setValue = usePlayerStore((s) => s.setSelectedPlayValue);
+  const startGame = useGameStore((s) => s.startGame);
   const { startPaidSession } = useGameSession();
 
   // Fonte oficial: backend valida qual valor o usuário pode jogar (baseado no
@@ -88,6 +90,7 @@ function JogarPage() {
         await playable.refetch();
         return;
       }
+      startGame();
       navigate({ to: "/game" });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha ao validar depósito.");
