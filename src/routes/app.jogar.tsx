@@ -191,7 +191,7 @@ function JogarPage() {
           <div className="mt-3 flex flex-wrap gap-2">
             {PLAYER_MOCK.playOptions.map((v) => {
               const active = effectiveValue === v;
-              const affordable = balance >= v;
+              const affordable = effectiveBalance >= v;
               return (
                 <button
                   key={v}
