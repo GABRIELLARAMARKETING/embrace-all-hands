@@ -147,20 +147,15 @@ function JogarPage() {
           <div className="mt-3 flex flex-wrap gap-2">
             {PLAYER_MOCK.playOptions.map((v) => {
               const active = effectiveValue === v;
-              const allowed = serverAmount === v;
               return (
                 <button
                   key={v}
-                  disabled={!allowed}
-                  title={allowed ? undefined : "Valor não corresponde ao seu depósito"}
-                  onClick={() => allowed && setValue(v)}
+                  onClick={() => setValue(v)}
                   className={cn(
                     "rounded-full px-4 py-2 text-sm font-bold transition-all",
                     active
                       ? "bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] text-white shadow-[0_0_18px_rgba(168,85,247,0.55)]"
-                      : allowed
-                        ? "border border-[#3a1d5a] bg-[#1a0c30] text-white hover:border-[#5b2e8a]"
-                        : "cursor-not-allowed border border-[#3a1d5a]/40 bg-[#1a0c30]/40 text-white/30",
+                      : "border border-[#3a1d5a] bg-[#1a0c30] text-white hover:border-[#5b2e8a]",
                   )}
                 >
                   R${v}
