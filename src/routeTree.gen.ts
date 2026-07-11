@@ -35,6 +35,7 @@ import { Route as AppIndicarRouteImport } from './routes/app.indicar'
 import { Route as AppDepositarRouteImport } from './routes/app.depositar'
 import { Route as AdminWithdrawalsRouteImport } from './routes/admin.withdrawals'
 import { Route as AdminWebhooksRouteImport } from './routes/admin.webhooks'
+import { Route as AdminWalletRouteImport } from './routes/admin.wallet'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTrackingRouteImport } from './routes/admin.tracking'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -191,6 +192,11 @@ const AdminWithdrawalsRoute = AdminWithdrawalsRouteImport.update({
 const AdminWebhooksRoute = AdminWebhooksRouteImport.update({
   id: '/webhooks',
   path: '/webhooks',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminWalletRoute = AdminWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
@@ -363,6 +369,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/wallet': typeof AdminWalletRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
@@ -417,6 +424,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/wallet': typeof AdminWalletRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
@@ -473,6 +481,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/tracking': typeof AdminTrackingRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/wallet': typeof AdminWalletRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
@@ -530,6 +539,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tracking'
     | '/admin/users'
+    | '/admin/wallet'
     | '/admin/webhooks'
     | '/admin/withdrawals'
     | '/app/depositar'
@@ -584,6 +594,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tracking'
     | '/admin/users'
+    | '/admin/wallet'
     | '/admin/webhooks'
     | '/admin/withdrawals'
     | '/app/depositar'
@@ -639,6 +650,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tracking'
     | '/admin/users'
+    | '/admin/wallet'
     | '/admin/webhooks'
     | '/admin/withdrawals'
     | '/app/depositar'
@@ -859,6 +871,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWebhooksRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/wallet': {
+      id: '/admin/wallet'
+      path: '/wallet'
+      fullPath: '/admin/wallet'
+      preLoaderRoute: typeof AdminWalletRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -1077,6 +1096,7 @@ interface AdminRouteChildren {
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTrackingRoute: typeof AdminTrackingRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminWalletRoute: typeof AdminWalletRoute
   AdminWebhooksRoute: typeof AdminWebhooksRoute
   AdminWithdrawalsRoute: typeof AdminWithdrawalsRoute
 }
@@ -1107,6 +1127,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTrackingRoute: AdminTrackingRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminWalletRoute: AdminWalletRoute,
   AdminWebhooksRoute: AdminWebhooksRoute,
   AdminWithdrawalsRoute: AdminWithdrawalsRoute,
 }
