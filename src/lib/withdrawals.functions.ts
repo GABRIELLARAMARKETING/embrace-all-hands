@@ -337,6 +337,7 @@ export const markWithdrawalPaid = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => actionInput.parse(raw))
   .handler(async ({ data, context }) => {
     await ensureAdmin(context);
+    await assertNotImpersonating(context, "withdrawal.mark_paid");
     const { supabase, userId } = context;
 
     const { data: current, error: readErr } = await supabase
