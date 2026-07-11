@@ -74,6 +74,57 @@ export const HELIX_DIFFICULTY_PRESETS: Record<Exclude<HelixDifficulty, "custom">
     scoreMultiplier: 1.75,
     difficultyProgressionRate: 1.6,
   },
+  insane: {
+    ballSpeed: 1.9,
+    towerRotationSpeed: 2.0,
+    obstacleDensity: 0.85,
+    obstacleFrequency: 2.1,
+    gapSize: 0.55,
+    gravity: 1.7,
+    scoreMultiplier: 2.5,
+    difficultyProgressionRate: 2.1,
+  },
+  nightmare: {
+    ballSpeed: 2.4,
+    towerRotationSpeed: 2.6,
+    obstacleDensity: 0.95,
+    obstacleFrequency: 2.8,
+    gapSize: 0.45,
+    gravity: 2.2,
+    scoreMultiplier: 3.5,
+    difficultyProgressionRate: 2.8,
+  },
+};
+
+export const HELIX_SETTINGS_RANGES: Record<keyof HelixSettings, [number, number]> = {
+  ballSpeed: [0.5, 3.0],
+  towerRotationSpeed: [0.5, 3.0],
+  obstacleDensity: [0.0, 1.0],
+  obstacleFrequency: [0.5, 3.0],
+  gapSize: [0.4, 1.5],
+  gravity: [0.5, 3.0],
+  scoreMultiplier: [0.5, 5.0],
+  difficultyProgressionRate: [0.5, 3.0],
+};
+
+export const HELIX_DIFFICULTIES: HelixDifficulty[] = [
+  "easy",
+  "normal",
+  "hard",
+  "extreme",
+  "insane",
+  "nightmare",
+  "custom",
+];
+
+export const HELIX_DIFFICULTY_LABELS: Record<HelixDifficulty, string> = {
+  easy: "Fácil",
+  normal: "Normal",
+  hard: "Difícil",
+  extreme: "Extremo",
+  insane: "Insano",
+  nightmare: "Pesadelo",
+  custom: "Personalizado",
 };
 
 export const HELIX_SETTINGS_RANGES: Record<keyof HelixSettings, [number, number]> = {
