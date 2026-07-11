@@ -48,6 +48,15 @@ function JogarPage() {
   });
   const serverAmount = playable.data?.ok ? playable.data.amount : null;
 
+  const fetchProfile = useServerFn(getMyProfile);
+  const profileQuery = useQuery({
+    queryKey: ["my-profile"],
+    queryFn: () => fetchProfile(),
+    refetchOnMount: "always",
+  });
+  const balance = profileQuery.data?.balance ?? 0;
+
+
   // Diagnóstico rápido no console — inspecionar em DevTools ao abrir /app/jogar.
   useEffect(() => {
     if (playable.data) {
