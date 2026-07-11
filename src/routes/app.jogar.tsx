@@ -212,10 +212,16 @@ function JogarPage() {
               );
             })}
           </div>
-          {!playable.isLoading && !serverAmount && (
-            <div className="mt-2 text-[11px] font-semibold text-amber-300/90">
-              Nenhum depósito disponível para jogar. Faça um depósito para liberar.
+          {isDemo ? (
+            <div className="mt-2 text-[11px] font-semibold text-emerald-300/90">
+              Modo demo — saldo demo {formatCurrency(demoBalance)} (não sacável).
             </div>
+          ) : (
+            !playable.isLoading && !serverAmount && (
+              <div className="mt-2 text-[11px] font-semibold text-amber-300/90">
+                Nenhum depósito disponível para jogar. Faça um depósito para liberar.
+              </div>
+            )
           )}
 
 
