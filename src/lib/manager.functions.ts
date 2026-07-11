@@ -61,19 +61,22 @@ export const getManagerDashboardSummary = createServerFn({ method: "GET" })
     if (userIds.length) {
       const { count: pd } = await supabase
         .from("deposits").select("id", { count: "exact", head: true })
-        .in("user_id", userIds as any).eq("status", "pending");
+        .in("user_id", userIds as any).eq("status", "pending").neq("provider", "admin_manual");
       pendingDeposits = pd ?? 0;
 
       const { data: paidRecent } = await supabase
         .from("deposits").select("amount")
         .in("user_id", userIds as any).in("status", ["approved", "paid"])
+        .neq("provider", "admin_manual")
         .gte("confirmed_at", since24h);
       received24h = (paidRecent ?? []).reduce((s: number, r: any) => s + Number(r.amount || 0), 0);
 
       const { data: allPaid } = await supabase
         .from("deposits").select("amount")
-        .in("user_id", userIds as any).in("status", ["approved", "paid"]);
+        .in("user_id", userIds as any).in("status", ["approved", "paid"])
+        .neq("provider", "admin_manual");
       totalReceived = (allPaid ?? []).reduce((s: number, r: any) => s + Number(r.amount || 0), 0);
+
 
       const { count: pw } = await supabase
         .from("affiliate_withdrawals").select("id", { count: "exact", head: true })
