@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 // Module-scoped state so start/finish can happen from different components.
@@ -31,6 +32,7 @@ function setCurrentGameSession(id: string | null) {
 }
 
 export function useGameSession() {
+  const queryClient = useQueryClient();
   const startSession = useCallback(async (themeId: string | null) => {
     startedAt = Date.now();
     try {
@@ -99,8 +101,12 @@ export function useGameSession() {
         /* swallow */
       }
       setCurrentGameSession(null);
+      // Refresca saldo/depósitos no frontend após finalizar a sessão no backend.
+      queryClient.invalidateQueries({ queryKey: ["my-profile"] });
+      queryClient.invalidateQueries({ queryKey: ["my-deposits"] });
+      queryClient.invalidateQueries({ queryKey: ["playable-deposit"] });
     },
-    [],
+    [queryClient],
   );
 
   return { startSession, startPaidSession, finishSession };
