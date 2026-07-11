@@ -225,6 +225,7 @@ export const approveWithdrawal = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => actionInput.parse(raw))
   .handler(async ({ data, context }) => {
     await ensureAdmin(context);
+    await assertNotImpersonating(context, "withdrawal.approve");
     const { supabase, userId } = context;
 
     const { data: current, error: readErr } = await supabase
