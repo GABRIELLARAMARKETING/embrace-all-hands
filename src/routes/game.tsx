@@ -45,6 +45,12 @@ function GamePage() {
     }
   }, [selectedPlayValue, navigate]);
 
+  useEffect(() => {
+    if (selectedPlayValue != null && HELIX_ALLOWED_AMOUNTS.has(selectedPlayValue)) {
+      useGameStore.getState().startGame();
+    }
+  }, [selectedPlayValue]);
+
 
 
   const score = useGameStore((s) => s.score);
