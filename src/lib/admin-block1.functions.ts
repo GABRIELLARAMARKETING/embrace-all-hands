@@ -136,7 +136,9 @@ export const getDepositsTimeSeries = createServerFn({ method: "GET" })
       .from("deposits")
       .select("amount, credited_at")
       .in("status", ["paid", "approved"])
+      .neq("provider", "admin_manual")
       .gte("credited_at", start.toISOString());
+
     if (error) throw new Error(error.message);
 
     // bucket por dia UTC
