@@ -9,7 +9,7 @@ import { PLAYER_MOCK, MAP_OPTIONS } from "@/data/playerMockData";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { cn } from "@/lib/utils";
-import helixClassicMap from "@/assets/helix-classic-map.png.asset.json";
+const helixClassicMap = { url: "/images/helix-classic-map.png" };
 import { getPlayableDeposit, validatePlayValue } from "@/lib/helix-play.functions";
 import { useGameSession } from "@/hooks/useGameSession";
 import { useGameStore } from "@/store/useGameStore";
