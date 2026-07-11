@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { auditLog } from "./audit.functions";
+import { assertNotImpersonating } from "./impersonation.functions";
+
 
 
 const withdrawInput = z.object({
