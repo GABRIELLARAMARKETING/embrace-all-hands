@@ -15,6 +15,7 @@ export const requestAffiliateWithdrawal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => withdrawInput.parse(data))
   .handler(async ({ data, context }) => {
+    await assertNotImpersonating(context, "withdrawal.request");
     const { supabase, userId } = context;
 
     const { data: profile, error: profileError } = await supabase
