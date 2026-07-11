@@ -130,14 +130,14 @@ function JogarPage() {
             <div className="mt-1 text-3xl font-black text-[#FFD600] drop-shadow-[0_0_14px_rgba(255,214,0,0.55)]">
               {formatCurrency(minWithdraw)}
             </div>
-            {value ? (
+            {effectiveValue ? (
               <div className="mt-1 text-[11px] text-white/55">
-                Depósito de {formatCurrency(value)} · sacar só ao atingir{" "}
+                Depósito de {formatCurrency(effectiveValue)} · sacar só ao atingir{" "}
                 {formatCurrency(minWithdraw)}
               </div>
             ) : (
               <div className="mt-1 text-[11px] text-white/45">
-                Escolha um valor de entrada para ver o mínimo
+                Faça um depósito para desbloquear o jogo
               </div>
             )}
           </div>
