@@ -101,8 +101,12 @@ export function useGameSession() {
         /* swallow */
       }
       setCurrentGameSession(null);
+      // Refresca saldo/depósitos no frontend após finalizar a sessão no backend.
+      queryClient.invalidateQueries({ queryKey: ["my-profile"] });
+      queryClient.invalidateQueries({ queryKey: ["my-deposits"] });
+      queryClient.invalidateQueries({ queryKey: ["playable-deposit"] });
     },
-    [],
+    [queryClient],
   );
 
   return { startSession, startPaidSession, finishSession };
