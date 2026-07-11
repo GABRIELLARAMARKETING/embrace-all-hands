@@ -22,7 +22,11 @@ export function MoneyProgressBar() {
   const gameState = useGameStore((s) => s.gameState);
   const restartGame = useGameStore((s) => s.restartGame);
   const totalCoins = useGameStore((s) => s.totalCoins);
+  const score = useGameStore((s) => s.score);
+  const currentLevel = useGameStore((s) => s.currentLevel);
   const navigate = useNavigate();
+  const { finishSession } = useGameSession();
+
 
   const [money, setMoney] = useState(0);
   const [platforms, setPlatforms] = useState(0);
