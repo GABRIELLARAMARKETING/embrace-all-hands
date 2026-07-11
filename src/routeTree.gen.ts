@@ -61,6 +61,7 @@ import { Route as AdminAuditoriaRouteImport } from './routes/admin.auditoria'
 import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
 import { Route as AdminApiKeysRouteImport } from './routes/admin.api-keys'
 import { Route as AdminAffiliatesRouteImport } from './routes/admin.affiliates'
+import { Route as AppJogarDebugRouteImport } from './routes/app.jogar.debug'
 import { Route as ApiPublicRCodeRouteImport } from './routes/api/public/r.$code'
 import { Route as ApiPublicWebhooksDiggionSecretRouteImport } from './routes/api/public/webhooks.diggion.$secret'
 
@@ -324,6 +325,11 @@ const AdminAffiliatesRoute = AdminAffiliatesRouteImport.update({
   path: '/affiliates',
   getParentRoute: () => AdminRoute,
 } as any)
+const AppJogarDebugRoute = AppJogarDebugRouteImport.update({
+  id: '/debug',
+  path: '/debug',
+  getParentRoute: () => AppJogarRoute,
+} as any)
 const ApiPublicRCodeRoute = ApiPublicRCodeRouteImport.update({
   id: '/api/public/r/$code',
   path: '/api/public/r/$code',
@@ -374,7 +380,7 @@ export interface FileRoutesByFullPath {
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
-  '/app/jogar': typeof AppJogarRoute
+  '/app/jogar': typeof AppJogarRouteWithChildren
   '/app/perfil': typeof AppPerfilRoute
   '/app/sacar': typeof AppSacarRoute
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
@@ -389,6 +395,7 @@ export interface FileRoutesByFullPath {
   '/gerente/saques': typeof GerenteSaquesRoute
   '/r/$code': typeof RCodeRoute
   '/app/': typeof AppIndexRoute
+  '/app/jogar/debug': typeof AppJogarDebugRoute
   '/api/public/r/$code': typeof ApiPublicRCodeRoute
   '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
 }
@@ -429,7 +436,7 @@ export interface FileRoutesByTo {
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
-  '/app/jogar': typeof AppJogarRoute
+  '/app/jogar': typeof AppJogarRouteWithChildren
   '/app/perfil': typeof AppPerfilRoute
   '/app/sacar': typeof AppSacarRoute
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
@@ -444,6 +451,7 @@ export interface FileRoutesByTo {
   '/gerente/saques': typeof GerenteSaquesRoute
   '/r/$code': typeof RCodeRoute
   '/app': typeof AppIndexRoute
+  '/app/jogar/debug': typeof AppJogarDebugRoute
   '/api/public/r/$code': typeof ApiPublicRCodeRoute
   '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
 }
@@ -486,7 +494,7 @@ export interface FileRoutesById {
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
-  '/app/jogar': typeof AppJogarRoute
+  '/app/jogar': typeof AppJogarRouteWithChildren
   '/app/perfil': typeof AppPerfilRoute
   '/app/sacar': typeof AppSacarRoute
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
@@ -501,6 +509,7 @@ export interface FileRoutesById {
   '/gerente/saques': typeof GerenteSaquesRoute
   '/r/$code': typeof RCodeRoute
   '/app/': typeof AppIndexRoute
+  '/app/jogar/debug': typeof AppJogarDebugRoute
   '/api/public/r/$code': typeof ApiPublicRCodeRoute
   '/api/public/webhooks/diggion/$secret': typeof ApiPublicWebhooksDiggionSecretRoute
 }
@@ -559,6 +568,7 @@ export interface FileRouteTypes {
     | '/gerente/saques'
     | '/r/$code'
     | '/app/'
+    | '/app/jogar/debug'
     | '/api/public/r/$code'
     | '/api/public/webhooks/diggion/$secret'
   fileRoutesByTo: FileRoutesByTo
@@ -614,6 +624,7 @@ export interface FileRouteTypes {
     | '/gerente/saques'
     | '/r/$code'
     | '/app'
+    | '/app/jogar/debug'
     | '/api/public/r/$code'
     | '/api/public/webhooks/diggion/$secret'
   id:
@@ -670,6 +681,7 @@ export interface FileRouteTypes {
     | '/gerente/saques'
     | '/r/$code'
     | '/app/'
+    | '/app/jogar/debug'
     | '/api/public/r/$code'
     | '/api/public/webhooks/diggion/$secret'
   fileRoutesById: FileRoutesById
@@ -1053,6 +1065,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAffiliatesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/app/jogar/debug': {
+      id: '/app/jogar/debug'
+      path: '/debug'
+      fullPath: '/app/jogar/debug'
+      preLoaderRoute: typeof AppJogarDebugRouteImport
+      parentRoute: typeof AppJogarRoute
+    }
     '/api/public/r/$code': {
       id: '/api/public/r/$code'
       path: '/api/public/r/$code'
@@ -1134,10 +1153,22 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface AppJogarRouteChildren {
+  AppJogarDebugRoute: typeof AppJogarDebugRoute
+}
+
+const AppJogarRouteChildren: AppJogarRouteChildren = {
+  AppJogarDebugRoute: AppJogarDebugRoute,
+}
+
+const AppJogarRouteWithChildren = AppJogarRoute._addFileChildren(
+  AppJogarRouteChildren,
+)
+
 interface AppRouteChildren {
   AppDepositarRoute: typeof AppDepositarRoute
   AppIndicarRoute: typeof AppIndicarRoute
-  AppJogarRoute: typeof AppJogarRoute
+  AppJogarRoute: typeof AppJogarRouteWithChildren
   AppPerfilRoute: typeof AppPerfilRoute
   AppSacarRoute: typeof AppSacarRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -1146,7 +1177,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppDepositarRoute: AppDepositarRoute,
   AppIndicarRoute: AppIndicarRoute,
-  AppJogarRoute: AppJogarRoute,
+  AppJogarRoute: AppJogarRouteWithChildren,
   AppPerfilRoute: AppPerfilRoute,
   AppSacarRoute: AppSacarRoute,
   AppIndexRoute: AppIndexRoute,
