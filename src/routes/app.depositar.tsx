@@ -443,8 +443,13 @@ function PixQrModal({
       qc.refetchQueries({ queryKey: ["my-profile"] });
     } else if (status?.status === "expired") {
       toast.error("PIX expirado. Gere um novo depósito.");
+    } else if (status?.status === "failed" || status?.status === "canceled") {
+      toast.error("Pagamento não concluído. Tente novamente.");
     }
   }, [status?.status, qc]);
+
+  const statusInfo = getStatusInfo(status?.status);
+
 
   return (
     <AnimatePresence>
