@@ -1,13 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useGameStore } from "@/store/useGameStore";
+import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { RewardClaimedModal } from "./RewardClaimedModal";
 
-const GOAL = 20;
-const PER_PLATFORM = 1;
-
 export function MoneyProgressBar() {
+  const selectedPlayValue = usePlayerStore((s) => s.selectedPlayValue);
+  // Regra oficial: por plataforma = 10% do depósito; meta = 5x o depósito.
+  const PER_PLATFORM = useMemo(
+    () => Math.round((selectedPlayValue ?? 5) * 10) / 100,
+    [selectedPlayValue],
+  );
+  const GOAL = useMemo(() => (selectedPlayValue ?? 5) * 5, [selectedPlayValue]);
   const gameState = useGameStore((s) => s.gameState);
   const restartGame = useGameStore((s) => s.restartGame);
   const totalCoins = useGameStore((s) => s.totalCoins);
@@ -32,14 +37,19 @@ export function MoneyProgressBar() {
   }, [gameState]);
 
   useEffect(() => {
-    const onPop = (e: Event) => {
-      const detail = (e as CustomEvent<{ value: number }>).detail;
-      setMoney((m) => m + (detail?.value ?? PER_PLATFORM));
+    // Publica o depósito atual para GameCanvas emitir moedas com valor correto.
+    (window as unknown as { __helixDeposit?: number }).__helixDeposit =
+      selectedPlayValue ?? 5;
+  }, [selectedPlayValue]);
+
+  useEffect(() => {
+    const onPop = () => {
+      setMoney((m) => Math.round((m + PER_PLATFORM) * 100) / 100);
       setPlatforms((p) => p + 1);
     };
     window.addEventListener("coin-pop", onPop);
     return () => window.removeEventListener("coin-pop", onPop);
-  }, []);
+  }, [PER_PLATFORM]);
 
   useEffect(() => {
     if (!claimError) return;
