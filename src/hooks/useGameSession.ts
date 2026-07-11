@@ -79,15 +79,20 @@ export function useGameSession() {
       const id = currentSessionId;
       if (!id) return;
       const duration = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+      const status = data.status ?? "finished";
       try {
+        // Chama o backend para finalizar (credita recompensa ou debita depósito em caso de perda).
+        await supabase.rpc("helix_finish_session", {
+          _session_id: id,
+          _reason: status === "gameover" ? "player_lost" : "player_finished",
+        });
+        // Metadados auxiliares da partida (score/nível/duração) — não afetam saldo.
         await supabase
           .from("game_sessions")
           .update({
             score: data.score,
             level_reached: data.level_reached,
             duration_seconds: duration,
-            status: data.status ?? "finished",
-            finished_at: new Date().toISOString(),
           })
           .eq("id", id);
       } catch {
