@@ -132,11 +132,13 @@ export const adminGetWallet = createServerFn({ method: "POST" })
       .from("deposits")
       .select("amount")
       .eq("user_id", data.userId)
-      .in("status", ["paid", "approved"]);
+      .in("status", ["paid", "approved"])
+      .neq("provider", "admin_manual");
     const totalDeposited = (totals ?? []).reduce(
       (acc, r) => acc + Number(r.amount ?? 0),
       0,
     );
+
 
     const { data: withdrawn } = await context.supabase
       .from("wallet_transactions")
