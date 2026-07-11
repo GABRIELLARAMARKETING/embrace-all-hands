@@ -21,12 +21,19 @@ import { beforeEach, describe, expect, it } from "vitest";
 type Store = {
   balanceCents: number;
   adminDepositCents: number; // depósito de referência (admin ou pix)
+  adminDepositStatus: "none" | "paid" | "approved" | "spent" | "pending";
   rewardsCents: number;      // recompensas de gameplay disponíveis
   isDemo: boolean;
 };
 
 function makeStore(): Store {
-  return { balanceCents: 0, adminDepositCents: 0, rewardsCents: 0, isDemo: false };
+  return {
+    balanceCents: 0,
+    adminDepositCents: 0,
+    adminDepositStatus: "none",
+    rewardsCents: 0,
+    isDemo: false,
+  };
 }
 
 /** Replica o RPC helix_withdrawal_rules (versão relevante para o teste). */
@@ -42,9 +49,11 @@ function helixWithdrawalRules(store: Store) {
       missing_to_withdraw_cents: null,
     } as const;
   }
-  const hasDeposit = store.adminDepositCents > 0;
+  const hasDeposit =
+    store.adminDepositCents > 0 &&
+    ["paid", "approved", "spent"].includes(store.adminDepositStatus);
   const referenceCents = hasDeposit ? store.adminDepositCents : undefined;
-  const availableCents = store.rewardsCents;
+  const availableCents = store.balanceCents;
   // regra usada em produção: mínimo = valor do depósito de referência
   const minCents = hasDeposit ? store.adminDepositCents : null;
   const canWithdraw = hasDeposit && minCents !== null && availableCents >= minCents;
@@ -66,7 +75,7 @@ function helixWithdrawalRules(store: Store) {
 /** Mesma queryFn efetivamente executada pela rota /app/sacar. */
 function makeSacarQuery(store: Store) {
   return {
-    queryKey: ["helix", "withdrawal-rules"] as const,
+    queryKey: ["helix-withdrawal-rules"] as const,
     queryFn: async () => helixWithdrawalRules(store),
     staleTime: 0,
     refetchOnMount: "always" as const,
@@ -98,8 +107,9 @@ describe("/app/sacar — saldo sacável (E2E)", () => {
 
     // 2) Admin credita R$ 100,00 no painel admin
     store.adminDepositCents = 10000;
+    store.adminDepositStatus = "paid";
     store.balanceCents = 10000;
-    await qc.invalidateQueries({ queryKey: ["helix", "withdrawal-rules"] });
+    await qc.invalidateQueries({ queryKey: ["helix-withdrawal-rules"] });
     rules = await qc.fetchQuery(makeSacarQuery(store));
     expect(rules.has_deposit).toBe(true);
     expect(rules.reference_deposit_cents).toBe(10000);
@@ -111,7 +121,10 @@ describe("/app/sacar — saldo sacável (E2E)", () => {
     // 3) Usuário joga e resgata R$ 500,00 em recompensas Helix
     store.rewardsCents = 50000;
     store.balanceCents = 50000;
-    await qc.invalidateQueries({ queryKey: ["helix", "withdrawal-rules"] });
+    // Ao finalizar a partida, o depósito usado passa para spent. A regra de
+    // saque precisa continuar reconhecendo essa referência para todos os usuários.
+    store.adminDepositStatus = "spent";
+    await qc.invalidateQueries({ queryKey: ["helix-withdrawal-rules"] });
     rules = await qc.fetchQuery(makeSacarQuery(store));
 
     // 4) Regressão do bug: NÃO pode travar em 0,00
@@ -123,8 +136,7 @@ describe("/app/sacar — saldo sacável (E2E)", () => {
 
     // 5) A rota lê o cache já com o valor atualizado
     const cached = qc.getQueryData<ReturnType<typeof helixWithdrawalRules>>([
-      "helix",
-      "withdrawal-rules",
+      "helix-withdrawal-rules",
     ]);
     expect(cached?.available_reward_cents).toBe(50000);
     // Renderização: (50000/100).toFixed(2) === "500.00"
