@@ -43,6 +43,14 @@ function JogarPage() {
   });
   const serverAmount = playable.data?.ok ? playable.data.amount : null;
 
+  // Diagnóstico rápido no console — inspecionar em DevTools ao abrir /app/jogar.
+  useEffect(() => {
+    if (playable.data) {
+      // eslint-disable-next-line no-console
+      console.log("[HELIX playable-deposit]", playable.data);
+    }
+  }, [playable.data]);
+
   // Sincroniza store com o valor autoritativo do backend; rejeita divergências.
   useEffect(() => {
     if (serverAmount != null && value !== serverAmount) {
