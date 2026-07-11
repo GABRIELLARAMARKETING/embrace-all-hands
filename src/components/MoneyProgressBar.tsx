@@ -1,13 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useGameStore } from "@/store/useGameStore";
+import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { RewardClaimedModal } from "./RewardClaimedModal";
 
-const GOAL = 20;
-const PER_PLATFORM = 1;
-
 export function MoneyProgressBar() {
+  const selectedPlayValue = usePlayerStore((s) => s.selectedPlayValue);
+  // Regra oficial: por plataforma = 10% do depósito; meta = 5x o depósito.
+  const PER_PLATFORM = useMemo(
+    () => Math.round((selectedPlayValue ?? 5) * 10) / 100,
+    [selectedPlayValue],
+  );
+  const GOAL = useMemo(() => (selectedPlayValue ?? 5) * 5, [selectedPlayValue]);
   const gameState = useGameStore((s) => s.gameState);
   const restartGame = useGameStore((s) => s.restartGame);
   const totalCoins = useGameStore((s) => s.totalCoins);
