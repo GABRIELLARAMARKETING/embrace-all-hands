@@ -14,13 +14,12 @@ import { usePlayerStore } from "@/store/usePlayerStore";
 import { PhysicsDebugOverlay } from "@/components/PhysicsDebugOverlay";
 import { CoinPopLayer } from "@/components/CoinPopLayer";
 import { MoneyProgressBar } from "@/components/MoneyProgressBar";
-import { useGameSession } from "@/hooks/useGameSession";
+import { hasCurrentGameSession, useGameSession } from "@/hooks/useGameSession";
 import { useThemePreload } from "@/hooks/useThemePreload";
 import { useHelixDifficultyLoader } from "@/hooks/useHelixDifficultyLoader";
 import { LogoHelix } from "@/components/LogoHelix";
 import { HELIX_ALLOWED_AMOUNTS } from "@/lib/helix-rules";
 import { supabase } from "@/integrations/supabase/client";
-import { hasCurrentGameSession } from "@/hooks/useGameSession";
 
 
 export const Route = createFileRoute("/game")({
