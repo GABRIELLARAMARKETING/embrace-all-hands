@@ -1500,6 +1500,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      helix_abandon_active_sessions: {
+        Args: { _grace_seconds?: number }
+        Returns: Json
+      }
       helix_create_session: {
         Args: { _deposit_id: string; _theme_id?: string }
         Returns: Json
