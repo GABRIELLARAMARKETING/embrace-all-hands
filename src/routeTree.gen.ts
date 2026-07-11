@@ -34,6 +34,7 @@ import { Route as AppJogarRouteImport } from './routes/app.jogar'
 import { Route as AppIndicarRouteImport } from './routes/app.indicar'
 import { Route as AppDepositarRouteImport } from './routes/app.depositar'
 import { Route as AdminWithdrawalsRouteImport } from './routes/admin.withdrawals'
+import { Route as AdminWithdrawalRequestsRouteImport } from './routes/admin.withdrawal-requests'
 import { Route as AdminWebhooksRouteImport } from './routes/admin.webhooks'
 import { Route as AdminWalletRouteImport } from './routes/admin.wallet'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -188,6 +189,11 @@ const AppDepositarRoute = AppDepositarRouteImport.update({
 const AdminWithdrawalsRoute = AdminWithdrawalsRouteImport.update({
   id: '/withdrawals',
   path: '/withdrawals',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminWithdrawalRequestsRoute = AdminWithdrawalRequestsRouteImport.update({
+  id: '/withdrawal-requests',
+  path: '/withdrawal-requests',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminWebhooksRoute = AdminWebhooksRouteImport.update({
@@ -377,6 +383,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/admin/wallet': typeof AdminWalletRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
+  '/admin/withdrawal-requests': typeof AdminWithdrawalRequestsRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
@@ -433,6 +440,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/admin/wallet': typeof AdminWalletRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
+  '/admin/withdrawal-requests': typeof AdminWithdrawalRequestsRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
@@ -491,6 +499,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/admin/wallet': typeof AdminWalletRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
+  '/admin/withdrawal-requests': typeof AdminWithdrawalRequestsRoute
   '/admin/withdrawals': typeof AdminWithdrawalsRoute
   '/app/depositar': typeof AppDepositarRoute
   '/app/indicar': typeof AppIndicarRoute
@@ -550,6 +559,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/wallet'
     | '/admin/webhooks'
+    | '/admin/withdrawal-requests'
     | '/admin/withdrawals'
     | '/app/depositar'
     | '/app/indicar'
@@ -606,6 +616,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/wallet'
     | '/admin/webhooks'
+    | '/admin/withdrawal-requests'
     | '/admin/withdrawals'
     | '/app/depositar'
     | '/app/indicar'
@@ -663,6 +674,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/wallet'
     | '/admin/webhooks'
+    | '/admin/withdrawal-requests'
     | '/admin/withdrawals'
     | '/app/depositar'
     | '/app/indicar'
@@ -874,6 +886,13 @@ declare module '@tanstack/react-router' {
       path: '/withdrawals'
       fullPath: '/admin/withdrawals'
       preLoaderRoute: typeof AdminWithdrawalsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/withdrawal-requests': {
+      id: '/admin/withdrawal-requests'
+      path: '/withdrawal-requests'
+      fullPath: '/admin/withdrawal-requests'
+      preLoaderRoute: typeof AdminWithdrawalRequestsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/webhooks': {
@@ -1117,6 +1136,7 @@ interface AdminRouteChildren {
   AdminUsersRoute: typeof AdminUsersRoute
   AdminWalletRoute: typeof AdminWalletRoute
   AdminWebhooksRoute: typeof AdminWebhooksRoute
+  AdminWithdrawalRequestsRoute: typeof AdminWithdrawalRequestsRoute
   AdminWithdrawalsRoute: typeof AdminWithdrawalsRoute
 }
 
@@ -1148,6 +1168,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminUsersRoute: AdminUsersRoute,
   AdminWalletRoute: AdminWalletRoute,
   AdminWebhooksRoute: AdminWebhooksRoute,
+  AdminWithdrawalRequestsRoute: AdminWithdrawalRequestsRoute,
   AdminWithdrawalsRoute: AdminWithdrawalsRoute,
 }
 
