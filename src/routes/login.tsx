@@ -158,16 +158,16 @@ function LoginPage() {
 
           <form onSubmit={onSubmit} className="mt-7 space-y-5" noValidate>
             <Field
-              label="Telefone (WhatsApp)"
-              placeholder="(11) 99999-0000"
-              inputMode="numeric"
-              autoComplete="tel"
-              value={phone}
+              label="Email ou telefone"
+              placeholder="voce@exemplo.com ou (11) 99999-0000"
+              inputMode={isEmail ? "email" : "numeric"}
+              autoComplete="username"
+              value={identifier}
               onChange={(v) => {
-                setPhone(formatPhone(v));
-                if (errors.phone) setErrors((e) => ({ ...e, phone: undefined }));
+                setIdentifier(v.includes("@") ? v : formatPhone(v));
+                if (errors.identifier) setErrors((e) => ({ ...e, identifier: undefined }));
               }}
-              error={errors.phone}
+              error={errors.identifier}
             />
 
             <Field
