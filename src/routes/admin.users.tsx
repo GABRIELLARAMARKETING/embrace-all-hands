@@ -790,3 +790,67 @@ function BlockModal({ user, saving, onClose, onConfirm }: { user: AdminUserRow; 
     </ModalShell>
   );
 }
+
+function DeleteModal({
+  user,
+  saving,
+  onClose,
+  onConfirm,
+}: {
+  user: AdminUserRow;
+  saving: boolean;
+  onClose: () => void;
+  onConfirm: (reason: string) => void;
+}) {
+  const [reason, setReason] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const canSubmit = useMemo(
+    () => reason.trim().length >= 3 && confirm === "EXCLUIR",
+    [reason, confirm],
+  );
+  return (
+    <ModalShell title={`Excluir ${user.name ?? user.email}?`} onClose={onClose}>
+      <div className="space-y-3 text-sm">
+        <div className="rounded-md border border-red-400/30 bg-red-500/10 p-3 text-red-100">
+          <strong>Atenção:</strong> esta ação é <strong>permanente</strong>. Todos os
+          dados vinculados ao usuário (perfil, papéis, transações, saques, sessões)
+          serão removidos e não poderão ser recuperados.
+        </div>
+        <label className="block">
+          <span className="mb-1 block text-xs text-white/60">Motivo da exclusão</span>
+          <input
+            className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2"
+            placeholder="Ex.: solicitação do usuário, conta fraudulenta..."
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-xs text-white/60">
+            Digite <span className="font-mono text-red-200">EXCLUIR</span> para confirmar
+          </span>
+          <input
+            className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 font-mono"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+          />
+        </label>
+        <div className="flex justify-end gap-2 pt-1">
+          <button
+            onClick={onClose}
+            className="rounded-md border border-white/10 bg-white/5 px-3 py-2"
+          >
+            Cancelar
+          </button>
+          <button
+            disabled={!canSubmit || saving}
+            onClick={() => onConfirm(reason.trim())}
+            className="rounded-md border border-red-400/40 bg-red-500/20 px-4 py-2 text-red-100 hover:bg-red-500/30 disabled:opacity-50"
+          >
+            {saving ? "Excluindo..." : "Excluir permanentemente"}
+          </button>
+        </div>
+      </div>
+    </ModalShell>
+  );
+}
