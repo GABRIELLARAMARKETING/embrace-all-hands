@@ -79,11 +79,23 @@ function LoginPage() {
       toast.success("Login realizado!");
       setTimeout(() => navigate({ to: "/app/jogar", replace: true }), 500);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Falha no login";
-      toast.error(msg.includes("Invalid") ? "Credenciais inválidas" : msg);
+      const raw = err instanceof Error ? err.message : "";
+      const lower = raw.toLowerCase();
+      let msg = "Não foi possível entrar. Tente novamente.";
+      if (lower.includes("invalid") || lower.includes("credentials"))
+        msg = "Email/telefone ou senha incorretos.";
+      else if (lower.includes("not confirmed") || lower.includes("email not"))
+        msg = "Confirme seu email antes de entrar.";
+      else if (lower.includes("rate") || lower.includes("too many"))
+        msg = "Muitas tentativas. Aguarde alguns minutos.";
+      else if (lower.includes("network") || lower.includes("fetch"))
+        msg = "Falha de conexão. Verifique sua internet.";
+      else if (raw) msg = raw;
+      toast.error(msg);
       setLoading(false);
     }
   }
+
 
 
   if (checkingSession) {

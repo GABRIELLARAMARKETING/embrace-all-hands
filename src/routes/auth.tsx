@@ -100,12 +100,25 @@ function SignupPage() {
       toast.success("Conta criada!");
       navigate({ to: "/app/jogar", replace: true });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Falha ao criar conta";
+      const raw = err instanceof Error ? err.message : "";
+      const lower = raw.toLowerCase();
+      let msg = "Não foi possível criar sua conta. Tente novamente.";
+      if (lower.includes("already registered") || lower.includes("user already"))
+        msg = "Este email já está cadastrado. Faça login.";
+      else if (lower.includes("invalid") && lower.includes("email"))
+        msg = "Email inválido. Verifique e tente novamente.";
+      else if (lower.includes("password")) msg = "Senha muito fraca (mínimo 6 caracteres).";
+      else if (lower.includes("rate") || lower.includes("too many"))
+        msg = "Muitas tentativas. Aguarde alguns minutos e tente novamente.";
+      else if (lower.includes("network") || lower.includes("fetch"))
+        msg = "Falha de conexão. Verifique sua internet.";
+      else if (raw) msg = raw;
       toast.error(msg);
       setSuccess(false);
       setLoading(false);
     }
   }
+
 
 
   return (
