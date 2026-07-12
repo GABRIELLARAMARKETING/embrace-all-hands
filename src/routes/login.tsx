@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, LogIn, Loader2, ChevronLeft, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { normalizeEmail, validateEmail, validatePassword } from "@/lib/authValidation";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
