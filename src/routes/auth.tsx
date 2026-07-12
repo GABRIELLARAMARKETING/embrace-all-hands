@@ -36,18 +36,26 @@ function formatPhone(v: string) {
 function SignupPage() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [errors, setErrors] = useState<{ name?: string; phone?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    phone?: string;
+    password?: string;
+  }>({});
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const digits = phone.replace(/\D/g, "");
+    const emailTrim = email.trim().toLowerCase();
     const errs: typeof errors = {};
     if (name.trim().length < 2) errs.name = "Informe seu nome";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim)) errs.email = "Email inválido";
     if (digits.length < 10) errs.phone = "Telefone inválido";
     if (password.length < 6) errs.password = "Mínimo 6 caracteres";
     setErrors(errs);
@@ -60,9 +68,8 @@ function SignupPage() {
           ? new URLSearchParams(window.location.search).get("ref")?.trim().toUpperCase() || undefined
           : undefined;
       const ref = urlRef || readCookie("helix_ref")?.toUpperCase() || undefined;
-      const email = phoneToEmail(phone);
       const { data: signUpData, error } = await supabase.auth.signUp({
-        email,
+        email: emailTrim,
         password,
         options: {
           emailRedirectTo: window.location.origin,
@@ -73,7 +80,10 @@ function SignupPage() {
 
       // Garante sessão ativa (caso confirmação de email esteja ativa ou conta já exista)
       if (!signUpData.session) {
-        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+        const { error: signInErr } = await supabase.auth.signInWithPassword({
+          email: emailTrim,
+          password,
+        });
         if (signInErr) throw signInErr;
       }
 
@@ -96,6 +106,7 @@ function SignupPage() {
       setLoading(false);
     }
   }
+
 
   return (
     <main
