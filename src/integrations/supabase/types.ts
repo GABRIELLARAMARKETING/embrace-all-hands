@@ -1638,6 +1638,10 @@ export type Database = {
         Args: { _reason?: string; _session_id: string }
         Returns: Json
       }
+      helix_log_withdrawal_snapshot: {
+        Args: { _context?: string }
+        Returns: Json
+      }
       helix_minimum_withdraw_cents: {
         Args: { _deposit_amount_cents: number }
         Returns: number
