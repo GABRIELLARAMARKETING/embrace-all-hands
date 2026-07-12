@@ -595,6 +595,16 @@ function Page() {
           }
         />
       )}
+
+      {/* Bulk delete confirm */}
+      {bulkDeleteOpen && (
+        <BulkDeleteModal
+          count={selectedIds.size}
+          progress={bulkProgress}
+          onClose={() => (bulkProgress ? null : setBulkDeleteOpen(false))}
+          onConfirm={(reason) => runBulkDelete(reason)}
+        />
+      )}
     </div>
   );
 }
