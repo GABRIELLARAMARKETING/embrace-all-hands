@@ -51,7 +51,11 @@ function SignupPage() {
     const emailTrim = email.trim().toLowerCase();
     const errs: typeof errors = {};
     if (name.trim().length < 2) errs.name = "Informe seu nome";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim)) errs.email = "Email inválido";
+    if (!emailTrim) errs.email = "Informe seu email";
+    else if (!emailTrim.includes("@")) errs.email = "Email deve conter '@'";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailTrim))
+      errs.email = "Formato de email inválido (ex.: voce@exemplo.com)";
+    else if (emailTrim.length > 254) errs.email = "Email muito longo";
     if (digits.length < 10) errs.phone = "Telefone inválido";
     if (password.length < 6) errs.password = "Mínimo 6 caracteres";
     setErrors(errs);
@@ -179,7 +183,7 @@ function SignupPage() {
               autoComplete="email"
               value={email}
               onChange={(v) => {
-                setEmail(v);
+                setEmail(v.replace(/\s+/g, ""));
                 if (errors.email) setErrors((e) => ({ ...e, email: undefined }));
               }}
               error={errors.email}
