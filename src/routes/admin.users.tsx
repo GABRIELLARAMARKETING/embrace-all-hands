@@ -933,3 +933,69 @@ function DeleteModal({
     </ModalShell>
   );
 }
+
+function BulkDeleteModal({
+  count,
+  progress,
+  onClose,
+  onConfirm,
+}: {
+  count: number;
+  progress: { done: number; total: number } | null;
+  onClose: () => void;
+  onConfirm: (reason: string) => void;
+}) {
+  const [reason, setReason] = useState("");
+  const [confirmText, setConfirmText] = useState("");
+  const busy = progress !== null;
+  return (
+    <ModalShell title={`Excluir ${count} conta(s) selecionada(s)`} onClose={onClose}>
+      <div className="space-y-3 text-sm">
+        <div className="rounded-md border border-red-400/30 bg-red-500/10 p-3 text-red-200">
+          Esta ação é irreversível. Os dados dos {count} usuário(s) selecionado(s) serão removidos.
+        </div>
+        <div>
+          <div className="mb-1 text-xs text-white/60">Motivo (auditoria)</div>
+          <input
+            className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 outline-none focus:border-red-400/60"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            disabled={busy}
+          />
+        </div>
+        <div>
+          <div className="mb-1 text-xs text-white/60">
+            Digite <span className="font-mono text-red-200">EXCLUIR</span> para confirmar
+          </div>
+          <input
+            className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 outline-none focus:border-red-400/60"
+            value={confirmText}
+            onChange={(e) => setConfirmText(e.target.value)}
+            disabled={busy}
+          />
+        </div>
+        {progress && (
+          <div className="text-xs text-white/70">
+            Excluindo... {progress.done}/{progress.total}
+          </div>
+        )}
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={onClose}
+            disabled={busy}
+            className="rounded-md border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10 disabled:opacity-40"
+          >
+            Cancelar
+          </button>
+          <button
+            disabled={busy || confirmText !== "EXCLUIR" || reason.trim().length < 3}
+            onClick={() => onConfirm(reason.trim())}
+            className="rounded-md border border-red-400/40 bg-red-500/20 px-3 py-2 text-red-100 hover:bg-red-500/30 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {busy ? "Excluindo..." : `Excluir ${count}`}
+          </button>
+        </div>
+      </div>
+    </ModalShell>
+  );
+}
