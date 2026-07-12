@@ -454,20 +454,28 @@ function Page() {
             )}
             {error && (
               <tr>
-                <td colSpan={10} className="px-3 py-6 text-center text-red-300">
+                <td colSpan={11} className="px-3 py-6 text-center text-red-300">
                   Erro ao carregar usuários: {(error as Error).message}
                 </td>
               </tr>
             )}
             {!isFetching && !users.length && !error && (
               <tr>
-                <td colSpan={10} className="px-3 py-6 text-center text-white/50">
+                <td colSpan={11} className="px-3 py-6 text-center text-white/50">
                   Nenhum usuário encontrado
                 </td>
               </tr>
             )}
             {users.map((u) => (
               <tr key={u.id} className="hover:bg-white/[0.03]">
+                <td className="px-3 py-2">
+                  <input
+                    type="checkbox"
+                    aria-label={`Selecionar ${u.name ?? u.id}`}
+                    checked={selectedIds.has(u.id)}
+                    onChange={() => toggleOne(u.id)}
+                  />
+                </td>
                 <td className="px-3 py-2 font-medium">{u.name ?? "—"}</td>
                 <td className="px-3 py-2 tabular-nums">{u.cpf ?? "—"}</td>
                 <td className="px-3 py-2 tabular-nums">{u.phone ?? "—"}</td>
