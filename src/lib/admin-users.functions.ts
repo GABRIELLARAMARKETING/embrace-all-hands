@@ -435,3 +435,55 @@ export const unblockAdminUser = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+const deleteInput = z.object({
+  id: z.string().uuid(),
+  reason: z.string().trim().min(3).max(500),
+  confirm: z.literal("EXCLUIR"),
+});
+
+export const deleteAdminUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => deleteInput.parse(raw))
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { userId } = context;
+    if (data.id === userId) throw new Error("Admin não pode excluir a própria conta.");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Snapshot para o log de auditoria
+    const { data: snapshot } = await supabaseAdmin
+      .from("profiles")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .select("id, full_name, display_name, email, cpf, phone, status, balance" as any)
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!snapshot) throw new Error("Usuário não encontrado.");
+
+    // Impede exclusão de super_admin/admin (proteção adicional)
+    const { data: roles } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.id);
+    if ((roles ?? []).some((r: { role: string }) => r.role === "super_admin" || r.role === "admin")) {
+      throw new Error("Contas com papel admin/super_admin não podem ser excluídas por esta ação.");
+    }
+
+    // Registra auditoria ANTES de excluir (o registro sobrevive à exclusão do usuário)
+    await supabaseAdmin.from("audit_logs").insert({
+      actor_id: userId,
+      action: "user.delete",
+      entity_type: "profile",
+      entity_id: data.id,
+      old_value: snapshot as never,
+      reason: data.reason,
+    });
+
+    // Exclui o usuário no Auth. As FKs em profiles/user_roles/etc. usam
+    // ON DELETE CASCADE, então os dados relacionados também são removidos.
+    const { error: delErr } = await supabaseAdmin.auth.admin.deleteUser(data.id);
+    if (delErr) throw new Error(`Falha ao excluir usuário: ${delErr.message}`);
+
+    return { ok: true };
+  });
