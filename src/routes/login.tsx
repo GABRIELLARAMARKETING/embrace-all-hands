@@ -72,6 +72,9 @@ function LoginPage() {
 
     setLoading(true);
     try {
+      // Guarda backend: revalida senha (e email quando aplicável) antes do Supabase
+      if (isEmail) assertAuthCredentials(emailToUse, password);
+      else if (validatePassword(password)) throw new Error(validatePassword(password)!);
       const { error } = await supabase.auth.signInWithPassword({
         email: emailToUse,
         password,
