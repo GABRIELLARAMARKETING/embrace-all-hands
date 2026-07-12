@@ -17,6 +17,14 @@ import { demoAccountSchema, type DemoAccountFormValues } from "@/utils/validator
 import { formatDate } from "@/utils/formatDate";
 import { createDemoAccounts, listDemoAccounts } from "@/lib/manager.functions";
 
+function formatPhoneBR(v: string) {
+  const d = (v ?? "").replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 2) return d;
+  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+
+
 export const Route = createFileRoute("/gerente/criar-demo")({
   head: () => ({
     meta: [
