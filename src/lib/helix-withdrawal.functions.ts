@@ -86,80 +86,98 @@ export const requestHelixWithdrawal = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const pixKeyMasked = maskPix(data.pixKey);
     let rules: HelixWithdrawalRules | null = null;
+    let ip: string | null = null;
+    let ua: string | null = null;
+    try {
+      ip = getRequestIP({ xForwardedFor: true }) ?? null;
+      ua = getRequestHeader("user-agent") ?? null;
+    } catch {
+      // outside request context
+    }
 
     try {
-      const { data: rulesRaw, error: rulesError } = await supabase.rpc("helix_withdrawal_rules");
-      if (rulesError) throw new Error(rulesError.message);
-      rules = rulesRaw as unknown as HelixWithdrawalRules;
+      // Snapshot rules for audit / friendlier errors (does not gate the decision).
+      const { data: rulesRaw } = await supabase.rpc("helix_withdrawal_rules");
+      rules = (rulesRaw as unknown as HelixWithdrawalRules) ?? null;
 
-      if ((rules as any).reason === "demo_account") {
-        await logWithdrawalAttempt({ userId, amountCents: data.amountCents, pixKeyMasked, rules, result: "blocked", reason: "demo_account" });
-        throw new Error("DEMO_BALANCE_NOT_WITHDRAWABLE: Contas demo não podem sacar.");
+      // Atomic RPC: row-locks the profile, re-validates eligibility, inserts the withdrawal,
+      // debits balance and writes wallet_transactions in a single transaction. This is what
+      // guarantees correctness under concurrent withdrawal requests.
+      const { data: rpcRaw, error: rpcError } = await supabase.rpc(
+        "helix_request_withdrawal_atomic",
+        {
+          _amount_cents: data.amountCents,
+          _pix_key: data.pixKey,
+          _request_ip: ip ?? undefined,
+          _request_user_agent: ua ?? undefined,
+        },
+      );
+      if (rpcError) throw new Error(rpcError.message);
+      const result = rpcRaw as {
+        ok: boolean;
+        reason?: string;
+        withdrawal_id?: string;
+        amount_cents?: number;
+        available_reward_cents?: number;
+        minimum_withdraw_cents?: number;
+        reference_deposit_cents?: number;
+      };
+
+      if (!result?.ok) {
+        const reason = result?.reason ?? "unknown";
+        await logWithdrawalAttempt({
+          userId,
+          amountCents: data.amountCents,
+          pixKeyMasked,
+          rules,
+          result: "blocked",
+          reason,
+        });
+        switch (reason) {
+          case "demo_account":
+            throw new Error("DEMO_BALANCE_NOT_WITHDRAWABLE: Contas demo não podem sacar.");
+          case "no_confirmed_deposit":
+            throw new Error("Faça um depósito confirmado antes de solicitar saque.");
+          case "below_minimum": {
+            const min = result.minimum_withdraw_cents ?? 0;
+            const avail = result.available_reward_cents ?? 0;
+            throw new Error(
+              `Saque mínimo é R$ ${(min / 100).toFixed(2)}. Faltam R$ ${(Math.max(min - avail, 0) / 100).toFixed(2)}.`,
+            );
+          }
+          case "insufficient_balance":
+            throw new Error("Saldo insuficiente para esse valor.");
+          case "invalid_amount":
+          case "invalid_pix":
+            throw new Error("Dados de saque inválidos.");
+          default:
+            throw new Error("Não foi possível processar o saque agora. Tente novamente.");
+        }
       }
 
-      if (!rules.has_deposit || !rules.minimum_withdraw_cents) {
-        const reason = "no_confirmed_deposit";
-        await logWithdrawalAttempt({ userId, amountCents: data.amountCents, pixKeyMasked, rules, result: "blocked", reason });
-        throw new Error("Faça um depósito confirmado antes de solicitar saque.");
-      }
-
-      if (data.amountCents < rules.minimum_withdraw_cents) {
-        const reason = "below_minimum";
-        await logWithdrawalAttempt({ userId, amountCents: data.amountCents, pixKeyMasked, rules, result: "blocked", reason });
-        throw new Error(
-          `Saque mínimo é R$ ${(rules.minimum_withdraw_cents / 100).toFixed(2)}. Faltam R$ ${((rules.minimum_withdraw_cents - rules.available_reward_cents) / 100).toFixed(2)}.`,
-        );
-      }
-
-      if (data.amountCents > rules.available_reward_cents) {
-        const reason = "insufficient_balance";
-        await logWithdrawalAttempt({ userId, amountCents: data.amountCents, pixKeyMasked, rules, result: "blocked", reason });
-        throw new Error("Saldo insuficiente para esse valor.");
-      }
-
+      const withdrawalId = result.withdrawal_id!;
       const amountReais = data.amountCents / 100;
 
-      const { data: withdrawal, error: insertError } = await supabase
-        .from("affiliate_withdrawals")
-        .insert({
-          user_id: userId,
-          amount: amountReais,
-          pix_key: data.pixKey,
-        })
-        .select("id, amount, status, created_at")
-        .single();
-      if (insertError) throw new Error(insertError.message);
-
+      // Best-effort admin notification (outside the DB transaction).
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { error: notifyError } = await supabaseAdmin
-          .from("admin_notifications")
-          .insert({
-            type: "WITHDRAWAL_REQUESTED",
-            severity: "warning",
-            title: `Novo saque solicitado: R$ ${amountReais}`,
-            message: `Usuário ${userId} solicitou saque Helix de R$ ${amountReais}.`,
-            payload: {
-              withdrawal_id: withdrawal.id,
-              user_id: userId,
-              amount: amountReais,
-              pix_key_masked: pixKeyMasked,
-              source: "helix",
-            },
-          });
-        if (notifyError) {
-          console.error("[helix-withdrawal] failed to insert admin_notification", notifyError);
-        }
+        const { error: notifyError } = await supabaseAdmin.from("admin_notifications").insert({
+          type: "WITHDRAWAL_REQUESTED",
+          severity: "warning",
+          title: `Novo saque solicitado: R$ ${amountReais}`,
+          message: `Usuário ${userId} solicitou saque Helix de R$ ${amountReais}.`,
+          payload: {
+            withdrawal_id: withdrawalId,
+            user_id: userId,
+            amount: amountReais,
+            pix_key_masked: pixKeyMasked,
+            source: "helix",
+          },
+        });
+        if (notifyError) console.error("[helix-withdrawal] admin_notification error", notifyError);
       } catch (e) {
-        console.error("[helix-withdrawal] admin_notification insert threw", e);
+        console.error("[helix-withdrawal] admin_notification threw", e);
       }
-
-      const newBalanceReais = (rules.available_reward_cents - data.amountCents) / 100;
-      const { error: updErr } = await supabase
-        .from("profiles")
-        .update({ balance: newBalanceReais })
-        .eq("id", userId);
-      if (updErr) throw new Error(updErr.message);
 
       await logWithdrawalAttempt({
         userId,
@@ -168,17 +186,26 @@ export const requestHelixWithdrawal = createServerFn({ method: "POST" })
         rules,
         result: "allowed",
         reason: "withdrawal_created",
-        withdrawalId: withdrawal.id,
+        withdrawalId,
       });
 
-      return { withdrawal, availableRewardCents: rules.available_reward_cents - data.amountCents };
+      return {
+        withdrawal: {
+          id: withdrawalId,
+          amount: amountReais,
+          status: "pending" as const,
+          created_at: new Date().toISOString(),
+        },
+        availableRewardCents: result.available_reward_cents ?? 0,
+      };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      // Only log as "error" for unexpected failures (blocked cases already logged above).
       if (
         !message.startsWith("Faça um depósito") &&
         !message.startsWith("Saque mínimo") &&
-        !message.startsWith("Saldo insuficiente")
+        !message.startsWith("Saldo insuficiente") &&
+        !message.startsWith("DEMO_BALANCE_NOT_WITHDRAWABLE") &&
+        !message.startsWith("Dados de saque")
       ) {
         await logWithdrawalAttempt({
           userId,
