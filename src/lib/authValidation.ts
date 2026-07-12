@@ -30,3 +30,21 @@ export function validatePassword(raw: string): string | null {
   if (v.length > PASSWORD_MAX) return `Máximo ${PASSWORD_MAX} caracteres`;
   return null;
 }
+
+/**
+ * Guarda única usada imediatamente antes de qualquer chamada ao Supabase
+ * (signUp / signInWithPassword). Reaplica `validateEmail` e `validatePassword`
+ * para garantir que nenhuma credencial inválida chegue ao backend, mesmo que
+ * a validação de formulário tenha sido burlada. Lança `Error` com mensagem
+ * pronta para exibição ao usuário.
+ */
+export function assertAuthCredentials(rawEmail: string, rawPassword: string): {
+  email: string;
+  password: string;
+} {
+  const emailErr = validateEmail(rawEmail);
+  if (emailErr) throw new Error(emailErr);
+  const pwErr = validatePassword(rawPassword);
+  if (pwErr) throw new Error(pwErr);
+  return { email: normalizeEmail(rawEmail), password: rawPassword };
+}
