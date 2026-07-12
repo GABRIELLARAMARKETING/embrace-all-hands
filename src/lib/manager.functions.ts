@@ -503,54 +503,71 @@ export const createDemoAccounts = createServerFn({ method: "POST" })
         email_confirm: true,
         user_metadata: { display_name: name, is_demo: true },
       });
-      if (authErr || !authUser?.user) throw new Error(authErr?.message ?? "Falha ao criar demo");
+      if (authErr || !authUser?.user) {
+        throw new Error(`Falha ao criar conta ${i}: ${authErr?.message ?? "erro desconhecido"}`);
+      }
       const newId = authUser.user.id;
 
-      const { data: code, error: codeErr } = await supabaseAdmin.rpc("generate_affiliate_code" as any);
-      if (codeErr) throw new Error(`Falha ao gerar código: ${codeErr.message}`);
-      const affiliateCode = (code as string) ?? `DM${nowMs.toString(36).slice(-4).toUpperCase()}${i}`;
-      const { error: upErr } = await supabaseAdmin
-        .from("profiles")
-        .update({
+      try {
+        const { data: code, error: codeErr } = await supabaseAdmin.rpc("generate_affiliate_code" as any);
+        if (codeErr) throw new Error(`Falha ao gerar código: ${codeErr.message}`);
+        const affiliateCode =
+          (code as string) ?? `DM${nowMs.toString(36).slice(-4).toUpperCase()}${i}`;
+
+        const { data: updated, error: upErr } = await supabaseAdmin
+          .from("profiles")
+          .update({
+            display_name: name,
+            phone,
+            is_demo: true,
+            manager_id: userId,
+            affiliate_code: affiliateCode,
+            demo_balance: 0,
+            balance: 0,
+          } as any)
+          .eq("id", newId)
+          .select("id")
+          .maybeSingle();
+        if (upErr) throw new Error(`Falha ao configurar perfil: ${upErr.message}`);
+        if (!updated) throw new Error("Perfil da conta demo não foi criado pelo sistema.");
+
+        if (data.initialBalance > 0) {
+          const { data: creditRes, error: cErr } = await supabase.rpc(
+            "manager_credit_demo_balance" as any,
+            {
+              _target_user_id: newId,
+              _amount: data.initialBalance,
+              _reason: "Saldo inicial ao criar conta demo",
+            },
+          );
+          if (cErr) throw new Error(`Falha ao creditar saldo: ${cErr.message}`);
+          if ((creditRes as any)?.ok !== true) {
+            throw new Error(
+              `Falha ao creditar saldo demo: ${(creditRes as any)?.reason ?? "desconhecido"}`,
+            );
+          }
+        }
+
+        await supabaseAdmin.from("demo_accounts").insert({
+          batch_id: batch?.id,
+          manager_id: userId,
           display_name: name,
           phone,
-          is_demo: true,
-          manager_id: userId,
           affiliate_code: affiliateCode,
-          demo_balance: 0,
-          balance: 0,
-        } as any)
-        .eq("id", newId);
-      if (upErr) throw new Error(upErr.message);
+          balance: data.initialBalance,
+        });
 
-      if (data.initialBalance > 0) {
-        const { data: creditRes, error: cErr } = await supabase.rpc(
-          "manager_credit_demo_balance" as any,
-          {
-            _target_user_id: newId,
-            _amount: data.initialBalance,
-            _reason: "Saldo inicial ao criar conta demo",
-          },
-        );
-        if (cErr) throw new Error(cErr.message);
-        if ((creditRes as any)?.ok !== true) {
-          throw new Error(`Falha ao creditar saldo demo: ${(creditRes as any)?.reason}`);
-        }
+        created.push({
+          id: newId, name, phone, email, password,
+          affiliateCode, balance: data.initialBalance,
+        });
+      } catch (err) {
+        // Rollback: remove auth user parcialmente criado para não deixar órfão
+        try { await supabaseAdmin.auth.admin.deleteUser(newId); } catch { /* ignore */ }
+        throw err instanceof Error
+          ? new Error(`Conta ${i} (${name}): ${err.message}`)
+          : new Error(`Conta ${i} (${name}): erro desconhecido`);
       }
-
-      await supabaseAdmin.from("demo_accounts").insert({
-        batch_id: batch?.id,
-        manager_id: userId,
-        display_name: name,
-        phone,
-        affiliate_code: affiliateCode,
-        balance: data.initialBalance,
-      });
-
-      created.push({
-        id: newId, name, phone, email, password,
-        affiliateCode, balance: data.initialBalance,
-      });
     }
 
     await audit(context, "demo_accounts_created", "demo_account_batches", batch?.id, {
