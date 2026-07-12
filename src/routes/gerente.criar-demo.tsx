@@ -17,6 +17,14 @@ import { demoAccountSchema, type DemoAccountFormValues } from "@/utils/validator
 import { formatDate } from "@/utils/formatDate";
 import { createDemoAccounts, listDemoAccounts } from "@/lib/manager.functions";
 
+function formatPhoneBR(v: string) {
+  const d = (v ?? "").replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 2) return d;
+  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+
+
 export const Route = createFileRoute("/gerente/criar-demo")({
   head: () => ({
     meta: [
@@ -95,6 +103,7 @@ function CriarDemoPage() {
           <AdminCard className="mx-auto mt-6 max-w-3xl border-[color:var(--admin-neon)]/30">
             <h3 className="text-base font-semibold text-white">Credenciais recém-criadas</h3>
             <p className="mt-1 text-xs text-[color:var(--admin-text-3)]">
+              Use estas credenciais em <span className="font-mono">/login</span> (telefone + senha).
               As senhas aparecem apenas nesta tela e não podem ser recuperadas depois.
             </p>
             <AdminTable
@@ -103,7 +112,7 @@ function CriarDemoPage() {
               emptyState={<EmptyState message="—" />}
               columns={[
                 { key: "name", header: "Nome", render: (r) => <span className="text-white">{r.name}</span> },
-                { key: "phone", header: "Login (telefone)", render: (r) => <span className="font-mono text-xs">{r.phone}</span> },
+                { key: "phone", header: "Login (telefone)", render: (r) => <span className="font-mono text-xs">{formatPhoneBR(r.phone)}</span> },
                 { key: "pw", header: "Senha", render: (r) => <span className="font-mono text-xs">{r.password}</span> },
                 { key: "code", header: "Cód. afiliado", render: (r) => <span className="font-mono text-xs">{r.affiliateCode}</span> },
                 { key: "bal", header: "Saldo", render: (r) => <MoneyValue value={r.balance} /> },
@@ -124,7 +133,7 @@ function CriarDemoPage() {
             columns={[
               { key: "n", header: "#", render: (_r, i) => i + 1, width: "48px" },
               { key: "name", header: "Nome", render: (r) => <span className="text-white">{r.name}</span> },
-              { key: "phone", header: "Telefone", render: (r) => r.phone },
+              { key: "phone", header: "Telefone", render: (r) => <span className="font-mono text-xs">{formatPhoneBR(r.phone)}</span> },
               { key: "code", header: "Cód.", render: (r) => <span className="font-mono text-xs">{r.affiliateCode}</span> },
               { key: "balance", header: "Saldo Inicial", render: (r) => <MoneyValue value={r.balance} /> },
               { key: "created", header: "Criada em", render: (r) => formatDate(r.createdAt) },
