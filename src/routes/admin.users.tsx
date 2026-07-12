@@ -187,6 +187,17 @@ function Page() {
     onError: (e: Error) => setNotice({ kind: "err", msg: e.message }),
   });
 
+  const del = useMutation({
+    mutationFn: (input: { id: string; reason: string; confirm: "EXCLUIR" }) =>
+      doDelete({ data: input }),
+    onSuccess: () => {
+      setNotice({ kind: "ok", msg: "Conta excluída com sucesso" });
+      setDeleteTarget(null);
+      refresh();
+    },
+    onError: (e: Error) => setNotice({ kind: "err", msg: e.message }),
+  });
+
   const exportCsv = async () => {
     // Fetch up to 500 rows respecting filters
     const res = await fetchList({
