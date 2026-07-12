@@ -5,6 +5,7 @@ import { Eye, EyeOff, UserPlus, Loader2, ChevronLeft, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { convertReferralClick } from "@/lib/tracking.functions";
+import { normalizeEmail, validateEmail, validatePassword } from "@/lib/authValidation";
 
 function readCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
@@ -48,16 +49,14 @@ function SignupPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const digits = phone.replace(/\D/g, "");
-    const emailTrim = email.trim().toLowerCase();
+    const emailTrim = normalizeEmail(email);
     const errs: typeof errors = {};
     if (name.trim().length < 2) errs.name = "Informe seu nome";
-    if (!emailTrim) errs.email = "Informe seu email";
-    else if (!emailTrim.includes("@")) errs.email = "Email deve conter '@'";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailTrim))
-      errs.email = "Formato de email inválido (ex.: voce@exemplo.com)";
-    else if (emailTrim.length > 254) errs.email = "Email muito longo";
+    const emailErr = validateEmail(email);
+    if (emailErr) errs.email = emailErr;
     if (digits.length < 10) errs.phone = "Telefone inválido";
-    if (password.length < 6) errs.password = "Mínimo 6 caracteres";
+    const pwErr = validatePassword(password);
+    if (pwErr) errs.password = pwErr;
     setErrors(errs);
     if (Object.keys(errs).length) return;
 
