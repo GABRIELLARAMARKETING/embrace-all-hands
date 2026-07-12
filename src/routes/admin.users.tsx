@@ -408,8 +408,16 @@ function Page() {
           >
             Limpar
           </button>
+          <button
+            disabled={selectedIds.size === 0}
+            onClick={() => setBulkDeleteOpen(true)}
+            className="inline-flex items-center gap-1 rounded-md border border-red-400/40 bg-red-500/10 px-3 py-2 text-sm text-red-200 hover:bg-red-500/20 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Trash2 className="h-3.5 w-3.5" /> Excluir selecionados ({selectedIds.size})
+          </button>
         </div>
       </div>
+
 
       {/* Table */}
       <div className="overflow-x-auto rounded-lg border border-white/10 bg-white/[0.02]">
