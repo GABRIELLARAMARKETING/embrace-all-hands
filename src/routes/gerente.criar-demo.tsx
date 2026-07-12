@@ -133,7 +133,7 @@ function CriarDemoPage() {
             columns={[
               { key: "n", header: "#", render: (_r, i) => i + 1, width: "48px" },
               { key: "name", header: "Nome", render: (r) => <span className="text-white">{r.name}</span> },
-              { key: "phone", header: "Telefone", render: (r) => r.phone },
+              { key: "phone", header: "Telefone", render: (r) => <span className="font-mono text-xs">{formatPhoneBR(r.phone)}</span> },
               { key: "code", header: "Cód.", render: (r) => <span className="font-mono text-xs">{r.affiliateCode}</span> },
               { key: "balance", header: "Saldo Inicial", render: (r) => <MoneyValue value={r.balance} /> },
               { key: "created", header: "Criada em", render: (r) => formatDate(r.createdAt) },
