@@ -29,11 +29,11 @@ function formatPhone(v: string) {
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [phone, setPhone] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ phone?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ identifier?: string; password?: string }>({});
   const [success, setSuccess] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
 
@@ -49,11 +49,21 @@ function LoginPage() {
     };
   }, [navigate]);
 
+  const isEmail = identifier.includes("@");
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const digits = phone.replace(/\D/g, "");
     const errs: typeof errors = {};
-    if (digits.length < 10) errs.phone = "Telefone inválido";
+    let emailToUse = "";
+    if (isEmail) {
+      const em = identifier.trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) errs.identifier = "Email inválido";
+      emailToUse = em;
+    } else {
+      const digits = identifier.replace(/\D/g, "");
+      if (digits.length < 10) errs.identifier = "Telefone ou email inválido";
+      emailToUse = phoneToEmail(digits);
+    }
     if (password.length < 6) errs.password = "Senha muito curta";
     setErrors(errs);
     if (Object.keys(errs).length) return;
@@ -61,7 +71,7 @@ function LoginPage() {
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email: phoneToEmail(phone),
+        email: emailToUse,
         password,
       });
       if (error) throw error;
@@ -70,10 +80,11 @@ function LoginPage() {
       setTimeout(() => navigate({ to: "/app/jogar", replace: true }), 500);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Falha no login";
-      toast.error(msg.includes("Invalid") ? "Telefone ou senha inválidos" : msg);
+      toast.error(msg.includes("Invalid") ? "Credenciais inválidas" : msg);
       setLoading(false);
     }
   }
+
 
   if (checkingSession) {
     return (
