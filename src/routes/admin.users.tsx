@@ -514,6 +514,18 @@ function Page() {
           onConfirm={(reason) => block.mutate({ id: blockTarget.id, reason })}
         />
       )}
+
+      {/* Delete confirm */}
+      {deleteTarget && (
+        <DeleteModal
+          user={deleteTarget}
+          saving={del.isPending}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={(reason) =>
+            del.mutate({ id: deleteTarget.id, reason, confirm: "EXCLUIR" })
+          }
+        />
+      )}
     </div>
   );
 }
