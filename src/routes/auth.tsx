@@ -5,6 +5,7 @@ import { Eye, EyeOff, UserPlus, Loader2, ChevronLeft, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { convertReferralClick } from "@/lib/tracking.functions";
+import { normalizeEmail, validateEmail, validatePassword } from "@/lib/authValidation";
 
 function readCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
