@@ -108,8 +108,8 @@ export const requestHelixWithdrawal = createServerFn({ method: "POST" })
         {
           _amount_cents: data.amountCents,
           _pix_key: data.pixKey,
-          _request_ip: ip,
-          _request_user_agent: ua,
+          _request_ip: ip ?? undefined,
+          _request_user_agent: ua ?? undefined,
         },
       );
       if (rpcError) throw new Error(rpcError.message);
