@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, LogIn, Loader2, ChevronLeft, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { normalizeEmail, validateEmail, validatePassword } from "@/lib/authValidation";
+import { assertAuthCredentials, normalizeEmail, validateEmail, validatePassword } from "@/lib/authValidation";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -72,6 +72,9 @@ function LoginPage() {
 
     setLoading(true);
     try {
+      // Guarda backend: revalida senha (e email quando aplicável) antes do Supabase
+      if (isEmail) assertAuthCredentials(emailToUse, password);
+      else if (validatePassword(password)) throw new Error(validatePassword(password)!);
       const { error } = await supabase.auth.signInWithPassword({
         email: emailToUse,
         password,

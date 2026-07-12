@@ -5,7 +5,7 @@ import { Eye, EyeOff, UserPlus, Loader2, ChevronLeft, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { convertReferralClick } from "@/lib/tracking.functions";
-import { normalizeEmail, validateEmail, validatePassword } from "@/lib/authValidation";
+import { assertAuthCredentials, normalizeEmail, validateEmail, validatePassword } from "@/lib/authValidation";
 
 function readCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
@@ -67,9 +67,11 @@ function SignupPage() {
           ? new URLSearchParams(window.location.search).get("ref")?.trim().toUpperCase() || undefined
           : undefined;
       const ref = urlRef || readCookie("helix_ref")?.toUpperCase() || undefined;
+      // Guarda backend: revalida email/senha imediatamente antes do Supabase
+      const safe = assertAuthCredentials(email, password);
       const { data: signUpData, error } = await supabase.auth.signUp({
-        email: emailTrim,
-        password,
+        email: safe.email,
+        password: safe.password,
         options: {
           emailRedirectTo: window.location.origin,
           data: { display_name: name.trim(), phone: digits, ref },
@@ -80,8 +82,8 @@ function SignupPage() {
       // Garante sessão ativa (caso confirmação de email esteja ativa ou conta já exista)
       if (!signUpData.session) {
         const { error: signInErr } = await supabase.auth.signInWithPassword({
-          email: emailTrim,
-          password,
+          email: safe.email,
+          password: safe.password,
         });
         if (signInErr) throw signInErr;
       }
