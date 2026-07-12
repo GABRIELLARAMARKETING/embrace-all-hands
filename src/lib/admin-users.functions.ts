@@ -482,8 +482,13 @@ export const deleteAdminUser = createServerFn({ method: "POST" })
 
     // Exclui o usuário no Auth. As FKs em profiles/user_roles/etc. usam
     // ON DELETE CASCADE, então os dados relacionados também são removidos.
+    // Exclui o usuário no Auth. As FKs em user_roles/transactions/etc. usam
+    // ON DELETE CASCADE, então esses dados relacionados são removidos.
     const { error: delErr } = await supabaseAdmin.auth.admin.deleteUser(data.id);
     if (delErr) throw new Error(`Falha ao excluir usuário: ${delErr.message}`);
+
+    // profiles não tem FK para auth.users — remover explicitamente.
+    await supabaseAdmin.from("profiles").delete().eq("id", data.id);
 
     return { ok: true };
   });
