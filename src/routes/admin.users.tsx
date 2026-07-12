@@ -116,11 +116,13 @@ function Page() {
   const doUpdate = useServerFn(updateAdminUser);
   const doBlock = useServerFn(blockAdminUser);
   const doUnblock = useServerFn(unblockAdminUser);
+  const doDelete = useServerFn(deleteAdminUser);
 
   const [filters, setFilters] = useState<Filters>(initialFilters);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editing, setEditing] = useState<AdminUserRow | null>(null);
   const [blockTarget, setBlockTarget] = useState<AdminUserRow | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AdminUserRow | null>(null);
   const [notice, setNotice] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
 
   const { data: stats } = useQuery({
