@@ -183,7 +183,7 @@ function SignupPage() {
               autoComplete="email"
               value={email}
               onChange={(v) => {
-                setEmail(v);
+                setEmail(v.replace(/\s+/g, ""));
                 if (errors.email) setErrors((e) => ({ ...e, email: undefined }));
               }}
               error={errors.email}
