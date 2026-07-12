@@ -451,6 +451,9 @@ function Page() {
                         <Ban className="h-3.5 w-3.5 text-red-300" />
                       </IconBtn>
                     )}
+                    <IconBtn title="Excluir conta" onClick={() => setDeleteTarget(u)}>
+                      <Trash2 className="h-3.5 w-3.5 text-red-300" />
+                    </IconBtn>
                   </div>
                 </td>
               </tr>
