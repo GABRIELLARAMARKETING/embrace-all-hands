@@ -22,10 +22,6 @@ export const Route = createFileRoute("/auth")({
   component: SignupPage,
 });
 
-function phoneToEmail(phone: string) {
-  const digits = phone.replace(/\D/g, "");
-  return `${digits}@helix-multi.app`;
-}
 function formatPhone(v: string) {
   const d = v.replace(/\D/g, "").slice(0, 11);
   if (d.length <= 2) return d.length ? `(${d}` : "";
