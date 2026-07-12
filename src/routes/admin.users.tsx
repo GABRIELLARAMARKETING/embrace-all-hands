@@ -424,6 +424,14 @@ function Page() {
         <table className="min-w-full text-left text-sm">
           <thead className="bg-white/5 text-xs uppercase tracking-wider text-white/60">
             <tr>
+              <th className="px-3 py-2 w-8">
+                <input
+                  type="checkbox"
+                  aria-label="Selecionar todos nesta página"
+                  checked={allOnPageSelected}
+                  onChange={toggleAllOnPage}
+                />
+              </th>
               <th className="px-3 py-2">Nome</th>
               <th className="px-3 py-2">CPF</th>
               <th className="px-3 py-2">Telefone</th>
@@ -439,7 +447,7 @@ function Page() {
           <tbody className="divide-y divide-white/5">
             {isFetching && !users.length && (
               <tr>
-                <td colSpan={10} className="px-3 py-6 text-center text-white/60">
+                <td colSpan={11} className="px-3 py-6 text-center text-white/60">
                   Carregando usuários...
                 </td>
               </tr>
