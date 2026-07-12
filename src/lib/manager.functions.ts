@@ -506,7 +506,8 @@ export const createDemoAccounts = createServerFn({ method: "POST" })
       if (authErr || !authUser?.user) throw new Error(authErr?.message ?? "Falha ao criar demo");
       const newId = authUser.user.id;
 
-      const { data: code } = await supabase.rpc("generate_affiliate_code" as any);
+      const { data: code, error: codeErr } = await supabaseAdmin.rpc("generate_affiliate_code" as any);
+      if (codeErr) throw new Error(`Falha ao gerar código: ${codeErr.message}`);
       const affiliateCode = (code as string) ?? `DM${nowMs.toString(36).slice(-4).toUpperCase()}${i}`;
       const { error: upErr } = await supabaseAdmin
         .from("profiles")
