@@ -172,6 +172,19 @@ function SignupPage() {
               error={errors.name}
             />
             <Field
+              label="Email"
+              placeholder="voce@exemplo.com"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              value={email}
+              onChange={(v) => {
+                setEmail(v);
+                if (errors.email) setErrors((e) => ({ ...e, email: undefined }));
+              }}
+              error={errors.email}
+            />
+            <Field
               label="Telefone (WhatsApp)"
               placeholder="(11) 99999-0000"
               inputMode="numeric"
