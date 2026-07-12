@@ -494,14 +494,18 @@ export const createDemoAccounts = createServerFn({ method: "POST" })
     for (let i = 1; i <= data.quantity; i++) {
       const name = `${data.namePattern} ${i}`;
       const password = `${pwPat}@${i}`;
-      const email = `demo-${nowMs}-${i}-${userId.slice(0, 8)}@helix.demo`.toLowerCase();
-      const phone = `55${String(nowMs).slice(-9)}${String(i).padStart(3, "0")}`.slice(0, 13);
+      // Phone must be 11 digits (BR) so it matches the login page's phone→email mapping.
+      // Format: 11 9 + 8 dígitos únicos derivados de timestamp+índice.
+      const unique = String(nowMs).slice(-7) + String(i).padStart(1, "0");
+      const phoneDigits = `119${unique.slice(-8)}`.slice(0, 11);
+      const email = `${phoneDigits}@helix-multi.app`;
+      const phone = phoneDigits;
 
       const { data: authUser, error: authErr } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
         email_confirm: true,
-        user_metadata: { display_name: name, is_demo: true },
+        user_metadata: { display_name: name, is_demo: true, phone: phoneDigits },
       });
       if (authErr || !authUser?.user) {
         throw new Error(`Falha ao criar conta ${i}: ${authErr?.message ?? "erro desconhecido"}`);
