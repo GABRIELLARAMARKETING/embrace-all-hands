@@ -9,11 +9,12 @@ import {
   updateAdminUser,
   blockAdminUser,
   unblockAdminUser,
+  deleteAdminUser,
   type AdminUserRow,
   type AdminUserDetails,
 } from "@/lib/admin-users.functions";
 import { formatDate } from "@/utils/formatDate";
-import { X, RefreshCw, Download, Search, Copy, Ban, Check, Edit3, Eye } from "lucide-react";
+import { X, RefreshCw, Download, Search, Copy, Ban, Check, Edit3, Eye, Trash2 } from "lucide-react";
 
 const STATUS_OPTIONS = ["", "active", "pending", "blocked", "inactive"] as const;
 const ROLE_OPTIONS = ["", "super_admin", "admin", "gerente", "afiliado", "user"] as const;
@@ -115,11 +116,13 @@ function Page() {
   const doUpdate = useServerFn(updateAdminUser);
   const doBlock = useServerFn(blockAdminUser);
   const doUnblock = useServerFn(unblockAdminUser);
+  const doDelete = useServerFn(deleteAdminUser);
 
   const [filters, setFilters] = useState<Filters>(initialFilters);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editing, setEditing] = useState<AdminUserRow | null>(null);
   const [blockTarget, setBlockTarget] = useState<AdminUserRow | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AdminUserRow | null>(null);
   const [notice, setNotice] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
 
   const { data: stats } = useQuery({
@@ -179,6 +182,17 @@ function Page() {
     mutationFn: (input: { id: string; reason: string }) => doUnblock({ data: input }),
     onSuccess: () => {
       setNotice({ kind: "ok", msg: "Conta desbloqueada com sucesso" });
+      refresh();
+    },
+    onError: (e: Error) => setNotice({ kind: "err", msg: e.message }),
+  });
+
+  const del = useMutation({
+    mutationFn: (input: { id: string; reason: string; confirm: "EXCLUIR" }) =>
+      doDelete({ data: input }),
+    onSuccess: () => {
+      setNotice({ kind: "ok", msg: "Conta excluída com sucesso" });
+      setDeleteTarget(null);
       refresh();
     },
     onError: (e: Error) => setNotice({ kind: "err", msg: e.message }),
@@ -437,6 +451,9 @@ function Page() {
                         <Ban className="h-3.5 w-3.5 text-red-300" />
                       </IconBtn>
                     )}
+                    <IconBtn title="Excluir conta" onClick={() => setDeleteTarget(u)}>
+                      <Trash2 className="h-3.5 w-3.5 text-red-300" />
+                    </IconBtn>
                   </div>
                 </td>
               </tr>
@@ -495,6 +512,18 @@ function Page() {
           saving={block.isPending}
           onClose={() => setBlockTarget(null)}
           onConfirm={(reason) => block.mutate({ id: blockTarget.id, reason })}
+        />
+      )}
+
+      {/* Delete confirm */}
+      {deleteTarget && (
+        <DeleteModal
+          user={deleteTarget}
+          saving={del.isPending}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={(reason) =>
+            del.mutate({ id: deleteTarget.id, reason, confirm: "EXCLUIR" })
+          }
         />
       )}
     </div>
@@ -755,6 +784,70 @@ function BlockModal({ user, saving, onClose, onConfirm }: { user: AdminUserRow; 
             className="rounded-md border border-red-400/40 bg-red-500/20 px-4 py-2 text-red-100 hover:bg-red-500/30 disabled:opacity-50"
           >
             {saving ? "Bloqueando..." : "Confirmar bloqueio"}
+          </button>
+        </div>
+      </div>
+    </ModalShell>
+  );
+}
+
+function DeleteModal({
+  user,
+  saving,
+  onClose,
+  onConfirm,
+}: {
+  user: AdminUserRow;
+  saving: boolean;
+  onClose: () => void;
+  onConfirm: (reason: string) => void;
+}) {
+  const [reason, setReason] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const canSubmit = useMemo(
+    () => reason.trim().length >= 3 && confirm === "EXCLUIR",
+    [reason, confirm],
+  );
+  return (
+    <ModalShell title={`Excluir ${user.name ?? user.email}?`} onClose={onClose}>
+      <div className="space-y-3 text-sm">
+        <div className="rounded-md border border-red-400/30 bg-red-500/10 p-3 text-red-100">
+          <strong>Atenção:</strong> esta ação é <strong>permanente</strong>. Todos os
+          dados vinculados ao usuário (perfil, papéis, transações, saques, sessões)
+          serão removidos e não poderão ser recuperados.
+        </div>
+        <label className="block">
+          <span className="mb-1 block text-xs text-white/60">Motivo da exclusão</span>
+          <input
+            className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2"
+            placeholder="Ex.: solicitação do usuário, conta fraudulenta..."
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-xs text-white/60">
+            Digite <span className="font-mono text-red-200">EXCLUIR</span> para confirmar
+          </span>
+          <input
+            className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 font-mono"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+          />
+        </label>
+        <div className="flex justify-end gap-2 pt-1">
+          <button
+            onClick={onClose}
+            className="rounded-md border border-white/10 bg-white/5 px-3 py-2"
+          >
+            Cancelar
+          </button>
+          <button
+            disabled={!canSubmit || saving}
+            onClick={() => onConfirm(reason.trim())}
+            className="rounded-md border border-red-400/40 bg-red-500/20 px-4 py-2 text-red-100 hover:bg-red-500/30 disabled:opacity-50"
+          >
+            {saving ? "Excluindo..." : "Excluir permanentemente"}
           </button>
         </div>
       </div>
