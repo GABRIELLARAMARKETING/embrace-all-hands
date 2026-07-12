@@ -123,6 +123,9 @@ function Page() {
   const [editing, setEditing] = useState<AdminUserRow | null>(null);
   const [blockTarget, setBlockTarget] = useState<AdminUserRow | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminUserRow | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number } | null>(null);
   const [notice, setNotice] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
 
   const { data: stats } = useQuery({
@@ -197,6 +200,48 @@ function Page() {
     },
     onError: (e: Error) => setNotice({ kind: "err", msg: e.message }),
   });
+
+  const runBulkDelete = async (reason: string) => {
+    const ids = Array.from(selectedIds);
+    setBulkProgress({ done: 0, total: ids.length });
+    let ok = 0;
+    let fail = 0;
+    for (const id of ids) {
+      try {
+        await doDelete({ data: { id, reason, confirm: "EXCLUIR" } });
+        ok++;
+      } catch {
+        fail++;
+      }
+      setBulkProgress((p) => (p ? { ...p, done: p.done + 1 } : p));
+    }
+    setBulkProgress(null);
+    setBulkDeleteOpen(false);
+    setSelectedIds(new Set());
+    setNotice({
+      kind: fail === 0 ? "ok" : "err",
+      msg: `Exclusão em massa: ${ok} sucesso(s), ${fail} falha(s).`,
+    });
+    refresh();
+  };
+
+  const toggleOne = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+  const allOnPageSelected = users.length > 0 && users.every((u) => selectedIds.has(u.id));
+  const toggleAllOnPage = () => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allOnPageSelected) users.forEach((u) => next.delete(u.id));
+      else users.forEach((u) => next.add(u.id));
+      return next;
+    });
+  };
 
   const exportCsv = async () => {
     // Fetch up to 500 rows respecting filters
@@ -363,14 +408,30 @@ function Page() {
           >
             Limpar
           </button>
+          <button
+            disabled={selectedIds.size === 0}
+            onClick={() => setBulkDeleteOpen(true)}
+            className="inline-flex items-center gap-1 rounded-md border border-red-400/40 bg-red-500/10 px-3 py-2 text-sm text-red-200 hover:bg-red-500/20 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Trash2 className="h-3.5 w-3.5" /> Excluir selecionados ({selectedIds.size})
+          </button>
         </div>
       </div>
+
 
       {/* Table */}
       <div className="overflow-x-auto rounded-lg border border-white/10 bg-white/[0.02]">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-white/5 text-xs uppercase tracking-wider text-white/60">
             <tr>
+              <th className="px-3 py-2 w-8">
+                <input
+                  type="checkbox"
+                  aria-label="Selecionar todos nesta página"
+                  checked={allOnPageSelected}
+                  onChange={toggleAllOnPage}
+                />
+              </th>
               <th className="px-3 py-2">Nome</th>
               <th className="px-3 py-2">CPF</th>
               <th className="px-3 py-2">Telefone</th>
@@ -386,27 +447,35 @@ function Page() {
           <tbody className="divide-y divide-white/5">
             {isFetching && !users.length && (
               <tr>
-                <td colSpan={10} className="px-3 py-6 text-center text-white/60">
+                <td colSpan={11} className="px-3 py-6 text-center text-white/60">
                   Carregando usuários...
                 </td>
               </tr>
             )}
             {error && (
               <tr>
-                <td colSpan={10} className="px-3 py-6 text-center text-red-300">
+                <td colSpan={11} className="px-3 py-6 text-center text-red-300">
                   Erro ao carregar usuários: {(error as Error).message}
                 </td>
               </tr>
             )}
             {!isFetching && !users.length && !error && (
               <tr>
-                <td colSpan={10} className="px-3 py-6 text-center text-white/50">
+                <td colSpan={11} className="px-3 py-6 text-center text-white/50">
                   Nenhum usuário encontrado
                 </td>
               </tr>
             )}
             {users.map((u) => (
               <tr key={u.id} className="hover:bg-white/[0.03]">
+                <td className="px-3 py-2">
+                  <input
+                    type="checkbox"
+                    aria-label={`Selecionar ${u.name ?? u.id}`}
+                    checked={selectedIds.has(u.id)}
+                    onChange={() => toggleOne(u.id)}
+                  />
+                </td>
                 <td className="px-3 py-2 font-medium">{u.name ?? "—"}</td>
                 <td className="px-3 py-2 tabular-nums">{u.cpf ?? "—"}</td>
                 <td className="px-3 py-2 tabular-nums">{u.phone ?? "—"}</td>
@@ -524,6 +593,16 @@ function Page() {
           onConfirm={(reason) =>
             del.mutate({ id: deleteTarget.id, reason, confirm: "EXCLUIR" })
           }
+        />
+      )}
+
+      {/* Bulk delete confirm */}
+      {bulkDeleteOpen && (
+        <BulkDeleteModal
+          count={selectedIds.size}
+          progress={bulkProgress}
+          onClose={() => (bulkProgress ? null : setBulkDeleteOpen(false))}
+          onConfirm={(reason) => runBulkDelete(reason)}
         />
       )}
     </div>
@@ -848,6 +927,72 @@ function DeleteModal({
             className="rounded-md border border-red-400/40 bg-red-500/20 px-4 py-2 text-red-100 hover:bg-red-500/30 disabled:opacity-50"
           >
             {saving ? "Excluindo..." : "Excluir permanentemente"}
+          </button>
+        </div>
+      </div>
+    </ModalShell>
+  );
+}
+
+function BulkDeleteModal({
+  count,
+  progress,
+  onClose,
+  onConfirm,
+}: {
+  count: number;
+  progress: { done: number; total: number } | null;
+  onClose: () => void;
+  onConfirm: (reason: string) => void;
+}) {
+  const [reason, setReason] = useState("");
+  const [confirmText, setConfirmText] = useState("");
+  const busy = progress !== null;
+  return (
+    <ModalShell title={`Excluir ${count} conta(s) selecionada(s)`} onClose={onClose}>
+      <div className="space-y-3 text-sm">
+        <div className="rounded-md border border-red-400/30 bg-red-500/10 p-3 text-red-200">
+          Esta ação é irreversível. Os dados dos {count} usuário(s) selecionado(s) serão removidos.
+        </div>
+        <div>
+          <div className="mb-1 text-xs text-white/60">Motivo (auditoria)</div>
+          <input
+            className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 outline-none focus:border-red-400/60"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            disabled={busy}
+          />
+        </div>
+        <div>
+          <div className="mb-1 text-xs text-white/60">
+            Digite <span className="font-mono text-red-200">EXCLUIR</span> para confirmar
+          </div>
+          <input
+            className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 outline-none focus:border-red-400/60"
+            value={confirmText}
+            onChange={(e) => setConfirmText(e.target.value)}
+            disabled={busy}
+          />
+        </div>
+        {progress && (
+          <div className="text-xs text-white/70">
+            Excluindo... {progress.done}/{progress.total}
+          </div>
+        )}
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={onClose}
+            disabled={busy}
+            className="rounded-md border border-white/10 bg-white/5 px-3 py-2 hover:bg-white/10 disabled:opacity-40"
+          >
+            Cancelar
+          </button>
+          <button
+            disabled={busy || confirmText !== "EXCLUIR" || reason.trim().length < 3}
+            onClick={() => onConfirm(reason.trim())}
+            className="rounded-md border border-red-400/40 bg-red-500/20 px-3 py-2 text-red-100 hover:bg-red-500/30 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {busy ? "Excluindo..." : `Excluir ${count}`}
           </button>
         </div>
       </div>
