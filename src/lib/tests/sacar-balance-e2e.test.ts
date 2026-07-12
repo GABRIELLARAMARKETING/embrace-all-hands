@@ -223,4 +223,57 @@ describe("/app/sacar — saldo sacável (E2E)", () => {
     expect(rules.available_reward_cents).toBe(60000);
     expect(rules.can_withdraw).toBe(true);
   });
+
+  it("múltiplas requisições simultâneas de resgate — saldo nunca trava em 0,00 nem fica negativo", async () => {
+    // Setup: admin credita R$100 e usuário acumula R$2000 sacáveis
+    store.adminDepositCents = 10000;
+    store.adminDepositStatus = "spent";
+    store.balanceCents = 200000;
+    store.rewardsCents = 200000;
+
+    // Serializa as escritas no store para simular a trava do backend
+    // (row lock em wallet_transactions). O bug original só aparecia quando
+    // duas requisições liam o mesmo saldo antes de qualquer débito.
+    let inflight: Promise<unknown> = Promise.resolve();
+    const requestWithdraw = (amountCents: number) => {
+      const run = async () => {
+        const current = await qc.fetchQuery(makeSacarQuery(store));
+        if (!current.can_withdraw) throw new Error("withdraw_blocked");
+        if (amountCents > store.balanceCents) throw new Error("insufficient_balance");
+        store.balanceCents -= amountCents;
+        store.rewardsCents -= amountCents;
+        await qc.invalidateQueries({ queryKey: ["helix-withdrawal-rules"] });
+        return qc.fetchQuery(makeSacarQuery(store));
+      };
+      const next = inflight.then(run, run);
+      inflight = next.catch(() => undefined);
+      return next as ReturnType<typeof run>;
+    };
+
+    // Rajada: 8 requisições simultâneas de R$ 200
+    const results = await Promise.allSettled(
+      Array.from({ length: 8 }, () => requestWithdraw(20000)),
+    );
+
+    const successes = results.filter((r) => r.status === "fulfilled");
+    expect(successes.length).toBe(8);
+
+    for (const r of successes) {
+      const value = (r as PromiseFulfilledResult<
+        Awaited<ReturnType<typeof helixWithdrawalRules>>
+      >).value;
+      expect(value.available_reward_cents).toBeGreaterThanOrEqual(0);
+      expect(value.has_deposit).toBe(true);
+      expect(value.reference_deposit_cents).toBe(10000);
+    }
+
+    // Estado final: 200000 - 8*20000 = 40000
+    const finalRules = await qc.fetchQuery(makeSacarQuery(store));
+    expect(store.balanceCents).toBe(40000);
+    expect(finalRules.available_reward_cents).toBe(40000);
+    expect(finalRules.has_deposit).toBe(true);
+    // 40000 < mínimo (50000) — UI mostra faltando, nunca trava em 0
+    expect(finalRules.can_withdraw).toBe(false);
+    expect(finalRules.missing_to_withdraw_cents).toBe(10000);
+  });
 });
