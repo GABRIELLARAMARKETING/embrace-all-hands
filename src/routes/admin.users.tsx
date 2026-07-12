@@ -9,11 +9,12 @@ import {
   updateAdminUser,
   blockAdminUser,
   unblockAdminUser,
+  deleteAdminUser,
   type AdminUserRow,
   type AdminUserDetails,
 } from "@/lib/admin-users.functions";
 import { formatDate } from "@/utils/formatDate";
-import { X, RefreshCw, Download, Search, Copy, Ban, Check, Edit3, Eye } from "lucide-react";
+import { X, RefreshCw, Download, Search, Copy, Ban, Check, Edit3, Eye, Trash2 } from "lucide-react";
 
 const STATUS_OPTIONS = ["", "active", "pending", "blocked", "inactive"] as const;
 const ROLE_OPTIONS = ["", "super_admin", "admin", "gerente", "afiliado", "user"] as const;
