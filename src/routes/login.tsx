@@ -57,15 +57,16 @@ function LoginPage() {
     const errs: typeof errors = {};
     let emailToUse = "";
     if (isEmail) {
-      const em = identifier.trim().toLowerCase();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) errs.identifier = "Email inválido";
-      emailToUse = em;
+      const emailErr = validateEmail(identifier);
+      if (emailErr) errs.identifier = emailErr;
+      emailToUse = normalizeEmail(identifier);
     } else {
       const digits = identifier.replace(/\D/g, "");
       if (digits.length < 10) errs.identifier = "Telefone ou email inválido";
       emailToUse = phoneToEmail(digits);
     }
-    if (password.length < 6) errs.password = "Senha muito curta";
+    const pwErr = validatePassword(password);
+    if (pwErr) errs.password = pwErr;
     setErrors(errs);
     if (Object.keys(errs).length) return;
 
