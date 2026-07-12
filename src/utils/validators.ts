@@ -16,7 +16,7 @@ export const demoAccountSchema = z.object({
   initialBalance: z
     .number({ invalid_type_error: "Informe o saldo" })
     .min(0, "Saldo não pode ser negativo")
-    .max(1_000_000, "Valor muito alto"),
+    .max(1000, "Máx. R$ 1.000 por conta demo"),
 });
 
 export type DemoAccountFormValues = z.infer<typeof demoAccountSchema>;
