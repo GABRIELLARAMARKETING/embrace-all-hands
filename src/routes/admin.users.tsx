@@ -201,6 +201,48 @@ function Page() {
     onError: (e: Error) => setNotice({ kind: "err", msg: e.message }),
   });
 
+  const runBulkDelete = async (reason: string) => {
+    const ids = Array.from(selectedIds);
+    setBulkProgress({ done: 0, total: ids.length });
+    let ok = 0;
+    let fail = 0;
+    for (const id of ids) {
+      try {
+        await doDelete({ data: { id, reason, confirm: "EXCLUIR" } });
+        ok++;
+      } catch {
+        fail++;
+      }
+      setBulkProgress((p) => (p ? { ...p, done: p.done + 1 } : p));
+    }
+    setBulkProgress(null);
+    setBulkDeleteOpen(false);
+    setSelectedIds(new Set());
+    setNotice({
+      kind: fail === 0 ? "ok" : "err",
+      msg: `Exclusão em massa: ${ok} sucesso(s), ${fail} falha(s).`,
+    });
+    refresh();
+  };
+
+  const toggleOne = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+  const allOnPageSelected = users.length > 0 && users.every((u) => selectedIds.has(u.id));
+  const toggleAllOnPage = () => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allOnPageSelected) users.forEach((u) => next.delete(u.id));
+      else users.forEach((u) => next.add(u.id));
+      return next;
+    });
+  };
+
   const exportCsv = async () => {
     // Fetch up to 500 rows respecting filters
     const res = await fetchList({
