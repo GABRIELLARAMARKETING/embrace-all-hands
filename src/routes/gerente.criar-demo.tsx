@@ -95,6 +95,7 @@ function CriarDemoPage() {
           <AdminCard className="mx-auto mt-6 max-w-3xl border-[color:var(--admin-neon)]/30">
             <h3 className="text-base font-semibold text-white">Credenciais recém-criadas</h3>
             <p className="mt-1 text-xs text-[color:var(--admin-text-3)]">
+              Use estas credenciais em <span className="font-mono">/login</span> (telefone + senha).
               As senhas aparecem apenas nesta tela e não podem ser recuperadas depois.
             </p>
             <AdminTable
@@ -103,7 +104,7 @@ function CriarDemoPage() {
               emptyState={<EmptyState message="—" />}
               columns={[
                 { key: "name", header: "Nome", render: (r) => <span className="text-white">{r.name}</span> },
-                { key: "phone", header: "Login (telefone)", render: (r) => <span className="font-mono text-xs">{r.phone}</span> },
+                { key: "phone", header: "Login (telefone)", render: (r) => <span className="font-mono text-xs">{formatPhoneBR(r.phone)}</span> },
                 { key: "pw", header: "Senha", render: (r) => <span className="font-mono text-xs">{r.password}</span> },
                 { key: "code", header: "Cód. afiliado", render: (r) => <span className="font-mono text-xs">{r.affiliateCode}</span> },
                 { key: "bal", header: "Saldo", render: (r) => <MoneyValue value={r.balance} /> },
