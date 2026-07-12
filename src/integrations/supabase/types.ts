@@ -1656,6 +1656,15 @@ export type Database = {
         }
         Returns: Json
       }
+      helix_request_withdrawal_atomic: {
+        Args: {
+          _amount_cents: number
+          _pix_key: string
+          _request_ip?: string
+          _request_user_agent?: string
+        }
+        Returns: Json
+      }
       helix_withdrawal_rules: { Args: never; Returns: Json }
       impersonation_start: {
         Args: {
