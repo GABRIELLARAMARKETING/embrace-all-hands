@@ -74,12 +74,14 @@ function SignupPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const digits = phone.replace(/\D/g, "");
+    const cpfDigits = cpf.replace(/\D/g, "");
     const emailTrim = normalizeEmail(email);
     const errs: typeof errors = {};
     if (name.trim().length < 2) errs.name = "Informe seu nome";
     const emailErr = validateEmail(email);
     if (emailErr) errs.email = emailErr;
     if (digits.length < 10) errs.phone = "Telefone inválido";
+    if (!isValidCPF(cpfDigits)) errs.cpf = "CPF inválido";
     const pwErr = validatePassword(password);
     if (pwErr) errs.password = pwErr;
     setErrors(errs);
@@ -99,7 +101,7 @@ function SignupPage() {
         password: safe.password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { display_name: name.trim(), phone: digits, ref },
+          data: { display_name: name.trim(), phone: digits, cpf: cpfDigits, ref },
         },
       });
       if (error) throw error;
