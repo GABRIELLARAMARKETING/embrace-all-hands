@@ -26,6 +26,7 @@ import { Route as GerenteLoginRouteImport } from './routes/gerente.login'
 import { Route as GerenteIndicarRouteImport } from './routes/gerente.indicar'
 import { Route as GerenteIndicadosRouteImport } from './routes/gerente.indicados'
 import { Route as GerenteGerentesRouteImport } from './routes/gerente.gerentes'
+import { Route as GerenteEsqueciSenhaRouteImport } from './routes/gerente.esqueci-senha'
 import { Route as GerenteCriarDemoRouteImport } from './routes/gerente.criar-demo'
 import { Route as GerenteCriarContaRouteImport } from './routes/gerente.criar-conta'
 import { Route as GerenteAjustesIndicadosRouteImport } from './routes/gerente.ajustes-indicados'
@@ -151,6 +152,11 @@ const GerenteIndicadosRoute = GerenteIndicadosRouteImport.update({
 const GerenteGerentesRoute = GerenteGerentesRouteImport.update({
   id: '/gerentes',
   path: '/gerentes',
+  getParentRoute: () => GerenteRoute,
+} as any)
+const GerenteEsqueciSenhaRoute = GerenteEsqueciSenhaRouteImport.update({
+  id: '/esqueci-senha',
+  path: '/esqueci-senha',
   getParentRoute: () => GerenteRoute,
 } as any)
 const GerenteCriarDemoRoute = GerenteCriarDemoRouteImport.update({
@@ -406,6 +412,7 @@ export interface FileRoutesByFullPath {
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
   '/gerente/criar-conta': typeof GerenteCriarContaRoute
   '/gerente/criar-demo': typeof GerenteCriarDemoRoute
+  '/gerente/esqueci-senha': typeof GerenteEsqueciSenhaRoute
   '/gerente/gerentes': typeof GerenteGerentesRoute
   '/gerente/indicados': typeof GerenteIndicadosRoute
   '/gerente/indicar': typeof GerenteIndicarRoute
@@ -465,6 +472,7 @@ export interface FileRoutesByTo {
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
   '/gerente/criar-conta': typeof GerenteCriarContaRoute
   '/gerente/criar-demo': typeof GerenteCriarDemoRoute
+  '/gerente/esqueci-senha': typeof GerenteEsqueciSenhaRoute
   '/gerente/gerentes': typeof GerenteGerentesRoute
   '/gerente/indicados': typeof GerenteIndicadosRoute
   '/gerente/indicar': typeof GerenteIndicarRoute
@@ -526,6 +534,7 @@ export interface FileRoutesById {
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
   '/gerente/criar-conta': typeof GerenteCriarContaRoute
   '/gerente/criar-demo': typeof GerenteCriarDemoRoute
+  '/gerente/esqueci-senha': typeof GerenteEsqueciSenhaRoute
   '/gerente/gerentes': typeof GerenteGerentesRoute
   '/gerente/indicados': typeof GerenteIndicadosRoute
   '/gerente/indicar': typeof GerenteIndicarRoute
@@ -588,6 +597,7 @@ export interface FileRouteTypes {
     | '/gerente/ajustes-indicados'
     | '/gerente/criar-conta'
     | '/gerente/criar-demo'
+    | '/gerente/esqueci-senha'
     | '/gerente/gerentes'
     | '/gerente/indicados'
     | '/gerente/indicar'
@@ -647,6 +657,7 @@ export interface FileRouteTypes {
     | '/gerente/ajustes-indicados'
     | '/gerente/criar-conta'
     | '/gerente/criar-demo'
+    | '/gerente/esqueci-senha'
     | '/gerente/gerentes'
     | '/gerente/indicados'
     | '/gerente/indicar'
@@ -707,6 +718,7 @@ export interface FileRouteTypes {
     | '/gerente/ajustes-indicados'
     | '/gerente/criar-conta'
     | '/gerente/criar-demo'
+    | '/gerente/esqueci-senha'
     | '/gerente/gerentes'
     | '/gerente/indicados'
     | '/gerente/indicar'
@@ -854,6 +866,13 @@ declare module '@tanstack/react-router' {
       path: '/gerentes'
       fullPath: '/gerente/gerentes'
       preLoaderRoute: typeof GerenteGerentesRouteImport
+      parentRoute: typeof GerenteRoute
+    }
+    '/gerente/esqueci-senha': {
+      id: '/gerente/esqueci-senha'
+      path: '/esqueci-senha'
+      fullPath: '/gerente/esqueci-senha'
+      preLoaderRoute: typeof GerenteEsqueciSenhaRouteImport
       parentRoute: typeof GerenteRoute
     }
     '/gerente/criar-demo': {
@@ -1250,6 +1269,7 @@ interface GerenteRouteChildren {
   GerenteAjustesIndicadosRoute: typeof GerenteAjustesIndicadosRoute
   GerenteCriarContaRoute: typeof GerenteCriarContaRoute
   GerenteCriarDemoRoute: typeof GerenteCriarDemoRoute
+  GerenteEsqueciSenhaRoute: typeof GerenteEsqueciSenhaRoute
   GerenteGerentesRoute: typeof GerenteGerentesRoute
   GerenteIndicadosRoute: typeof GerenteIndicadosRoute
   GerenteIndicarRoute: typeof GerenteIndicarRoute
@@ -1264,6 +1284,7 @@ const GerenteRouteChildren: GerenteRouteChildren = {
   GerenteAjustesIndicadosRoute: GerenteAjustesIndicadosRoute,
   GerenteCriarContaRoute: GerenteCriarContaRoute,
   GerenteCriarDemoRoute: GerenteCriarDemoRoute,
+  GerenteEsqueciSenhaRoute: GerenteEsqueciSenhaRoute,
   GerenteGerentesRoute: GerenteGerentesRoute,
   GerenteIndicadosRoute: GerenteIndicadosRoute,
   GerenteIndicarRoute: GerenteIndicarRoute,
