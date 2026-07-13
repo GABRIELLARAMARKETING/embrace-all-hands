@@ -58,6 +58,7 @@ function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -66,6 +67,7 @@ function SignupPage() {
     name?: string;
     email?: string;
     phone?: string;
+    cpf?: string;
     password?: string;
   }>({});
 
