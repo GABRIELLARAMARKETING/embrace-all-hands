@@ -59,12 +59,15 @@ function JogarPage() {
   const demoBalance = profileQuery.data?.demoBalance ?? 0;
   const effectiveBalance = isDemo ? demoBalance : balance;
 
-  // Garante que o valor selecionado continue cabendo no saldo atual.
+  // Garante que o valor selecionado continue cabendo no saldo atual — apenas
+  // depois que o perfil terminou de carregar; durante o loading effectiveBalance=0
+  // e resetaria o valor recém-clicado indevidamente.
   useEffect(() => {
+    if (!profileQuery.isSuccess) return;
     if (value != null && effectiveBalance < value) {
       setValue(null);
     }
-  }, [effectiveBalance, value, setValue]);
+  }, [profileQuery.isSuccess, effectiveBalance, value, setValue]);
 
   // Apenas o mapa clássico está disponível nesta rota.
   const availableMaps = useMemo(
