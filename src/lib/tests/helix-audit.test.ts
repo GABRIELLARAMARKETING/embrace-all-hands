@@ -13,6 +13,7 @@ type Deposit = { id: string; user_id: string; amount: number; status: string; cr
 type Session = {
   id: string;
   deposit_id: string | null;
+  stake_cents?: number | null;
   payout_per_platform_cents: number;
   status: string;
   created_at: string;
@@ -74,12 +75,13 @@ describe("helix-rules helpers", () => {
     expect(HELIX_ALLOWED_AMOUNTS.has(v)).toBe(true);
   });
 
-  it.each([1, 3, 7, 15, 25, 40, 75, 200, 500, 0, -10])(
-    "recusa valor não permitido R$ %s",
-    (v) => {
-      expect(isAllowedDepositAmount(v)).toBe(false);
-    },
-  );
+  it.each([1, 3, 7, 15, 25, 40, 75, 200, 500])("aceita valor livre R$ %s", (v) => {
+    expect(isAllowedDepositAmount(v)).toBe(true);
+  });
+
+  it.each([0, -10])("recusa valor inválido R$ %s", (v) => {
+    expect(isAllowedDepositAmount(v)).toBe(false);
+  });
 
   it("mapa payout casa com regras oficiais", () => {
     for (const r of HELIX_DEPOSIT_RULES) {
@@ -88,9 +90,10 @@ describe("helix-rules helpers", () => {
     }
   });
 
-  it("retorna null para centavos fora do mapa", () => {
-    expect(getExpectedPayoutCents(777)).toBeNull();
-    expect(getExpectedPayoutCents(15000)).toBeNull();
+  it("calcula 10% para valores livres", () => {
+    expect(getExpectedPayoutCents(777)).toBe(78);
+    expect(getExpectedPayoutCents(15000)).toBe(1500);
+    expect(getExpectedPayoutCents(0)).toBeNull();
   });
 });
 
@@ -140,16 +143,16 @@ describe("runHelixAudit — depósitos inválidos", () => {
     expect(result.invalidDeposits).toHaveLength(0);
   });
 
-  it("lista depósitos com valores fora do mapa", async () => {
+  it("lista depósitos com valores inválidos", async () => {
     const now = new Date().toISOString();
     const deposits: Deposit[] = [
       { id: "ok", user_id: "u1", amount: 10, status: "paid", created_at: now },
-      { id: "bad1", user_id: "u2", amount: 7, status: "paid", created_at: now },
-      { id: "bad2", user_id: "u3", amount: 25, status: "waiting_payment", created_at: now },
-      { id: "bad3", user_id: "u4", amount: 999, status: "paid", created_at: now },
+      { id: "ok2", user_id: "u2", amount: 7, status: "paid", created_at: now },
+      { id: "bad1", user_id: "u3", amount: 0, status: "waiting_payment", created_at: now },
+      { id: "bad2", user_id: "u4", amount: -5, status: "paid", created_at: now },
     ];
     const result = await runHelixAudit(makeClient({ deposits }));
-    expect(result.invalidDeposits.map((d) => d.id).sort()).toEqual(["bad1", "bad2", "bad3"]);
+    expect(result.invalidDeposits.map((d) => d.id).sort()).toEqual(["bad1", "bad2"]);
     expect(result.invalidDeposits.every((d) => typeof d.amount === "number")).toBe(true);
   });
 
@@ -158,7 +161,7 @@ describe("runHelixAudit — depósitos inválidos", () => {
     const deposits: Deposit[] = Array.from({ length: 120 }, (_, i) => ({
       id: `bad${i}`,
       user_id: "u",
-      amount: 13, // sempre inválido
+      amount: 0, // sempre inválido
       status: "paid",
       created_at: now,
     }));
@@ -193,14 +196,14 @@ describe("runHelixAudit — sessões com payout divergente", () => {
     expect(result.sessionMismatches).toHaveLength(0);
   });
 
-  it("detecta sessão em que payout ≠ payout esperado do depósito", async () => {
+  it("detecta sessão em que payout ≠ payout esperado da entrada", async () => {
     const sessions: Session[] = [
-      // R$ 20 → esperado 200c, gravou 300c
-      mkSession({ id: "s1", payout_per_platform_cents: 300, depositAmount: 20 }),
-      // R$ 50 → esperado 500c, gravou 500c (OK)
-      mkSession({ id: "s2", payout_per_platform_cents: 500, depositAmount: 50 }),
-      // R$ 5 → esperado 50c, gravou 100c
-      mkSession({ id: "s3", payout_per_platform_cents: 100, depositAmount: 5 }),
+      // Entrada R$ 20 → esperado 200c, gravou 300c
+      mkSession({ id: "s1", stake_cents: 2000, payout_per_platform_cents: 300, depositAmount: 100 }),
+      // Entrada R$ 50 → esperado 500c, gravou 500c (OK)
+      mkSession({ id: "s2", stake_cents: 5000, payout_per_platform_cents: 500, depositAmount: 100 }),
+      // Entrada R$ 5 → esperado 50c, gravou 100c
+      mkSession({ id: "s3", stake_cents: 500, payout_per_platform_cents: 100, depositAmount: 100 }),
     ];
     const result = await runHelixAudit(makeClient({ sessions }));
     const ids = result.sessionMismatches.map((s) => s.id).sort();
@@ -211,9 +214,9 @@ describe("runHelixAudit — sessões com payout divergente", () => {
     expect(s1.deposit_amount).toBe(20);
   });
 
-  it("marca sessão vinculada a depósito de valor não permitido", async () => {
+  it("marca sessão com entrada inválida", async () => {
     const sessions: Session[] = [
-      mkSession({ id: "weird", payout_per_platform_cents: 130, depositAmount: 13 }),
+      mkSession({ id: "weird", stake_cents: 0, payout_per_platform_cents: 130, depositAmount: 13 }),
     ];
     const result = await runHelixAudit(makeClient({ sessions }));
     expect(result.sessionMismatches).toHaveLength(1);
