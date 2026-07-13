@@ -155,7 +155,7 @@ function DepositarPage() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <PlayerCard className="mt-4 p-4">
           <div className="text-[11px] font-bold tracking-widest text-[#C084FC]">VALOR RÁPIDO</div>
-          <div className="mt-3 grid grid-cols-6 gap-2">
+          <div className="mt-3 grid grid-cols-4 gap-2">
             {PLAYER_MOCK.depositOptions.map((v) => {
               const badge = DEPOSIT_BADGES[v];
               const active = amount === v;
