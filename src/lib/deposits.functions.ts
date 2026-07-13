@@ -31,10 +31,10 @@ export const createDiggionDeposit = createServerFn({ method: "POST" })
     z
       .object({
         amount: z
-          .number()
-          .min(MIN_DEPOSIT)
-          .max(MAX_DEPOSIT)
-          .refine((v) => ALLOWED_AMOUNTS.has(v), "Valor de depósito não permitido"),
+          .number({ invalid_type_error: `Selecione um valor de depósito (${ALLOWED_AMOUNTS_LABEL}).` })
+          .min(MIN_DEPOSIT, `Depósito mínimo é R$ ${MIN_DEPOSIT}. Valores permitidos: ${ALLOWED_AMOUNTS_LABEL}.`)
+          .max(MAX_DEPOSIT, `Depósito máximo é R$ ${MAX_DEPOSIT}. Valores permitidos: ${ALLOWED_AMOUNTS_LABEL}.`)
+          .refine((v) => ALLOWED_AMOUNTS.has(v), `Valor de depósito não permitido. Escolha ${ALLOWED_AMOUNTS_LABEL}.`),
         cpf: z
           .string()
           .transform(onlyDigits)
