@@ -136,6 +136,21 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const ref = new URLSearchParams(window.location.search).get("ref");
+      if (ref) {
+        const code = ref.trim().toUpperCase().slice(0, 24);
+        if (code) {
+          document.cookie = `helix_ref=${encodeURIComponent(code)}; Path=/; Max-Age=604800; SameSite=Lax`;
+        }
+      }
+    } catch {
+      /* noop */
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
