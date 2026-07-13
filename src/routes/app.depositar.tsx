@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 const helixLogo = "/images/helixfast-logo.png";
 import { createDiggionDeposit, getDepositStatus } from "@/lib/deposits.functions";
 import { getMyProfile } from "@/lib/profile.functions";
-import { HELIX_DEPOSIT_RULES, isAllowedDepositAmount } from "@/lib/helix-rules";
+import { HELIX_DEPOSIT_RULES } from "@/lib/helix-rules";
 
 export const Route = createFileRoute("/app/depositar")({
   head: () => ({
@@ -124,7 +124,7 @@ function DepositarPage() {
   const amount = watch("amount");
 
   const onSubmit = () => {
-    if (!isAllowedDepositAmount(amount)) {
+    if (!(PLAYER_MOCK.depositOptions as readonly number[]).includes(amount)) {
       toast.error("Selecione um valor permitido: R$ 5, 10, 20, 30, 50 ou 100.");
       return;
     }
