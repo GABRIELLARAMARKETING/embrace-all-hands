@@ -2,6 +2,8 @@ import { createFileRoute, Outlet, redirect, Link, useRouterState } from "@tansta
 import { createContext, useContext, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { NotificationBell } from "@/components/admin/NotificationBell";
+
 import {
   LayoutDashboard,
   Users,
@@ -184,20 +186,24 @@ function AdminPanelLayout() {
           </AnimatePresence>
 
           <main className="flex-1 lg:pl-[240px]">
-            <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-white/5 bg-[#050810]/80 px-4 py-3 backdrop-blur lg:hidden">
+            <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-white/5 bg-[#050810]/80 px-4 py-3 backdrop-blur">
               <button
                 onClick={() => setMobileOpen(true)}
-                className="rounded-md border border-white/10 p-2"
+                className="rounded-md border border-white/10 p-2 lg:hidden"
                 aria-label="Abrir menu"
               >
                 <Menu className="h-4 w-4" />
               </button>
-              <div className="text-sm font-semibold">Admin Panel</div>
+              <div className="text-sm font-semibold lg:hidden">Admin Panel</div>
+              <div className="ml-auto flex items-center gap-2">
+                <NotificationBell />
+              </div>
             </header>
             <div className="mx-auto w-full max-w-7xl px-4 py-6 lg:px-8">
               <Outlet />
             </div>
           </main>
+
         </div>
       </div>
     </AdminPanelUIContext.Provider>
