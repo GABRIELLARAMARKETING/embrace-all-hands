@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as GerenteSaquesRouteImport } from './routes/gerente.saques'
+import { Route as GerenteRedefinirSenhaRouteImport } from './routes/gerente.redefinir-senha'
 import { Route as GerentePainelRouteImport } from './routes/gerente.painel'
 import { Route as GerenteNotificacoesRouteImport } from './routes/gerente.notificacoes'
 import { Route as GerenteMeusSaquesRouteImport } from './routes/gerente.meus-saques'
@@ -117,6 +118,11 @@ const RCodeRoute = RCodeRouteImport.update({
 const GerenteSaquesRoute = GerenteSaquesRouteImport.update({
   id: '/saques',
   path: '/saques',
+  getParentRoute: () => GerenteRoute,
+} as any)
+const GerenteRedefinirSenhaRoute = GerenteRedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
   getParentRoute: () => GerenteRoute,
 } as any)
 const GerentePainelRoute = GerentePainelRouteImport.update({
@@ -420,6 +426,7 @@ export interface FileRoutesByFullPath {
   '/gerente/meus-saques': typeof GerenteMeusSaquesRoute
   '/gerente/notificacoes': typeof GerenteNotificacoesRoute
   '/gerente/painel': typeof GerentePainelRoute
+  '/gerente/redefinir-senha': typeof GerenteRedefinirSenhaRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/r/$code': typeof RCodeRoute
   '/app/': typeof AppIndexRoute
@@ -480,6 +487,7 @@ export interface FileRoutesByTo {
   '/gerente/meus-saques': typeof GerenteMeusSaquesRoute
   '/gerente/notificacoes': typeof GerenteNotificacoesRoute
   '/gerente/painel': typeof GerentePainelRoute
+  '/gerente/redefinir-senha': typeof GerenteRedefinirSenhaRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/r/$code': typeof RCodeRoute
   '/app': typeof AppIndexRoute
@@ -542,6 +550,7 @@ export interface FileRoutesById {
   '/gerente/meus-saques': typeof GerenteMeusSaquesRoute
   '/gerente/notificacoes': typeof GerenteNotificacoesRoute
   '/gerente/painel': typeof GerentePainelRoute
+  '/gerente/redefinir-senha': typeof GerenteRedefinirSenhaRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/r/$code': typeof RCodeRoute
   '/app/': typeof AppIndexRoute
@@ -605,6 +614,7 @@ export interface FileRouteTypes {
     | '/gerente/meus-saques'
     | '/gerente/notificacoes'
     | '/gerente/painel'
+    | '/gerente/redefinir-senha'
     | '/gerente/saques'
     | '/r/$code'
     | '/app/'
@@ -665,6 +675,7 @@ export interface FileRouteTypes {
     | '/gerente/meus-saques'
     | '/gerente/notificacoes'
     | '/gerente/painel'
+    | '/gerente/redefinir-senha'
     | '/gerente/saques'
     | '/r/$code'
     | '/app'
@@ -726,6 +737,7 @@ export interface FileRouteTypes {
     | '/gerente/meus-saques'
     | '/gerente/notificacoes'
     | '/gerente/painel'
+    | '/gerente/redefinir-senha'
     | '/gerente/saques'
     | '/r/$code'
     | '/app/'
@@ -817,6 +829,13 @@ declare module '@tanstack/react-router' {
       path: '/saques'
       fullPath: '/gerente/saques'
       preLoaderRoute: typeof GerenteSaquesRouteImport
+      parentRoute: typeof GerenteRoute
+    }
+    '/gerente/redefinir-senha': {
+      id: '/gerente/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/gerente/redefinir-senha'
+      preLoaderRoute: typeof GerenteRedefinirSenhaRouteImport
       parentRoute: typeof GerenteRoute
     }
     '/gerente/painel': {
@@ -1277,6 +1296,7 @@ interface GerenteRouteChildren {
   GerenteMeusSaquesRoute: typeof GerenteMeusSaquesRoute
   GerenteNotificacoesRoute: typeof GerenteNotificacoesRoute
   GerentePainelRoute: typeof GerentePainelRoute
+  GerenteRedefinirSenhaRoute: typeof GerenteRedefinirSenhaRoute
   GerenteSaquesRoute: typeof GerenteSaquesRoute
 }
 
@@ -1292,6 +1312,7 @@ const GerenteRouteChildren: GerenteRouteChildren = {
   GerenteMeusSaquesRoute: GerenteMeusSaquesRoute,
   GerenteNotificacoesRoute: GerenteNotificacoesRoute,
   GerentePainelRoute: GerentePainelRoute,
+  GerenteRedefinirSenhaRoute: GerenteRedefinirSenhaRoute,
   GerenteSaquesRoute: GerenteSaquesRoute,
 }
 
