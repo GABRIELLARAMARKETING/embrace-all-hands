@@ -130,7 +130,7 @@ function JogarPage() {
         return;
       }
 
-      if (!referenceDepositId || !effectiveValue) return;
+      if (!effectiveValue) return;
       const res = await validateFn({ data: { amount: effectiveValue } });
       if (!res.ok) {
         toast.error(
@@ -138,13 +138,16 @@ function JogarPage() {
             ? "Saldo insuficiente para esta entrada."
             : res.reason === "unsupported_amount"
               ? "Valor de entrada não suportado."
-              : "Depósito indisponível para jogar.",
+              : res.reason === "no_playable_deposit"
+                ? "Nenhum depósito confirmado disponível para jogar."
+                : "Depósito indisponível para jogar.",
         );
         await playable.refetch();
         await profileQuery.refetch();
         return;
       }
       const session = await startPaidSession(res.depositId, effectiveValue);
+
       if (!session.ok) {
         toast.error(
           session.reason === "insufficient_balance"
