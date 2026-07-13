@@ -75,6 +75,20 @@ function JogarPage() {
   // Regra oficial (backend): saque mínimo = 5x o valor da entrada escolhida.
   const effectiveValue = value;
   const minWithdraw = effectiveValue ? effectiveValue * 5 : 0;
+  const maxEntry = Math.max(0, Math.floor(effectiveBalance * 100) / 100);
+  const setEntryValue = (raw: string) => {
+    if (!raw.trim()) {
+      setValue(null);
+      return;
+    }
+    const parsed = Number(raw.replace(",", "."));
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      setValue(null);
+      return;
+    }
+    const centsValue = Math.floor(parsed * 100) / 100;
+    setValue(Math.min(centsValue, maxEntry));
+  };
   // Habilita JOGAR: em modo demo, quando um valor válido está selecionado e cabe no demo_balance;
   // em modo real, quando existe depósito confirmado e o valor cabe no saldo.
   const canPlay = isDemo
@@ -180,6 +194,21 @@ function JogarPage() {
           {/* Valor de entrada */}
           <div className="mt-6 text-[11px] font-bold tracking-widest text-[#B47CFF]">
             VALOR DE ENTRADA
+          </div>
+          <div className="mt-3 rounded-2xl border border-[#3a1d5a] bg-[#150a28] px-4 py-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-black text-white/75">R$</span>
+              <input
+                value={effectiveValue ?? ""}
+                onChange={(event) => setEntryValue(event.currentTarget.value)}
+                inputMode="decimal"
+                placeholder="0,00"
+                className="min-w-0 flex-1 bg-transparent text-3xl font-black text-white outline-none placeholder:text-white/25"
+              />
+            </div>
+            <div className="mt-1 text-[11px] font-semibold text-white/50">
+              Disponível: {formatCurrency(maxEntry)}
+            </div>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {PLAYER_MOCK.playOptions.map((v) => {
