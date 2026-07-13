@@ -149,13 +149,23 @@ function JogarPage() {
       const session = await startPaidSession(res.depositId, effectiveValue);
 
       if (!session.ok) {
+        console.error("[helix] startPaidSession failed", { reason: session.reason, depositId: res.depositId, amount: effectiveValue });
         toast.error(
           session.reason === "insufficient_balance"
             ? "Saldo insuficiente para esta entrada."
             : session.reason === "session_already_active"
               ? "Você já tem uma partida em andamento."
-            : "Não foi possível iniciar a partida.",
+              : session.reason === "deposit_not_found"
+                ? "Depósito de referência não encontrado."
+                : session.reason === "deposit_not_paid"
+                  ? "Depósito de referência não está pago."
+                  : session.reason === "deposit_not_credited"
+                    ? "Depósito de referência não creditado."
+                    : session.reason === "unsupported_amount"
+                      ? "Valor de entrada não suportado."
+                      : `Não foi possível iniciar a partida (${session.reason ?? "desconhecido"}).`,
         );
+
         await playable.refetch();
         await profileQuery.refetch();
         return;
