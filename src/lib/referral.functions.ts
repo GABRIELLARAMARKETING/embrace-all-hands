@@ -46,14 +46,20 @@ export const getReferralStats = createServerFn({ method: "GET" })
     // process_deposit_commissions insere em commissions mas não atualiza os
     // campos agregados do perfil, então o painel /app/indicar exibia zero
     // mesmo com comissões disponíveis.
+    // Apenas comissões de afiliado (níveis 1/2/3). Nível 0 é a sobra do
+    // gerente e não deve entrar no saldo do painel /app/indicar — quando o
+    // usuário é também gerente dos próprios indicados, esse valor era somado
+    // em duplicidade (ex.: R$5 L1 + R$2 sobra por depósito = R$14 no lugar
+    // dos R$5 corretos).
     const { data: commissionRows } = await supabase
       .from("commissions")
-      .select("amount, status")
-      .eq("affiliate_id", userId);
+      .select("amount, status, level")
+      .eq("affiliate_id", userId)
+      .in("level", [1, 2, 3]);
 
     let availableSum = 0;
     let paidSum = 0;
-    for (const c of (commissionRows ?? []) as Array<{ amount: number; status: string }>) {
+    for (const c of (commissionRows ?? []) as Array<{ amount: number; status: string; level: number }>) {
       const amt = Number(c.amount ?? 0);
       if (c.status === "available") availableSum += amt;
       else if (c.status === "paid") paidSum += amt;
