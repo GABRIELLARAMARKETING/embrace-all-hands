@@ -94,8 +94,8 @@ export const getReferralStats = createServerFn({ method: "GET" })
     const totalDeposits = sumFor(allIds);
 
     return {
-      affiliateBalance: profile?.affiliate_balance ?? 0,
-      totalReceived: profile?.total_received ?? 0,
+      affiliateBalance,
+      totalReceived,
       affiliateCode,
       referralUrl: affiliateCode ? `${getPublicBaseUrl()}/?ref=${affiliateCode}` : null,
       stats: {
