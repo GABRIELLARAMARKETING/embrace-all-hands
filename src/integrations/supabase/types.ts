@@ -1730,6 +1730,7 @@ export type Database = {
       test_demo_account_isolation: { Args: never; Returns: string }
       test_helix_flow: { Args: never; Returns: string }
       test_multilevel_flow: { Args: never; Returns: string }
+      test_wallet_multi_match_flow: { Args: never; Returns: string }
     }
     Enums: {
       app_role: "super_admin" | "admin" | "gerente" | "afiliado" | "jogador"
