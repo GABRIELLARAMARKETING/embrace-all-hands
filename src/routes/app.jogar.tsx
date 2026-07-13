@@ -224,6 +224,65 @@ function JogarPage() {
             </div>
           </div>
 
+          {/* Indicador de saldo disponível + papel — confirma qual valor será usado como stake */}
+          <div className="mt-5 rounded-2xl border border-[#3a1d5a] bg-gradient-to-br from-[#1a0c30] to-[#150a28] px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-[10px] font-bold tracking-[0.22em] text-[#B47CFF]">
+                  {isDemo ? "SALDO DEMO DISPONÍVEL" : "SALDO DISPONÍVEL PARA STAKE"}
+                </div>
+                <div
+                  className={cn(
+                    "mt-1 text-2xl font-black drop-shadow-[0_0_12px_rgba(52,211,153,0.35)]",
+                    isDemo ? "text-emerald-300" : "text-emerald-400",
+                  )}
+                  data-testid="available-balance"
+                >
+                  {profileQuery.isLoading ? "—" : formatCurrency(effectiveBalance)}
+                </div>
+                <div className="mt-0.5 text-[11px] text-white/55">
+                  {isDemo
+                    ? "Saldo demo — não sacável"
+                    : "Valor creditado na carteira usado como stake da partida"}
+                </div>
+              </div>
+              <div className="shrink-0 flex flex-col items-end gap-1">
+                <span
+                  className={cn(
+                    "rounded-full border px-2.5 py-1 text-[10px] font-black tracking-widest uppercase",
+                    primaryRole === "gerente"
+                      ? "border-amber-400/60 bg-amber-500/10 text-amber-300"
+                      : primaryRole === "admin" || primaryRole === "super_admin"
+                        ? "border-rose-400/60 bg-rose-500/10 text-rose-300"
+                        : primaryRole === "afiliado"
+                          ? "border-sky-400/60 bg-sky-500/10 text-sky-300"
+                          : "border-white/20 bg-white/5 text-white/70",
+                  )}
+                  data-testid="user-role-badge"
+                >
+                  {roleLabel[primaryRole] ?? primaryRole}
+                </span>
+                {isDemo && (
+                  <span className="rounded-full border border-emerald-400/50 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
+                    DEMO
+                  </span>
+                )}
+              </div>
+            </div>
+            {effectiveValue != null && effectiveValue > 0 && (
+              <div className="mt-3 border-t border-white/5 pt-2 text-[11px] text-white/70">
+                Stake selecionado:{" "}
+                <span className="font-bold text-white">{formatCurrency(effectiveValue)}</span>{" "}
+                · Restante após entrada:{" "}
+                <span className="font-bold text-white">
+                  {formatCurrency(Math.max(0, effectiveBalance - effectiveValue))}
+                </span>
+              </div>
+            )}
+          </div>
+
+
+
           {/* Valor de entrada */}
           <div className="mt-6 text-[11px] font-bold tracking-widest text-[#B47CFF]">
             VALOR DE ENTRADA
