@@ -220,16 +220,16 @@ function JogarPage() {
               return (
                 <button
                   key={v}
-                  disabled={!affordable}
-                  title={affordable ? undefined : "Saldo insuficiente"}
-                  onClick={() => affordable && setValue(v)}
+                  type="button"
+                  title={affordable ? undefined : "Acima do saldo — ajuste no campo acima"}
+                  onClick={() => setValue(v)}
                   className={cn(
                     "rounded-full px-4 py-2 text-sm font-bold transition-all",
                     active
                       ? "bg-gradient-to-r from-[#A855F7] to-[#EC5FA3] text-white shadow-[0_0_18px_rgba(168,85,247,0.55)]"
                       : affordable
                         ? "border border-[#3a1d5a] bg-[#1a0c30] text-white hover:border-[#5b2e8a]"
-                        : "cursor-not-allowed border border-[#3a1d5a]/40 bg-[#1a0c30]/40 text-white/30",
+                        : "border border-[#3a1d5a]/60 bg-[#1a0c30]/60 text-white/60 hover:border-[#5b2e8a]",
                   )}
                 >
                   R${v}
