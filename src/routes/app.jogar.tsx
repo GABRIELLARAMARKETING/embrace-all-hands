@@ -92,11 +92,12 @@ function JogarPage() {
     const centsValue = Math.floor(parsed * 100) / 100;
     setValue(Math.min(centsValue, maxEntry));
   };
-  // Habilita JOGAR: em modo demo, quando um valor válido está selecionado e cabe no demo_balance;
-  // em modo real, quando existe depósito confirmado e o valor cabe no saldo.
+  // Habilita JOGAR: em modo demo, quando um valor válido cabe no demo_balance;
+  // em modo real, quando o valor cabe no saldo (backend valida se há depósito confirmado).
   const canPlay = isDemo
     ? effectiveValue != null && effectiveValue > 0 && demoBalance >= effectiveValue
-    : playable.isSuccess && !!referenceDepositId && effectiveValue != null && effectiveValue > 0 && balance >= effectiveValue && !playable.isFetching;
+    : profileQuery.isSuccess && effectiveValue != null && effectiveValue > 0 && balance >= effectiveValue;
+
 
   // Revalidação server-side no clique de JOGAR (defesa em profundidade).
   const validateFn = useServerFn(validatePlayValue);
@@ -129,7 +130,7 @@ function JogarPage() {
         return;
       }
 
-      if (!referenceDepositId || !effectiveValue) return;
+      if (!effectiveValue) return;
       const res = await validateFn({ data: { amount: effectiveValue } });
       if (!res.ok) {
         toast.error(
@@ -137,13 +138,16 @@ function JogarPage() {
             ? "Saldo insuficiente para esta entrada."
             : res.reason === "unsupported_amount"
               ? "Valor de entrada não suportado."
-              : "Depósito indisponível para jogar.",
+              : res.reason === "no_playable_deposit"
+                ? "Nenhum depósito confirmado disponível para jogar."
+                : "Depósito indisponível para jogar.",
         );
         await playable.refetch();
         await profileQuery.refetch();
         return;
       }
       const session = await startPaidSession(res.depositId, effectiveValue);
+
       if (!session.ok) {
         toast.error(
           session.reason === "insufficient_balance"
@@ -242,12 +246,13 @@ function JogarPage() {
               Modo demo — saldo demo {formatCurrency(demoBalance)} (não sacável).
             </div>
           ) : (
-            !playable.isLoading && !referenceDepositId && (
+            !profileQuery.isLoading && balance <= 0 && (
               <div className="mt-2 text-[11px] font-semibold text-amber-300/90">
-                Nenhum saldo confirmado disponível para jogar. Faça um depósito para liberar.
+                Saldo zerado. Faça um depósito para liberar o jogo.
               </div>
             )
           )}
+
 
 
 
