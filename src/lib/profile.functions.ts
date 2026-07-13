@@ -28,21 +28,26 @@ export const getMyProfile = createServerFn({ method: "POST" })
       /* não bloqueia */
     }
 
-    const [{ data: profile, error: profileError }, { count, error: countError }] =
-      await Promise.all([
-        supabase
-          .from("profiles")
-          .select("display_name, balance, coins, affiliate_balance, total_received, is_demo, demo_balance" as any)
-          .eq("id", userId)
-          .maybeSingle(),
-        supabase
-          .from("game_sessions")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", userId),
-      ]);
+    const [
+      { data: profile, error: profileError },
+      { count, error: countError },
+      { data: rolesRows, error: rolesError },
+    ] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("display_name, balance, coins, affiliate_balance, total_received, is_demo, demo_balance" as any)
+        .eq("id", userId)
+        .maybeSingle(),
+      supabase
+        .from("game_sessions")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId),
+      supabase.from("user_roles").select("role").eq("user_id", userId),
+    ]);
 
     if (profileError) throw new Error(profileError.message);
     if (countError) throw new Error(countError.message);
+    if (rolesError) throw new Error(rolesError.message);
 
     const email = (claims as { email?: string } | null)?.email ?? "";
     const p = (profile ?? {}) as any;
@@ -56,5 +61,7 @@ export const getMyProfile = createServerFn({ method: "POST" })
       totalReceived: p.total_received ?? 0,
       isDemo: !!p.is_demo,
       demoBalance: Number(p.demo_balance ?? 0),
+      roles: (rolesRows ?? []).map((r: { role: string }) => r.role),
     };
   });
+
