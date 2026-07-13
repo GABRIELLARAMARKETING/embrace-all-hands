@@ -316,17 +316,15 @@ function GameLogic({
               cameraShake.current = Math.max(cameraShake.current, 0.45);
               addScore(1);
               registerHelixPlatform(k + 1);
-              // Valor da moeda vem do backend (HELIX_DEPOSIT_RULES via window.__helixDeposit).
+              // Valor da moeda vem do valor de entrada salvo em window.__helixDeposit.
               // Sem depósito (modo teste grátis), usa a menor regra como demo
               // para que a HUD (moeda + barra) apareça igual ao modo pago.
               import("@/components/CoinPopLayer").then((m) => {
-                import("@/lib/helix-rules").then(({ HELIX_DEPOSIT_RULES }) => {
+                import("@/lib/helix-rules").then(({ HELIX_DEPOSIT_RULES, getPayoutPerPlatform }) => {
                   const dep = (window as unknown as { __helixDeposit?: number })
                     .__helixDeposit;
-                  const rule =
-                    HELIX_DEPOSIT_RULES.find((r) => r.amount === dep) ??
-                    HELIX_DEPOSIT_RULES[0];
-                  m.spawnCoinPop(rule.payoutCents / 100);
+                  const amountCents = Math.round((dep ?? HELIX_DEPOSIT_RULES[0].amount) * 100);
+                  m.spawnCoinPop(getPayoutPerPlatform(amountCents) / 100);
                 });
               });
               window.setTimeout(() => {

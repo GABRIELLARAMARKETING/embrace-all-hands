@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { HELIX_ALLOWED_AMOUNTS } from "@/lib/helix-rules";
 
 /**
  * Retorna um depósito confirmado que libera o jogo. O valor de entrada não
@@ -39,9 +38,7 @@ export const getPlayableDeposit = createServerFn({ method: "GET" })
       return { ok: false as const, reason: "no_paid_deposit" as const };
     }
 
-    const playable = deps.find(
-      (d) => HELIX_ALLOWED_AMOUNTS.has(Number(d.amount)),
-    );
+    const playable = deps.find((d) => Number(d.amount) > 0);
 
     if (!playable) {
       return { ok: false as const, reason: "no_playable_deposit" as const };
@@ -68,7 +65,7 @@ export const validatePlayValue = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    if (!HELIX_ALLOWED_AMOUNTS.has(data.amount)) {
+    if (!Number.isFinite(data.amount) || data.amount <= 0) {
       return { ok: false as const, reason: "unsupported_amount" as const };
     }
 
@@ -93,7 +90,7 @@ export const validatePlayValue = createServerFn({ method: "POST" })
       .limit(20);
     if (error) throw new Error(error.message);
 
-    const reference = (deps ?? []).find((d) => HELIX_ALLOWED_AMOUNTS.has(Number(d.amount)));
+    const reference = (deps ?? []).find((d) => Number(d.amount) > 0);
     if (!reference) {
       return { ok: false as const, reason: "no_playable_deposit" as const };
     }
@@ -116,7 +113,7 @@ export const startDemoSessionFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
 
-    if (!HELIX_ALLOWED_AMOUNTS.has(data.amount)) {
+    if (!Number.isFinite(data.amount) || data.amount <= 0) {
       return { ok: false as const, reason: "unsupported_amount" as const };
     }
 

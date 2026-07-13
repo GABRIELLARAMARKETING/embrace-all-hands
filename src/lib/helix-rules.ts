@@ -1,6 +1,7 @@
 /**
  * Fonte única de verdade das regras Helix PIX.
- * Deve refletir EXATAMENTE `public.helix_payout_cents` no banco.
+ * Deve refletir `public.helix_payout_cents` no banco: cada plataforma paga
+ * 10% do valor de entrada escolhido pelo jogador.
  */
 export const HELIX_DEPOSIT_RULES: ReadonlyArray<{
   amount: number;
@@ -25,12 +26,12 @@ export const HELIX_ALLOWED_AMOUNT_CENTS: ReadonlySet<number> = new Set(
 );
 
 export function getExpectedPayoutCents(amountCents: number): number | null {
-  const rule = HELIX_DEPOSIT_RULES.find((r) => r.amountCents === amountCents);
-  return rule ? rule.payoutCents : null;
+  if (!Number.isFinite(amountCents) || amountCents <= 0) return null;
+  return Math.max(1, Math.round(amountCents * 0.1));
 }
 
 export function isAllowedDepositAmount(amount: number): boolean {
-  return HELIX_ALLOWED_AMOUNTS.has(amount);
+  return Number.isFinite(amount) && amount > 0;
 }
 
 /**
@@ -38,11 +39,11 @@ export function isAllowedDepositAmount(amount: number): boolean {
  * Lança para qualquer valor fora da tabela — impede uso silencioso.
  */
 export function getPayoutPerPlatform(amountCents: number): number {
-  const rule = HELIX_DEPOSIT_RULES.find((r) => r.amountCents === amountCents);
-  if (!rule) {
-    throw new Error(`Unsupported deposit amount: ${amountCents} cents`);
+  const payout = getExpectedPayoutCents(amountCents);
+  if (payout == null) {
+    throw new Error(`Invalid play amount: ${amountCents} cents`);
   }
-  return rule.payoutCents;
+  return payout;
 }
 
 /**

@@ -18,7 +18,6 @@ import { hasCurrentGameSession, useGameSession } from "@/hooks/useGameSession";
 import { useThemePreload } from "@/hooks/useThemePreload";
 import { useHelixDifficultyLoader } from "@/hooks/useHelixDifficultyLoader";
 import { LogoHelix } from "@/components/LogoHelix";
-import { HELIX_ALLOWED_AMOUNTS } from "@/lib/helix-rules";
 import { supabase } from "@/integrations/supabase/client";
 
 
@@ -37,7 +36,7 @@ function GamePage() {
   useThemePreload();
   useHelixDifficultyLoader();
 
-  // Guard: /game exige um valor de depósito válido selecionado em /app/jogar.
+  // Guard: /game exige uma entrada válida selecionada em /app/jogar.
   const navigate = useNavigate();
   const selectedPlayValue = usePlayerStore((s) => s.selectedPlayValue);
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
@@ -61,7 +60,7 @@ function GamePage() {
       authenticated === true &&
       (!hasCurrentGameSession() ||
         selectedPlayValue == null ||
-        !HELIX_ALLOWED_AMOUNTS.has(selectedPlayValue))
+        selectedPlayValue <= 0)
     ) {
       navigate({ to: "/app/jogar", replace: true });
     }
@@ -72,7 +71,7 @@ function GamePage() {
       authenticated === true &&
       hasCurrentGameSession() &&
       selectedPlayValue != null &&
-      HELIX_ALLOWED_AMOUNTS.has(selectedPlayValue)
+      selectedPlayValue > 0
     ) {
       useGameStore.getState().startGame();
     }
