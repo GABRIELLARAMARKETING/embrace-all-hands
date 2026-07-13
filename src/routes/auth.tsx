@@ -242,6 +242,18 @@ function SignupPage() {
               error={errors.phone}
             />
             <Field
+              label="CPF"
+              placeholder="000.000.000-00"
+              inputMode="numeric"
+              autoComplete="off"
+              value={cpf}
+              onChange={(v) => {
+                setCpf(formatCPF(v));
+                if (errors.cpf) setErrors((e) => ({ ...e, cpf: undefined }));
+              }}
+              error={errors.cpf}
+            />
+            <Field
               label="Senha"
               placeholder="Mínimo 6 caracteres"
               type={showPass ? "text" : "password"}
