@@ -1,14 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, CheckCircle2, Mail, Send, Sparkles } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clock, Mail, MailCheck, RefreshCw, Send, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { AdminCard } from "@/components/admin/AdminCard";
 import { AdminInput } from "@/components/admin/AdminInput";
 import { AdminButton } from "@/components/admin/AdminButton";
 import { supabase } from "@/integrations/supabase/client";
+
+const RESEND_COOLDOWN_SECONDS = 60;
 
 export const Route = createFileRoute("/gerente/esqueci-senha")({
   head: () => ({
