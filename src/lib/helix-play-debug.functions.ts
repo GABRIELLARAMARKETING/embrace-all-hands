@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { noInput } from "@/lib/validation";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { HELIX_ALLOWED_AMOUNTS } from "@/lib/helix-rules";
 
 /**
  * Diagnóstico: retorna todos os depósitos pagos/creditados do usuário,
@@ -36,11 +35,11 @@ export const getPlayableDepositDebug = createServerFn({ method: "GET" })
 
     const rows = (deps ?? []).map((d) => {
       const amount = Number(d.amount);
-      const isPaidStatus = d.status === "paid" || d.status === "approved";
+      const isPaidStatus = d.status === "paid" || d.status === "approved" || d.status === "spent";
       const isCredited = !!d.credited_at;
-      const isAllowedAmount = HELIX_ALLOWED_AMOUNTS.has(amount);
+      const isAllowedAmount = amount > 0;
       const usedBy = usedMap.get(d.id) ?? null;
-      const isPlayable = isPaidStatus && isCredited && isAllowedAmount && !usedBy;
+      const isPlayable = isPaidStatus && isCredited && isAllowedAmount;
       return {
         id: d.id,
         amount,
@@ -70,7 +69,7 @@ export const getPlayableDepositDebug = createServerFn({ method: "GET" })
     return {
       ok: true as const,
       userId,
-      allowedAmounts: Array.from(HELIX_ALLOWED_AMOUNTS),
+      allowedAmounts: "any_positive_amount_within_balance",
       totalDeposits: rows.length,
       chosen: chosen
         ? { id: chosen.id, amount: chosen.amount, status: chosen.status }
