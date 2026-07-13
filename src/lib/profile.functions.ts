@@ -12,7 +12,9 @@ export interface ProfilePayload {
   totalReceived: number;
   isDemo: boolean;
   demoBalance: number;
+  roles: string[];
 }
+
 
 export const getMyProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
