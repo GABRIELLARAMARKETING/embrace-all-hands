@@ -38,7 +38,7 @@ export const MAP_OPTIONS: MapOption[] = [
 ];
 
 export const DEPOSIT_BADGES: Record<number, { label: string; tone: "min" | "hot" | "pop" | "bonus" }> = {
-  10: { label: "MÍNIMO", tone: "min" },
+  20: { label: "MÍNIMO", tone: "min" },
   50: { label: "POPULAR", tone: "pop" },
   100: { label: "BÔNUS +100%", tone: "bonus" },
 };
