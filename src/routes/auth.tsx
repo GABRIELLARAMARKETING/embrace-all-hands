@@ -30,11 +30,35 @@ function formatPhone(v: string) {
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
 }
 
+function formatCPF(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 3) return d;
+  if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`;
+  if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`;
+  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
+}
+
+function isValidCPF(cpf: string): boolean {
+  const d = cpf.replace(/\D/g, "");
+  if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false;
+  let sum = 0;
+  for (let i = 0; i < 9; i++) sum += parseInt(d[i]) * (10 - i);
+  let rev = 11 - (sum % 11);
+  if (rev >= 10) rev = 0;
+  if (rev !== parseInt(d[9])) return false;
+  sum = 0;
+  for (let i = 0; i < 10; i++) sum += parseInt(d[i]) * (11 - i);
+  rev = 11 - (sum % 11);
+  if (rev >= 10) rev = 0;
+  return rev === parseInt(d[10]);
+}
+
 function SignupPage() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -43,18 +67,21 @@ function SignupPage() {
     name?: string;
     email?: string;
     phone?: string;
+    cpf?: string;
     password?: string;
   }>({});
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const digits = phone.replace(/\D/g, "");
+    const cpfDigits = cpf.replace(/\D/g, "");
     const emailTrim = normalizeEmail(email);
     const errs: typeof errors = {};
     if (name.trim().length < 2) errs.name = "Informe seu nome";
     const emailErr = validateEmail(email);
     if (emailErr) errs.email = emailErr;
     if (digits.length < 10) errs.phone = "Telefone inválido";
+    if (!isValidCPF(cpfDigits)) errs.cpf = "CPF inválido";
     const pwErr = validatePassword(password);
     if (pwErr) errs.password = pwErr;
     setErrors(errs);
@@ -74,7 +101,7 @@ function SignupPage() {
         password: safe.password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { display_name: name.trim(), phone: digits, ref },
+          data: { display_name: name.trim(), phone: digits, cpf: cpfDigits, ref },
         },
       });
       if (error) throw error;
@@ -213,6 +240,18 @@ function SignupPage() {
                 if (errors.phone) setErrors((e) => ({ ...e, phone: undefined }));
               }}
               error={errors.phone}
+            />
+            <Field
+              label="CPF"
+              placeholder="000.000.000-00"
+              inputMode="numeric"
+              autoComplete="off"
+              value={cpf}
+              onChange={(v) => {
+                setCpf(formatCPF(v));
+                if (errors.cpf) setErrors((e) => ({ ...e, cpf: undefined }));
+              }}
+              error={errors.cpf}
             />
             <Field
               label="Senha"
