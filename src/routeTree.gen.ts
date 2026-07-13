@@ -27,6 +27,7 @@ import { Route as GerenteIndicarRouteImport } from './routes/gerente.indicar'
 import { Route as GerenteIndicadosRouteImport } from './routes/gerente.indicados'
 import { Route as GerenteGerentesRouteImport } from './routes/gerente.gerentes'
 import { Route as GerenteCriarDemoRouteImport } from './routes/gerente.criar-demo'
+import { Route as GerenteCriarContaRouteImport } from './routes/gerente.criar-conta'
 import { Route as GerenteAjustesIndicadosRouteImport } from './routes/gerente.ajustes-indicados'
 import { Route as AppSacarRouteImport } from './routes/app.sacar'
 import { Route as AppPerfilRouteImport } from './routes/app.perfil'
@@ -155,6 +156,11 @@ const GerenteGerentesRoute = GerenteGerentesRouteImport.update({
 const GerenteCriarDemoRoute = GerenteCriarDemoRouteImport.update({
   id: '/criar-demo',
   path: '/criar-demo',
+  getParentRoute: () => GerenteRoute,
+} as any)
+const GerenteCriarContaRoute = GerenteCriarContaRouteImport.update({
+  id: '/criar-conta',
+  path: '/criar-conta',
   getParentRoute: () => GerenteRoute,
 } as any)
 const GerenteAjustesIndicadosRoute = GerenteAjustesIndicadosRouteImport.update({
@@ -398,6 +404,7 @@ export interface FileRoutesByFullPath {
   '/app/perfil': typeof AppPerfilRoute
   '/app/sacar': typeof AppSacarRoute
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
+  '/gerente/criar-conta': typeof GerenteCriarContaRoute
   '/gerente/criar-demo': typeof GerenteCriarDemoRoute
   '/gerente/gerentes': typeof GerenteGerentesRoute
   '/gerente/indicados': typeof GerenteIndicadosRoute
@@ -456,6 +463,7 @@ export interface FileRoutesByTo {
   '/app/perfil': typeof AppPerfilRoute
   '/app/sacar': typeof AppSacarRoute
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
+  '/gerente/criar-conta': typeof GerenteCriarContaRoute
   '/gerente/criar-demo': typeof GerenteCriarDemoRoute
   '/gerente/gerentes': typeof GerenteGerentesRoute
   '/gerente/indicados': typeof GerenteIndicadosRoute
@@ -516,6 +524,7 @@ export interface FileRoutesById {
   '/app/perfil': typeof AppPerfilRoute
   '/app/sacar': typeof AppSacarRoute
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
+  '/gerente/criar-conta': typeof GerenteCriarContaRoute
   '/gerente/criar-demo': typeof GerenteCriarDemoRoute
   '/gerente/gerentes': typeof GerenteGerentesRoute
   '/gerente/indicados': typeof GerenteIndicadosRoute
@@ -577,6 +586,7 @@ export interface FileRouteTypes {
     | '/app/perfil'
     | '/app/sacar'
     | '/gerente/ajustes-indicados'
+    | '/gerente/criar-conta'
     | '/gerente/criar-demo'
     | '/gerente/gerentes'
     | '/gerente/indicados'
@@ -635,6 +645,7 @@ export interface FileRouteTypes {
     | '/app/perfil'
     | '/app/sacar'
     | '/gerente/ajustes-indicados'
+    | '/gerente/criar-conta'
     | '/gerente/criar-demo'
     | '/gerente/gerentes'
     | '/gerente/indicados'
@@ -694,6 +705,7 @@ export interface FileRouteTypes {
     | '/app/perfil'
     | '/app/sacar'
     | '/gerente/ajustes-indicados'
+    | '/gerente/criar-conta'
     | '/gerente/criar-demo'
     | '/gerente/gerentes'
     | '/gerente/indicados'
@@ -849,6 +861,13 @@ declare module '@tanstack/react-router' {
       path: '/criar-demo'
       fullPath: '/gerente/criar-demo'
       preLoaderRoute: typeof GerenteCriarDemoRouteImport
+      parentRoute: typeof GerenteRoute
+    }
+    '/gerente/criar-conta': {
+      id: '/gerente/criar-conta'
+      path: '/criar-conta'
+      fullPath: '/gerente/criar-conta'
+      preLoaderRoute: typeof GerenteCriarContaRouteImport
       parentRoute: typeof GerenteRoute
     }
     '/gerente/ajustes-indicados': {
@@ -1229,6 +1248,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface GerenteRouteChildren {
   GerenteAjustesIndicadosRoute: typeof GerenteAjustesIndicadosRoute
+  GerenteCriarContaRoute: typeof GerenteCriarContaRoute
   GerenteCriarDemoRoute: typeof GerenteCriarDemoRoute
   GerenteGerentesRoute: typeof GerenteGerentesRoute
   GerenteIndicadosRoute: typeof GerenteIndicadosRoute
@@ -1242,6 +1262,7 @@ interface GerenteRouteChildren {
 
 const GerenteRouteChildren: GerenteRouteChildren = {
   GerenteAjustesIndicadosRoute: GerenteAjustesIndicadosRoute,
+  GerenteCriarContaRoute: GerenteCriarContaRoute,
   GerenteCriarDemoRoute: GerenteCriarDemoRoute,
   GerenteGerentesRoute: GerenteGerentesRoute,
   GerenteIndicadosRoute: GerenteIndicadosRoute,
