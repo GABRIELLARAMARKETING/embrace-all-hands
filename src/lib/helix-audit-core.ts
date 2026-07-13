@@ -24,21 +24,20 @@ export async function runHelixAudit(client: any): Promise<HelixAuditResult> {
   }
   const rulesAllOk = rules.every((r) => r.ok);
 
-  const allowed = HELIX_DEPOSIT_RULES.map((r) => r.amount);
   const { data: badDeps } = await client
     .from("deposits")
     .select("id, user_id, amount, status, created_at")
     .order("created_at", { ascending: false })
     .limit(200);
   const invalidDeposits = (badDeps ?? [])
-    .filter((d: any) => !allowed.includes(Number(d.amount)))
+    .filter((d: any) => Number(d.amount) <= 0)
     .slice(0, 50)
     .map((d: any) => ({ ...d, amount: Number(d.amount) }));
 
   const { data: sessions } = await client
     .from("game_sessions")
     .select(
-      "id, deposit_id, payout_per_platform_cents, status, created_at, deposits:deposit_id(amount)",
+      "id, deposit_id, stake_cents, payout_per_platform_cents, status, created_at, deposits:deposit_id(amount)",
     )
     .not("deposit_id", "is", null)
     .gt("payout_per_platform_cents", 0)
@@ -47,9 +46,17 @@ export async function runHelixAudit(client: any): Promise<HelixAuditResult> {
 
   const sessionMismatches: HelixAuditResult["sessionMismatches"] = [];
   for (const s of (sessions ?? []) as any[]) {
-    const depAmountReais = s.deposits?.amount != null ? Number(s.deposits.amount) : null;
-    const depAmountCents = depAmountReais != null ? Math.round(depAmountReais * 100) : null;
-    const expected = depAmountCents != null ? getExpectedPayoutCents(depAmountCents) : null;
+    const depAmountReais = s.stake_cents != null
+      ? Number(s.stake_cents) / 100
+      : s.deposits?.amount != null
+        ? Number(s.deposits.amount)
+        : null;
+    const amountCents = s.stake_cents != null
+      ? Number(s.stake_cents)
+      : depAmountReais != null
+        ? Math.round(depAmountReais * 100)
+        : null;
+    const expected = amountCents != null ? getExpectedPayoutCents(amountCents) : null;
     if (expected == null || s.payout_per_platform_cents !== expected) {
       sessionMismatches.push({
         id: s.id,

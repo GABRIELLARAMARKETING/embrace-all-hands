@@ -11,16 +11,17 @@ describe("helix-rules: getPayoutPerPlatform", () => {
     [1000, 100],
     [2000, 200],
     [3000, 300],
+    [4375, 438],
     [5000, 500],
     [10000, 1000],
   ])("getPayoutPerPlatform(%i) === %i", (cents, expected) => {
     expect(getPayoutPerPlatform(cents)).toBe(expected);
   });
 
-  it.each([0, 1, 499, 1500, 2500, 4000, 9999, 100000])(
-    "rejeita valor não permitido (%i)",
+  it.each([0, -1, -500])(
+    "rejeita valor inválido (%i)",
     (cents) => {
-      expect(() => getPayoutPerPlatform(cents)).toThrow(/unsupported/i);
+      expect(() => getPayoutPerPlatform(cents)).toThrow(/invalid/i);
     },
   );
 

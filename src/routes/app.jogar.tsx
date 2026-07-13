@@ -33,8 +33,8 @@ function JogarPage() {
   const startGame = useGameStore((s) => s.startGame);
   const { startPaidSession, startDemoSession } = useGameSession();
 
-  // Fonte oficial: backend valida qual valor o usuário pode jogar (baseado no
-  // último depósito pago e ainda não usado em uma sessão).
+  // Fonte oficial: backend valida se existe depósito confirmado e qual saldo o
+  // usuário ainda pode usar em partidas.
   const fetchPlayable = useServerFn(getPlayableDeposit);
   const playable = useQuery({
     queryKey: ["helix", "playable-deposit"],
@@ -46,7 +46,7 @@ function JogarPage() {
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
   });
-  const serverAmount = playable.data?.ok ? playable.data.amount : null;
+  const referenceDepositId = playable.data?.ok ? playable.data.depositId : null;
 
   const fetchProfile = useServerFn(getMyProfile);
   const profileQuery = useQuery({
@@ -59,23 +59,12 @@ function JogarPage() {
   const demoBalance = profileQuery.data?.demoBalance ?? 0;
   const effectiveBalance = isDemo ? demoBalance : balance;
 
-
-  // Diagnóstico rápido no console — inspecionar em DevTools ao abrir /app/jogar.
+  // Garante que o valor selecionado continue cabendo no saldo atual.
   useEffect(() => {
-    if (playable.data) {
-      // eslint-disable-next-line no-console
-      console.log("[HELIX playable-deposit]", playable.data);
+    if (value != null && effectiveBalance < value) {
+      setValue(null);
     }
-  }, [playable.data]);
-
-  // Sincroniza store com o valor autoritativo do backend; rejeita divergências.
-  // Em modo demo, o usuário escolhe o valor livremente (dentro do demo_balance).
-  useEffect(() => {
-    if (isDemo) return;
-    if (serverAmount != null && value !== serverAmount) {
-      setValue(serverAmount);
-    }
-  }, [isDemo, serverAmount, value, setValue]);
+  }, [effectiveBalance, value, setValue]);
 
   // Apenas o mapa clássico está disponível nesta rota.
   const availableMaps = useMemo(
@@ -83,14 +72,28 @@ function JogarPage() {
     [],
   );
   const selectedMap = availableMaps[0];
-  // Regra oficial (backend): saque mínimo = 5x o valor do depósito.
-  const effectiveValue = isDemo ? value : (serverAmount ?? value ?? null);
+  // Regra oficial (backend): saque mínimo = 5x o valor da entrada escolhida.
+  const effectiveValue = value;
   const minWithdraw = effectiveValue ? effectiveValue * 5 : 0;
+  const maxEntry = Math.max(0, Math.floor(effectiveBalance * 100) / 100);
+  const setEntryValue = (raw: string) => {
+    if (!raw.trim()) {
+      setValue(null);
+      return;
+    }
+    const parsed = Number(raw.replace(",", "."));
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      setValue(null);
+      return;
+    }
+    const centsValue = Math.floor(parsed * 100) / 100;
+    setValue(Math.min(centsValue, maxEntry));
+  };
   // Habilita JOGAR: em modo demo, quando um valor válido está selecionado e cabe no demo_balance;
-  // em modo real, quando o backend confirmou um depósito jogável.
+  // em modo real, quando existe depósito confirmado e o valor cabe no saldo.
   const canPlay = isDemo
     ? effectiveValue != null && effectiveValue > 0 && demoBalance >= effectiveValue
-    : playable.isSuccess && !!serverAmount && !playable.isFetching;
+    : playable.isSuccess && !!referenceDepositId && effectiveValue != null && effectiveValue > 0 && balance >= effectiveValue && !playable.isFetching;
 
   // Revalidação server-side no clique de JOGAR (defesa em profundidade).
   const validateFn = useServerFn(validatePlayValue);
@@ -123,27 +126,31 @@ function JogarPage() {
         return;
       }
 
-      if (!serverAmount) return;
-      const res = await validateFn({ data: { amount: serverAmount } });
+      if (!referenceDepositId || !effectiveValue) return;
+      const res = await validateFn({ data: { amount: effectiveValue } });
       if (!res.ok) {
         toast.error(
-          res.reason === "amount_mismatch"
-            ? "Valor não corresponde ao seu depósito."
-            : res.reason === "deposit_already_used"
-              ? "Este depósito já foi usado em uma partida."
+          res.reason === "insufficient_balance"
+            ? "Saldo insuficiente para esta entrada."
+            : res.reason === "unsupported_amount"
+              ? "Valor de entrada não suportado."
               : "Depósito indisponível para jogar.",
         );
         await playable.refetch();
+        await profileQuery.refetch();
         return;
       }
-      const session = await startPaidSession(res.depositId);
+      const session = await startPaidSession(res.depositId, effectiveValue);
       if (!session.ok) {
         toast.error(
-          session.reason === "deposit_already_used"
-            ? "Este depósito já foi usado em uma partida."
+          session.reason === "insufficient_balance"
+            ? "Saldo insuficiente para esta entrada."
+            : session.reason === "session_already_active"
+              ? "Você já tem uma partida em andamento."
             : "Não foi possível iniciar a partida.",
         );
         await playable.refetch();
+        await profileQuery.refetch();
         return;
       }
       startGame();
@@ -184,9 +191,24 @@ function JogarPage() {
             </div>
           </div>
 
-          {/* Valor de entrada — travado no depósito real do usuário (backend) */}
+          {/* Valor de entrada */}
           <div className="mt-6 text-[11px] font-bold tracking-widest text-[#B47CFF]">
             VALOR DE ENTRADA
+          </div>
+          <div className="mt-3 rounded-2xl border border-[#3a1d5a] bg-[#150a28] px-4 py-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-black text-white/75">R$</span>
+              <input
+                value={effectiveValue ?? ""}
+                onChange={(event) => setEntryValue(event.currentTarget.value)}
+                inputMode="decimal"
+                placeholder="0,00"
+                className="min-w-0 flex-1 bg-transparent text-3xl font-black text-white outline-none placeholder:text-white/25"
+              />
+            </div>
+            <div className="mt-1 text-[11px] font-semibold text-white/50">
+              Disponível: {formatCurrency(maxEntry)}
+            </div>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {PLAYER_MOCK.playOptions.map((v) => {
@@ -217,9 +239,9 @@ function JogarPage() {
               Modo demo — saldo demo {formatCurrency(demoBalance)} (não sacável).
             </div>
           ) : (
-            !playable.isLoading && !serverAmount && (
+            !playable.isLoading && !referenceDepositId && (
               <div className="mt-2 text-[11px] font-semibold text-amber-300/90">
-                Nenhum depósito disponível para jogar. Faça um depósito para liberar.
+                Nenhum saldo confirmado disponível para jogar. Faça um depósito para liberar.
               </div>
             )
           )}
@@ -238,7 +260,7 @@ function JogarPage() {
             </div>
             {effectiveValue ? (
               <div className="mt-1 text-[11px] text-white/55">
-                Depósito de {formatCurrency(effectiveValue)} · sacar só ao atingir{" "}
+                Entrada de {formatCurrency(effectiveValue)} · sacar só ao atingir{" "}
                 {formatCurrency(minWithdraw)}
               </div>
             ) : (

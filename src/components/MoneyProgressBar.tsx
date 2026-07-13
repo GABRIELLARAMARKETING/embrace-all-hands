@@ -4,7 +4,7 @@ import { useGameStore } from "@/store/useGameStore";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { RewardClaimedModal } from "./RewardClaimedModal";
-import { HELIX_DEPOSIT_RULES } from "@/lib/helix-rules";
+import { HELIX_DEPOSIT_RULES, getPayoutPerPlatform } from "@/lib/helix-rules";
 import { useGameSession } from "@/hooks/useGameSession";
 import { waitForPendingHelixPlatforms } from "@/lib/helix-platform-client";
 
@@ -16,7 +16,13 @@ export function MoneyProgressBar() {
   const isDemo = selectedPlayValue == null;
   const rule = useMemo(() => {
     if (selectedPlayValue == null) return HELIX_DEPOSIT_RULES[0] ?? null;
-    return HELIX_DEPOSIT_RULES.find((r) => r.amount === selectedPlayValue) ?? null;
+    const amountCents = Math.round(selectedPlayValue * 100);
+    return {
+      amount: selectedPlayValue,
+      payoutPerPlatform: getPayoutPerPlatform(amountCents) / 100,
+      amountCents,
+      payoutCents: getPayoutPerPlatform(amountCents),
+    };
   }, [selectedPlayValue]);
   const PER_PLATFORM = rule ? rule.payoutCents / 100 : 0;
   const GOAL = rule ? rule.amount * 5 : 0;

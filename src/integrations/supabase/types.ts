@@ -550,6 +550,7 @@ export type Database = {
           platforms_passed: number
           reward_cents: number
           score: number
+          stake_cents: number | null
           status: string
           theme_id: string | null
           user_id: string | null
@@ -572,6 +573,7 @@ export type Database = {
           platforms_passed?: number
           reward_cents?: number
           score?: number
+          stake_cents?: number | null
           status?: string
           theme_id?: string | null
           user_id?: string | null
@@ -594,6 +596,7 @@ export type Database = {
           platforms_passed?: number
           reward_cents?: number
           score?: number
+          stake_cents?: number | null
           status?: string
           theme_id?: string | null
           user_id?: string | null
@@ -1631,7 +1634,7 @@ export type Database = {
         Returns: Json
       }
       helix_create_session: {
-        Args: { _deposit_id: string; _theme_id?: string }
+        Args: { _amount: number; _deposit_id: string; _theme_id?: string }
         Returns: Json
       }
       helix_finish_session: {

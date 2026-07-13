@@ -59,11 +59,12 @@ export function useGameSession() {
     }
   }, []);
 
-  const startPaidSession = useCallback(async (depositId: string, themeId: string | null = null) => {
+  const startPaidSession = useCallback(async (depositId: string, amount: number, themeId: string | null = null) => {
     startedAt = Date.now();
     try {
       const { data, error } = await supabase.rpc("helix_create_session", {
         _deposit_id: depositId,
+        _amount: amount,
         _theme_id: themeId ?? undefined,
       });
       if (error) return { ok: false as const, reason: error.message };
