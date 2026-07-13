@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as GerenteSaquesRouteImport } from './routes/gerente.saques'
+import { Route as GerenteRedefinirSenhaRouteImport } from './routes/gerente.redefinir-senha'
 import { Route as GerentePainelRouteImport } from './routes/gerente.painel'
 import { Route as GerenteNotificacoesRouteImport } from './routes/gerente.notificacoes'
 import { Route as GerenteMeusSaquesRouteImport } from './routes/gerente.meus-saques'
@@ -26,6 +27,7 @@ import { Route as GerenteLoginRouteImport } from './routes/gerente.login'
 import { Route as GerenteIndicarRouteImport } from './routes/gerente.indicar'
 import { Route as GerenteIndicadosRouteImport } from './routes/gerente.indicados'
 import { Route as GerenteGerentesRouteImport } from './routes/gerente.gerentes'
+import { Route as GerenteEsqueciSenhaRouteImport } from './routes/gerente.esqueci-senha'
 import { Route as GerenteCriarDemoRouteImport } from './routes/gerente.criar-demo'
 import { Route as GerenteCriarContaRouteImport } from './routes/gerente.criar-conta'
 import { Route as GerenteAjustesIndicadosRouteImport } from './routes/gerente.ajustes-indicados'
@@ -118,6 +120,11 @@ const GerenteSaquesRoute = GerenteSaquesRouteImport.update({
   path: '/saques',
   getParentRoute: () => GerenteRoute,
 } as any)
+const GerenteRedefinirSenhaRoute = GerenteRedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
+  getParentRoute: () => GerenteRoute,
+} as any)
 const GerentePainelRoute = GerentePainelRouteImport.update({
   id: '/painel',
   path: '/painel',
@@ -151,6 +158,11 @@ const GerenteIndicadosRoute = GerenteIndicadosRouteImport.update({
 const GerenteGerentesRoute = GerenteGerentesRouteImport.update({
   id: '/gerentes',
   path: '/gerentes',
+  getParentRoute: () => GerenteRoute,
+} as any)
+const GerenteEsqueciSenhaRoute = GerenteEsqueciSenhaRouteImport.update({
+  id: '/esqueci-senha',
+  path: '/esqueci-senha',
   getParentRoute: () => GerenteRoute,
 } as any)
 const GerenteCriarDemoRoute = GerenteCriarDemoRouteImport.update({
@@ -406,6 +418,7 @@ export interface FileRoutesByFullPath {
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
   '/gerente/criar-conta': typeof GerenteCriarContaRoute
   '/gerente/criar-demo': typeof GerenteCriarDemoRoute
+  '/gerente/esqueci-senha': typeof GerenteEsqueciSenhaRoute
   '/gerente/gerentes': typeof GerenteGerentesRoute
   '/gerente/indicados': typeof GerenteIndicadosRoute
   '/gerente/indicar': typeof GerenteIndicarRoute
@@ -413,6 +426,7 @@ export interface FileRoutesByFullPath {
   '/gerente/meus-saques': typeof GerenteMeusSaquesRoute
   '/gerente/notificacoes': typeof GerenteNotificacoesRoute
   '/gerente/painel': typeof GerentePainelRoute
+  '/gerente/redefinir-senha': typeof GerenteRedefinirSenhaRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/r/$code': typeof RCodeRoute
   '/app/': typeof AppIndexRoute
@@ -465,6 +479,7 @@ export interface FileRoutesByTo {
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
   '/gerente/criar-conta': typeof GerenteCriarContaRoute
   '/gerente/criar-demo': typeof GerenteCriarDemoRoute
+  '/gerente/esqueci-senha': typeof GerenteEsqueciSenhaRoute
   '/gerente/gerentes': typeof GerenteGerentesRoute
   '/gerente/indicados': typeof GerenteIndicadosRoute
   '/gerente/indicar': typeof GerenteIndicarRoute
@@ -472,6 +487,7 @@ export interface FileRoutesByTo {
   '/gerente/meus-saques': typeof GerenteMeusSaquesRoute
   '/gerente/notificacoes': typeof GerenteNotificacoesRoute
   '/gerente/painel': typeof GerentePainelRoute
+  '/gerente/redefinir-senha': typeof GerenteRedefinirSenhaRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/r/$code': typeof RCodeRoute
   '/app': typeof AppIndexRoute
@@ -526,6 +542,7 @@ export interface FileRoutesById {
   '/gerente/ajustes-indicados': typeof GerenteAjustesIndicadosRoute
   '/gerente/criar-conta': typeof GerenteCriarContaRoute
   '/gerente/criar-demo': typeof GerenteCriarDemoRoute
+  '/gerente/esqueci-senha': typeof GerenteEsqueciSenhaRoute
   '/gerente/gerentes': typeof GerenteGerentesRoute
   '/gerente/indicados': typeof GerenteIndicadosRoute
   '/gerente/indicar': typeof GerenteIndicarRoute
@@ -533,6 +550,7 @@ export interface FileRoutesById {
   '/gerente/meus-saques': typeof GerenteMeusSaquesRoute
   '/gerente/notificacoes': typeof GerenteNotificacoesRoute
   '/gerente/painel': typeof GerentePainelRoute
+  '/gerente/redefinir-senha': typeof GerenteRedefinirSenhaRoute
   '/gerente/saques': typeof GerenteSaquesRoute
   '/r/$code': typeof RCodeRoute
   '/app/': typeof AppIndexRoute
@@ -588,6 +606,7 @@ export interface FileRouteTypes {
     | '/gerente/ajustes-indicados'
     | '/gerente/criar-conta'
     | '/gerente/criar-demo'
+    | '/gerente/esqueci-senha'
     | '/gerente/gerentes'
     | '/gerente/indicados'
     | '/gerente/indicar'
@@ -595,6 +614,7 @@ export interface FileRouteTypes {
     | '/gerente/meus-saques'
     | '/gerente/notificacoes'
     | '/gerente/painel'
+    | '/gerente/redefinir-senha'
     | '/gerente/saques'
     | '/r/$code'
     | '/app/'
@@ -647,6 +667,7 @@ export interface FileRouteTypes {
     | '/gerente/ajustes-indicados'
     | '/gerente/criar-conta'
     | '/gerente/criar-demo'
+    | '/gerente/esqueci-senha'
     | '/gerente/gerentes'
     | '/gerente/indicados'
     | '/gerente/indicar'
@@ -654,6 +675,7 @@ export interface FileRouteTypes {
     | '/gerente/meus-saques'
     | '/gerente/notificacoes'
     | '/gerente/painel'
+    | '/gerente/redefinir-senha'
     | '/gerente/saques'
     | '/r/$code'
     | '/app'
@@ -707,6 +729,7 @@ export interface FileRouteTypes {
     | '/gerente/ajustes-indicados'
     | '/gerente/criar-conta'
     | '/gerente/criar-demo'
+    | '/gerente/esqueci-senha'
     | '/gerente/gerentes'
     | '/gerente/indicados'
     | '/gerente/indicar'
@@ -714,6 +737,7 @@ export interface FileRouteTypes {
     | '/gerente/meus-saques'
     | '/gerente/notificacoes'
     | '/gerente/painel'
+    | '/gerente/redefinir-senha'
     | '/gerente/saques'
     | '/r/$code'
     | '/app/'
@@ -807,6 +831,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GerenteSaquesRouteImport
       parentRoute: typeof GerenteRoute
     }
+    '/gerente/redefinir-senha': {
+      id: '/gerente/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/gerente/redefinir-senha'
+      preLoaderRoute: typeof GerenteRedefinirSenhaRouteImport
+      parentRoute: typeof GerenteRoute
+    }
     '/gerente/painel': {
       id: '/gerente/painel'
       path: '/painel'
@@ -854,6 +885,13 @@ declare module '@tanstack/react-router' {
       path: '/gerentes'
       fullPath: '/gerente/gerentes'
       preLoaderRoute: typeof GerenteGerentesRouteImport
+      parentRoute: typeof GerenteRoute
+    }
+    '/gerente/esqueci-senha': {
+      id: '/gerente/esqueci-senha'
+      path: '/esqueci-senha'
+      fullPath: '/gerente/esqueci-senha'
+      preLoaderRoute: typeof GerenteEsqueciSenhaRouteImport
       parentRoute: typeof GerenteRoute
     }
     '/gerente/criar-demo': {
@@ -1250,6 +1288,7 @@ interface GerenteRouteChildren {
   GerenteAjustesIndicadosRoute: typeof GerenteAjustesIndicadosRoute
   GerenteCriarContaRoute: typeof GerenteCriarContaRoute
   GerenteCriarDemoRoute: typeof GerenteCriarDemoRoute
+  GerenteEsqueciSenhaRoute: typeof GerenteEsqueciSenhaRoute
   GerenteGerentesRoute: typeof GerenteGerentesRoute
   GerenteIndicadosRoute: typeof GerenteIndicadosRoute
   GerenteIndicarRoute: typeof GerenteIndicarRoute
@@ -1257,6 +1296,7 @@ interface GerenteRouteChildren {
   GerenteMeusSaquesRoute: typeof GerenteMeusSaquesRoute
   GerenteNotificacoesRoute: typeof GerenteNotificacoesRoute
   GerentePainelRoute: typeof GerentePainelRoute
+  GerenteRedefinirSenhaRoute: typeof GerenteRedefinirSenhaRoute
   GerenteSaquesRoute: typeof GerenteSaquesRoute
 }
 
@@ -1264,6 +1304,7 @@ const GerenteRouteChildren: GerenteRouteChildren = {
   GerenteAjustesIndicadosRoute: GerenteAjustesIndicadosRoute,
   GerenteCriarContaRoute: GerenteCriarContaRoute,
   GerenteCriarDemoRoute: GerenteCriarDemoRoute,
+  GerenteEsqueciSenhaRoute: GerenteEsqueciSenhaRoute,
   GerenteGerentesRoute: GerenteGerentesRoute,
   GerenteIndicadosRoute: GerenteIndicadosRoute,
   GerenteIndicarRoute: GerenteIndicarRoute,
@@ -1271,6 +1312,7 @@ const GerenteRouteChildren: GerenteRouteChildren = {
   GerenteMeusSaquesRoute: GerenteMeusSaquesRoute,
   GerenteNotificacoesRoute: GerenteNotificacoesRoute,
   GerentePainelRoute: GerentePainelRoute,
+  GerenteRedefinirSenhaRoute: GerenteRedefinirSenhaRoute,
   GerenteSaquesRoute: GerenteSaquesRoute,
 }
 

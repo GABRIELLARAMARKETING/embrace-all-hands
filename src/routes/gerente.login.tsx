@@ -187,7 +187,17 @@ function LoginPage() {
               <Lock size={16} className="mr-2" />
               Entrar no painel
             </AdminButton>
+
+            <div className="flex justify-end">
+              <Link
+                to="/gerente/esqueci-senha"
+                className="text-xs font-medium text-[color:var(--admin-text-2)] hover:text-[color:var(--admin-neon)]"
+              >
+                Esqueci minha senha
+              </Link>
+            </div>
           </form>
+
 
           <div className="mt-6 flex items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-[color:var(--admin-text-3)]">
             <span className="h-px flex-1 bg-[color:var(--admin-border)]" />
