@@ -57,7 +57,23 @@ function JogarPage() {
   const balance = profileQuery.data?.balance ?? 0;
   const isDemo = !!profileQuery.data?.isDemo;
   const demoBalance = profileQuery.data?.demoBalance ?? 0;
+  const roles = profileQuery.data?.roles ?? [];
+  const primaryRole =
+    roles.find((r) => r === "super_admin") ??
+    roles.find((r) => r === "admin") ??
+    roles.find((r) => r === "gerente") ??
+    roles.find((r) => r === "afiliado") ??
+    roles[0] ??
+    "jogador";
+  const roleLabel: Record<string, string> = {
+    super_admin: "Super Admin",
+    admin: "Admin",
+    gerente: "Gerente",
+    afiliado: "Afiliado",
+    jogador: "Jogador",
+  };
   const effectiveBalance = isDemo ? demoBalance : balance;
+
 
   // Garante que o valor selecionado continue cabendo no saldo atual — apenas
   // depois que o perfil terminou de carregar; durante o loading effectiveBalance=0
