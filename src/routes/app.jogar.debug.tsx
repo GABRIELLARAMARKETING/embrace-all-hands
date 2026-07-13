@@ -68,7 +68,7 @@ function DebugPage() {
                 </div>
               )}
               <div className="mt-1 font-mono text-[11px] text-white/50">
-                allowedAmounts: [{q.data.allowedAmounts.join(", ")}]
+                allowedAmounts: qualquer valor positivo dentro do saldo
               </div>
             </div>
 
