@@ -6,9 +6,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const CPF_RE = /^\d{11}$/;
-const MIN_DEPOSIT = 5; // R$
+const MIN_DEPOSIT = 20; // R$
 const MAX_DEPOSIT = 100; // R$
-const ALLOWED_AMOUNTS = new Set<number>([5, 10, 20, 30, 50, 100]);
+const ALLOWED_AMOUNTS = new Set<number>([20, 30, 50, 100]);
+const ALLOWED_AMOUNTS_LABEL = "R$ 20, 30, 50 ou 100";
 
 function onlyDigits(s: string): string {
   return String(s || "").replace(/\D+/g, "");
