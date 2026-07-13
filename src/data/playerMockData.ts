@@ -17,8 +17,8 @@ export const PLAYER_MOCK = {
   commissionPercent: 50,
   withdrawMin: 20,
   depositMin: 20,
-  depositOptions: [10, 20, 30, 50, 100] as const,
-  playOptions: [10, 20, 30, 50, 100] as const,
+  depositOptions: [20, 30, 50, 100] as const,
+  playOptions: [20, 30, 50, 100] as const,
   pixMockCode:
     "00020126360014BR.GOV.BCB.PIX0114+55119999999995204000053039865405120.005802BR5910HelixMulti6009SaoPaulo62070503***6304ABCD",
   referralStats: {
@@ -38,7 +38,7 @@ export const MAP_OPTIONS: MapOption[] = [
 ];
 
 export const DEPOSIT_BADGES: Record<number, { label: string; tone: "min" | "hot" | "pop" | "bonus" }> = {
-  10: { label: "MÍNIMO", tone: "min" },
+  20: { label: "MÍNIMO", tone: "min" },
   50: { label: "POPULAR", tone: "pop" },
   100: { label: "BÔNUS +100%", tone: "bonus" },
 };

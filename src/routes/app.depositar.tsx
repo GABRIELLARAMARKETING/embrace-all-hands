@@ -125,7 +125,7 @@ function DepositarPage() {
 
   const onSubmit = () => {
     if (!(PLAYER_MOCK.depositOptions as readonly number[]).includes(amount)) {
-      toast.error("Selecione um valor permitido: R$ 5, 10, 20, 30, 50 ou 100.");
+      toast.error("Selecione um valor permitido: R$ 20, 30, 50 ou 100.");
       return;
     }
     setConfirmOpen(true);
