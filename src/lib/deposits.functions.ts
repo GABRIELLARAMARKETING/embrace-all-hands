@@ -6,9 +6,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const CPF_RE = /^\d{11}$/;
-const MIN_DEPOSIT = 5; // R$
+const MIN_DEPOSIT = 20; // R$
 const MAX_DEPOSIT = 100; // R$
-const ALLOWED_AMOUNTS = new Set<number>([5, 10, 20, 30, 50, 100]);
+const ALLOWED_AMOUNTS = new Set<number>([20, 30, 50, 100]);
+const ALLOWED_AMOUNTS_LABEL = "R$ 20, 30, 50 ou 100";
 
 function onlyDigits(s: string): string {
   return String(s || "").replace(/\D+/g, "");
@@ -30,10 +31,10 @@ export const createDiggionDeposit = createServerFn({ method: "POST" })
     z
       .object({
         amount: z
-          .number()
-          .min(MIN_DEPOSIT)
-          .max(MAX_DEPOSIT)
-          .refine((v) => ALLOWED_AMOUNTS.has(v), "Valor de depósito não permitido"),
+          .number({ invalid_type_error: `Selecione um valor de depósito (${ALLOWED_AMOUNTS_LABEL}).` })
+          .min(MIN_DEPOSIT, `Depósito mínimo é R$ ${MIN_DEPOSIT}. Valores permitidos: ${ALLOWED_AMOUNTS_LABEL}.`)
+          .max(MAX_DEPOSIT, `Depósito máximo é R$ ${MAX_DEPOSIT}. Valores permitidos: ${ALLOWED_AMOUNTS_LABEL}.`)
+          .refine((v) => ALLOWED_AMOUNTS.has(v), `Valor de depósito não permitido. Escolha ${ALLOWED_AMOUNTS_LABEL}.`),
         cpf: z
           .string()
           .transform(onlyDigits)
