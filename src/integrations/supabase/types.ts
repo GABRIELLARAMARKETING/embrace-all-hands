@@ -1633,12 +1633,10 @@ export type Database = {
         Args: { _amount: number; _theme_id?: string }
         Returns: Json
       }
-      helix_create_session:
-        | {
-            Args: { _amount: number; _deposit_id: string; _theme_id?: string }
-            Returns: Json
-          }
-        | { Args: { _deposit_id: string; _theme_id?: string }; Returns: Json }
+      helix_create_session: {
+        Args: { _amount: number; _deposit_id: string; _theme_id?: string }
+        Returns: Json
+      }
       helix_finish_session: {
         Args: { _reason?: string; _session_id: string }
         Returns: Json
