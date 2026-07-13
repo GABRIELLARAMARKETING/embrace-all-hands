@@ -92,11 +92,12 @@ function JogarPage() {
     const centsValue = Math.floor(parsed * 100) / 100;
     setValue(Math.min(centsValue, maxEntry));
   };
-  // Habilita JOGAR: em modo demo, quando um valor válido está selecionado e cabe no demo_balance;
-  // em modo real, quando existe depósito confirmado e o valor cabe no saldo.
+  // Habilita JOGAR: em modo demo, quando um valor válido cabe no demo_balance;
+  // em modo real, quando o valor cabe no saldo (backend valida se há depósito confirmado).
   const canPlay = isDemo
     ? effectiveValue != null && effectiveValue > 0 && demoBalance >= effectiveValue
-    : playable.isSuccess && !!referenceDepositId && effectiveValue != null && effectiveValue > 0 && balance >= effectiveValue && !playable.isFetching;
+    : profileQuery.isSuccess && effectiveValue != null && effectiveValue > 0 && balance >= effectiveValue;
+
 
   // Revalidação server-side no clique de JOGAR (defesa em profundidade).
   const validateFn = useServerFn(validatePlayValue);
