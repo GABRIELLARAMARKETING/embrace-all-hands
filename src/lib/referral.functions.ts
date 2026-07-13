@@ -34,8 +34,6 @@ export const getReferralStats = createServerFn({ method: "GET" })
 
     let affiliateCode = profile?.affiliate_code ?? null;
 
-    // Garante que o usuário tenha um affiliate_code (trigger cobre novos users,
-    // mas contas antigas podem não ter). Gera on-demand via RPC.
     if (!affiliateCode) {
       const { data: code } = await supabase.rpc("generate_affiliate_code" as never);
       if (code) {
@@ -43,6 +41,26 @@ export const getReferralStats = createServerFn({ method: "GET" })
         affiliateCode = code as string;
       }
     }
+
+    // Fonte de verdade para saldo/total: tabela commissions.
+    // process_deposit_commissions insere em commissions mas não atualiza os
+    // campos agregados do perfil, então o painel /app/indicar exibia zero
+    // mesmo com comissões disponíveis.
+    const { data: commissionRows } = await supabase
+      .from("commissions")
+      .select("amount, status")
+      .eq("affiliate_id", userId);
+
+    let availableSum = 0;
+    let paidSum = 0;
+    for (const c of (commissionRows ?? []) as Array<{ amount: number; status: string }>) {
+      const amt = Number(c.amount ?? 0);
+      if (c.status === "available") availableSum += amt;
+      else if (c.status === "paid") paidSum += amt;
+    }
+
+    const affiliateBalance = Math.max(Number(profile?.affiliate_balance ?? 0), availableSum);
+    const totalReceived = Math.max(Number(profile?.total_received ?? 0), paidSum);
 
     // Agrega contagem por nível a partir de referrals
     const { data: refs } = await supabase
