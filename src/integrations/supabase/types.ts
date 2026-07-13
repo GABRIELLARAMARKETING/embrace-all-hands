@@ -1720,12 +1720,16 @@ export type Database = {
           user_id: string
         }[]
       }
+      sync_profile_is_influencer: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
       test_demo_account_isolation: { Args: never; Returns: string }
       test_helix_flow: { Args: never; Returns: string }
       test_multilevel_flow: { Args: never; Returns: string }
     }
     Enums: {
-      app_role: "super_admin" | "admin" | "gerente" | "afiliado"
+      app_role: "super_admin" | "admin" | "gerente" | "afiliado" | "jogador"
       commission_status:
         | "pending"
         | "approved"
@@ -1893,7 +1897,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["super_admin", "admin", "gerente", "afiliado"],
+      app_role: ["super_admin", "admin", "gerente", "afiliado", "jogador"],
       commission_status: [
         "pending",
         "approved",
