@@ -246,12 +246,13 @@ function JogarPage() {
               Modo demo — saldo demo {formatCurrency(demoBalance)} (não sacável).
             </div>
           ) : (
-            !playable.isLoading && !referenceDepositId && (
+            !profileQuery.isLoading && balance <= 0 && (
               <div className="mt-2 text-[11px] font-semibold text-amber-300/90">
-                Nenhum saldo confirmado disponível para jogar. Faça um depósito para liberar.
+                Saldo zerado. Faça um depósito para liberar o jogo.
               </div>
             )
           )}
+
 
 
 
