@@ -29,21 +29,45 @@ type FormValues = z.infer<typeof schema>;
 
 function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
+  const [sentTo, setSentTo] = useState<string>("");
+  const [cooldown, setCooldown] = useState(0);
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { email: "" },
   });
 
-  const onSubmit = async ({ email }: FormValues) => {
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const t = setInterval(() => setCooldown((s) => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(t);
+  }, [cooldown]);
+
+  const sendReset = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/gerente/redefinir-senha`,
     });
     if (error) {
       toast.error(error.message);
-      return;
+      return false;
     }
+    return true;
+  };
+
+  const onSubmit = async ({ email }: FormValues) => {
+    const ok = await sendReset(email);
+    if (!ok) return;
     toast.success("Enviamos um link para seu e-mail.");
+    setSentTo(email);
     setSent(true);
+    setCooldown(RESEND_COOLDOWN_SECONDS);
+  };
+
+  const onResend = async () => {
+    if (cooldown > 0 || !sentTo) return;
+    const ok = await sendReset(sentTo);
+    if (!ok) return;
+    toast.success("Link reenviado.");
+    setCooldown(RESEND_COOLDOWN_SECONDS);
   };
 
   return (
@@ -73,12 +97,40 @@ function ForgotPasswordPage() {
           {sent ? (
             <div className="space-y-5">
               <div className="flex flex-col items-center text-center">
-                <CheckCircle2 size={48} className="text-[color:var(--admin-neon)]" />
-                <h2 className="mt-4 text-xl font-extrabold text-white">Verifique seu e-mail</h2>
+                <div className="grid h-16 w-16 place-items-center rounded-full bg-[color:var(--admin-green)]/15">
+                  <CheckCircle2 size={40} className="text-[color:var(--admin-neon)]" />
+                </div>
+                <h2 className="mt-4 text-xl font-extrabold text-white">E-mail enviado!</h2>
                 <p className="mt-2 text-sm text-[color:var(--admin-text-2)]">
-                  Se existir uma conta com este e-mail, você receberá um link para redefinir sua senha em instantes.
+                  Enviamos um link de redefinição de senha para
+                </p>
+                <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-white">
+                  <MailCheck size={16} className="text-[color:var(--admin-neon)]" />
+                  {sentTo}
                 </p>
               </div>
+
+              <div className="rounded-[10px] border border-[color:var(--admin-border)] bg-[color:var(--admin-input)]/60 p-4">
+                <div className="flex items-start gap-3">
+                  <Clock size={18} className="mt-0.5 shrink-0 text-[color:var(--admin-neon)]" />
+                  <div className="space-y-1 text-xs text-[color:var(--admin-text-2)]">
+                    <p className="font-semibold text-white">Tempo estimado de entrega: 1 a 3 minutos</p>
+                    <p>Verifique também sua caixa de spam ou lixo eletrônico.</p>
+                    <p>O link expira em <span className="font-semibold text-white">1 hora</span> por segurança.</p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={onResend}
+                disabled={cooldown > 0}
+                className="flex w-full items-center justify-center gap-2 rounded-[10px] border border-[color:var(--admin-border)] bg-transparent px-4 py-2.5 text-sm font-semibold text-[color:var(--admin-text-2)] transition-colors hover:border-[color:var(--admin-green)] hover:text-[color:var(--admin-neon)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <RefreshCw size={14} />
+                {cooldown > 0 ? `Reenviar em ${cooldown}s` : "Reenviar e-mail"}
+              </button>
+
               <Link
                 to="/gerente/login"
                 className="flex items-center justify-center gap-2 rounded-[10px] border border-[color:var(--admin-border)] bg-[color:var(--admin-input)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:border-[color:var(--admin-green)] hover:text-[color:var(--admin-neon)]"
