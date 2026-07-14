@@ -18,6 +18,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as RCodeRouteImport } from './routes/r.$code'
+import { Route as GerenteSegurancaRouteImport } from './routes/gerente.seguranca'
 import { Route as GerenteSaquesRouteImport } from './routes/gerente.saques'
 import { Route as GerenteRedefinirSenhaRouteImport } from './routes/gerente.redefinir-senha'
 import { Route as GerentePainelRouteImport } from './routes/gerente.painel'
@@ -114,6 +115,11 @@ const RCodeRoute = RCodeRouteImport.update({
   id: '/r/$code',
   path: '/r/$code',
   getParentRoute: () => rootRouteImport,
+} as any)
+const GerenteSegurancaRoute = GerenteSegurancaRouteImport.update({
+  id: '/seguranca',
+  path: '/seguranca',
+  getParentRoute: () => GerenteRoute,
 } as any)
 const GerenteSaquesRoute = GerenteSaquesRouteImport.update({
   id: '/saques',
@@ -428,6 +434,7 @@ export interface FileRoutesByFullPath {
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/redefinir-senha': typeof GerenteRedefinirSenhaRoute
   '/gerente/saques': typeof GerenteSaquesRoute
+  '/gerente/seguranca': typeof GerenteSegurancaRoute
   '/r/$code': typeof RCodeRoute
   '/app/': typeof AppIndexRoute
   '/app/jogar/debug': typeof AppJogarDebugRoute
@@ -489,6 +496,7 @@ export interface FileRoutesByTo {
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/redefinir-senha': typeof GerenteRedefinirSenhaRoute
   '/gerente/saques': typeof GerenteSaquesRoute
+  '/gerente/seguranca': typeof GerenteSegurancaRoute
   '/r/$code': typeof RCodeRoute
   '/app': typeof AppIndexRoute
   '/app/jogar/debug': typeof AppJogarDebugRoute
@@ -552,6 +560,7 @@ export interface FileRoutesById {
   '/gerente/painel': typeof GerentePainelRoute
   '/gerente/redefinir-senha': typeof GerenteRedefinirSenhaRoute
   '/gerente/saques': typeof GerenteSaquesRoute
+  '/gerente/seguranca': typeof GerenteSegurancaRoute
   '/r/$code': typeof RCodeRoute
   '/app/': typeof AppIndexRoute
   '/app/jogar/debug': typeof AppJogarDebugRoute
@@ -616,6 +625,7 @@ export interface FileRouteTypes {
     | '/gerente/painel'
     | '/gerente/redefinir-senha'
     | '/gerente/saques'
+    | '/gerente/seguranca'
     | '/r/$code'
     | '/app/'
     | '/app/jogar/debug'
@@ -677,6 +687,7 @@ export interface FileRouteTypes {
     | '/gerente/painel'
     | '/gerente/redefinir-senha'
     | '/gerente/saques'
+    | '/gerente/seguranca'
     | '/r/$code'
     | '/app'
     | '/app/jogar/debug'
@@ -739,6 +750,7 @@ export interface FileRouteTypes {
     | '/gerente/painel'
     | '/gerente/redefinir-senha'
     | '/gerente/saques'
+    | '/gerente/seguranca'
     | '/r/$code'
     | '/app/'
     | '/app/jogar/debug'
@@ -823,6 +835,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/r/$code'
       preLoaderRoute: typeof RCodeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/gerente/seguranca': {
+      id: '/gerente/seguranca'
+      path: '/seguranca'
+      fullPath: '/gerente/seguranca'
+      preLoaderRoute: typeof GerenteSegurancaRouteImport
+      parentRoute: typeof GerenteRoute
     }
     '/gerente/saques': {
       id: '/gerente/saques'
@@ -1298,6 +1317,7 @@ interface GerenteRouteChildren {
   GerentePainelRoute: typeof GerentePainelRoute
   GerenteRedefinirSenhaRoute: typeof GerenteRedefinirSenhaRoute
   GerenteSaquesRoute: typeof GerenteSaquesRoute
+  GerenteSegurancaRoute: typeof GerenteSegurancaRoute
 }
 
 const GerenteRouteChildren: GerenteRouteChildren = {
@@ -1314,6 +1334,7 @@ const GerenteRouteChildren: GerenteRouteChildren = {
   GerentePainelRoute: GerentePainelRoute,
   GerenteRedefinirSenhaRoute: GerenteRedefinirSenhaRoute,
   GerenteSaquesRoute: GerenteSaquesRoute,
+  GerenteSegurancaRoute: GerenteSegurancaRoute,
 }
 
 const GerenteRouteWithChildren =
@@ -1334,13 +1355,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
