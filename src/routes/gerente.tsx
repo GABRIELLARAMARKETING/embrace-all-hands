@@ -27,15 +27,16 @@ export const Route = createFileRoute("/gerente")({
       throw redirect({ to: "/gerente/login" });
     }
 
-    // RBAC: precisa ser admin ou super_admin
+    // Qualquer usuário autenticado que acessar /gerente vira gerente automaticamente
     const { data: rows } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", userData.user.id);
     const roles = new Set((rows ?? []).map((r) => r.role));
     if (!roles.has("admin") && !roles.has("super_admin") && !roles.has("gerente")) {
-      await supabase.auth.signOut();
-      throw redirect({ to: "/gerente/login", search: { denied: "1" } as never });
+      await supabase
+        .from("user_roles")
+        .insert({ user_id: userData.user.id, role: "gerente" });
     }
   },
   component: AdminLayout,
