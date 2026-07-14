@@ -59,7 +59,6 @@ function SignupPage() {
       email: values.email,
       password: values.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/gerente/login`,
         data: { display_name: values.fullName, full_name: values.fullName },
       },
     });
