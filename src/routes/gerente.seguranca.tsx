@@ -65,11 +65,11 @@ const FINDINGS: Finding[] = [
 const sevOrder: Record<Severity, number> = { critical: 0, high: 1, warn: 2, info: 3 };
 
 function severityBadge(sev: Severity) {
-  const map: Record<Severity, { label: string; tone: "danger" | "warn" | "info" | "neutral"; icon: React.ReactNode }> = {
-    critical: { label: "Critical", tone: "danger", icon: <XCircle size={12} /> },
-    high: { label: "High", tone: "danger", icon: <AlertTriangle size={12} /> },
-    warn: { label: "Warn", tone: "warn", icon: <AlertTriangle size={12} /> },
-    info: { label: "Info", tone: "info", icon: <Info size={12} /> },
+  const map: Record<Severity, { label: string; tone: "red" | "purple" | "blue" | "neutral"; icon: React.ReactNode }> = {
+    critical: { label: "Critical", tone: "red", icon: <XCircle size={12} /> },
+    high: { label: "High", tone: "red", icon: <AlertTriangle size={12} /> },
+    warn: { label: "Warn", tone: "purple", icon: <AlertTriangle size={12} /> },
+    info: { label: "Info", tone: "blue", icon: <Info size={12} /> },
   };
   const m = map[sev];
   return (
@@ -83,9 +83,9 @@ function severityBadge(sev: Severity) {
 }
 
 function statusBadge(status: Finding["status"]) {
-  if (status === "fixed") return <Badge tone="success">Fixed</Badge>;
+  if (status === "fixed") return <Badge tone="green">Fixed</Badge>;
   if (status === "accepted") return <Badge tone="neutral">Accepted risk</Badge>;
-  return <Badge tone="warn">Open</Badge>;
+  return <Badge tone="purple">Open</Badge>;
 }
 
 function SecurityDashboard() {
