@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AdminCard } from "@/components/admin/AdminCard";
 import { Badge } from "@/components/admin/Badge";
 import { SectionTitle } from "@/components/admin/SectionTitle";
+import { TopHeader } from "@/components/admin/TopHeader";
 import { AlertTriangle, Info, XCircle } from "lucide-react";
 
 export const Route = createFileRoute("/gerente/seguranca")({
