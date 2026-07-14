@@ -158,6 +158,7 @@ function SecurityDashboard() {
         Snapshot atualizado manualmente a partir do scanner Lovable. Achados em tempo real ficam na
         aba Security do dashboard Lovable.
       </p>
-    </div>
+      </div>
+    </>
   );
 }
