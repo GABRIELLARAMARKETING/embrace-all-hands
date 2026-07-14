@@ -35,6 +35,7 @@ const items: NavItem[] = [
     icon: <Settings2 size={18} />,
   },
   { to: "/gerente/notificacoes", label: "Notificações", icon: <Bell size={18} /> },
+  { to: "/gerente/seguranca", label: "Segurança", icon: <ShieldCheck size={18} /> },
 ];
 
 
