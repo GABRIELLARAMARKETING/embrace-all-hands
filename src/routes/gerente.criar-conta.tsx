@@ -107,8 +107,7 @@ function SignupPage() {
               <div>
                 <h2 className="text-2xl font-extrabold text-white">Conta criada</h2>
                 <p className="mt-2 text-sm text-[color:var(--admin-text-2)]">
-                  Enviamos um e-mail de confirmação. Assim que confirmar, um administrador
-                  precisa liberar seu acesso de gerente antes do primeiro login.
+                  Um administrador precisa liberar seu acesso de gerente antes do primeiro login.
                 </p>
               </div>
               <AdminButton
