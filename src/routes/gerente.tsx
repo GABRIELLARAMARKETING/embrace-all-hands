@@ -8,8 +8,14 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/gerente")({
   ssr: false,
   beforeLoad: async ({ location }) => {
-    // Login page é público
-    if (location.pathname === "/gerente/login") return;
+    // Rotas públicas do fluxo de autenticação
+    const PUBLIC_PATHS = [
+      "/gerente/login",
+      "/gerente/criar-conta",
+      "/gerente/esqueci-senha",
+      "/gerente/redefinir-senha",
+    ];
+    if (PUBLIC_PATHS.includes(location.pathname)) return;
 
     if (location.pathname === "/gerente" || location.pathname === "/gerente/") {
       throw redirect({ to: "/gerente/painel" });
