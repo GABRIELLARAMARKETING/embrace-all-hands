@@ -202,15 +202,23 @@
 }
 
 .admin-scroll * {
-  touch-action: pan-y;
+  touch-action: manipulation;
 }
 
 /* Inputs must still allow text selection / caret on iOS */
 .admin-scroll input,
 .admin-scroll textarea,
-.admin-scroll select,
-.admin-scroll button {
-  touch-action: pan-y;
+.admin-scroll select {
+  touch-action: manipulation;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.admin-scroll a,
+.admin-scroll button,
+.admin-scroll [role="button"] {
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(0, 230, 118, 0.15);
 }
 
 /* Public login/signup routes also live under the game shell, where the

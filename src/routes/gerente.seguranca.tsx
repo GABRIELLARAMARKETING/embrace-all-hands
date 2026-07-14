@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AdminCard } from "@/components/admin/AdminCard";
 import { Badge } from "@/components/admin/Badge";
 import { SectionTitle } from "@/components/admin/SectionTitle";
+import { TopHeader } from "@/components/admin/TopHeader";
 import { AlertTriangle, Info, XCircle } from "lucide-react";
 
 export const Route = createFileRoute("/gerente/seguranca")({
@@ -95,11 +96,13 @@ function SecurityDashboard() {
   const acceptedCount = sorted.filter((f) => f.status === "accepted").length;
 
   return (
-    <div className="space-y-6 p-6">
-      <SectionTitle
-        title="Segurança"
-        subtitle="Últimos achados dos scanners de segurança do projeto."
-      />
+    <>
+      <TopHeader title="Segurança" subtitle="Últimos achados dos scanners de segurança do projeto." />
+      <div className="space-y-6 p-4 sm:p-6">
+        <SectionTitle
+          title="Segurança"
+          subtitle="Últimos achados dos scanners de segurança do projeto."
+        />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <AdminCard>
@@ -155,6 +158,7 @@ function SecurityDashboard() {
         Snapshot atualizado manualmente a partir do scanner Lovable. Achados em tempo real ficam na
         aba Security do dashboard Lovable.
       </p>
-    </div>
+      </div>
+    </>
   );
 }
