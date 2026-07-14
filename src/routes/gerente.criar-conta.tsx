@@ -70,8 +70,19 @@ function SignupPage() {
       toast.error("Não foi possível criar a conta.");
       return;
     }
-    setDone(true);
-    toast.success("Conta criada! Aguardando liberação de acesso.");
+    // Garante sessão ativa e redireciona direto para a área logada
+    if (!data.session) {
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      });
+      if (signInErr) {
+        toast.error(signInErr.message);
+        return;
+      }
+    }
+    toast.success("Conta criada! Redirecionando...");
+    navigate({ to: "/gerente", replace: true });
   };
 
   return (
