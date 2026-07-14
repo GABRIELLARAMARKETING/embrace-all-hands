@@ -151,7 +151,7 @@ function SignupPage() {
 
   return (
     <main
-      className="relative flex min-h-screen w-full items-center justify-center overflow-hidden px-4 py-8"
+      className="auth-scroll relative flex min-h-screen w-full items-start justify-center px-4 py-8 sm:items-center"
       style={{
         fontFamily: "'Poppins', ui-sans-serif, system-ui, sans-serif",
         background:
