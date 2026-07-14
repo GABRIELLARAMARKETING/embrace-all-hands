@@ -191,9 +191,23 @@
  * scroll their own main region, so we allow scroll on a scoped container. */
 .admin-scroll {
   height: 100vh;
+  height: 100dvh; /* iOS: exclude dynamic toolbars so content isn't clipped */
   overflow-y: auto;
   overscroll-behavior: contain;
-  touch-action: auto;
+  touch-action: pan-y; /* iOS Safari respects pan-y over inherited `none` */
+  -webkit-overflow-scrolling: touch; /* momentum scroll on iPhone/iPad */
+}
+
+.admin-scroll * {
+  touch-action: pan-y;
+}
+
+/* Inputs must still allow text selection / caret on iOS */
+.admin-scroll input,
+.admin-scroll textarea,
+.admin-scroll select,
+.admin-scroll button {
+  touch-action: manipulation;
 }
 
 /* Player app (mobile-first prototype) needs its own scroll container. */
