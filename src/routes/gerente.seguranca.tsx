@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AdminCard } from "@/components/admin/AdminCard";
 import { Badge } from "@/components/admin/Badge";
 import { SectionTitle } from "@/components/admin/SectionTitle";
-import { ShieldCheck, AlertTriangle, Info, XCircle } from "lucide-react";
+import { AlertTriangle, Info, XCircle } from "lucide-react";
 
 export const Route = createFileRoute("/gerente/seguranca")({
   component: SecurityDashboard,
