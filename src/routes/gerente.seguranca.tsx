@@ -96,11 +96,13 @@ function SecurityDashboard() {
   const acceptedCount = sorted.filter((f) => f.status === "accepted").length;
 
   return (
-    <div className="space-y-6 p-6">
-      <SectionTitle
-        title="Segurança"
-        subtitle="Últimos achados dos scanners de segurança do projeto."
-      />
+    <>
+      <TopHeader title="Segurança" subtitle="Últimos achados dos scanners de segurança do projeto." />
+      <div className="space-y-6 p-4 sm:p-6">
+        <SectionTitle
+          title="Segurança"
+          subtitle="Últimos achados dos scanners de segurança do projeto."
+        />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <AdminCard>
