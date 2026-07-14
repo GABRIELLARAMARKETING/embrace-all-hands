@@ -50,11 +50,8 @@ export const useAdminUI = () => useContext(AdminUIContext);
 
 function AdminLayout() {
   const location = useLocation();
+  const isPublicAuthPath = PUBLIC_AUTH_PATHS.includes(location.pathname);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  if (PUBLIC_AUTH_PATHS.includes(location.pathname)) {
-    return <Outlet />;
-  }
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -62,6 +59,10 @@ function AdminLayout() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [mobileOpen]);
+
+  if (isPublicAuthPath) {
+    return <Outlet />;
+  }
 
   return (
     <AdminUIContext.Provider value={{ openMobileMenu: () => setMobileOpen(true) }}>
