@@ -99,7 +99,6 @@ function SecurityDashboard() {
       <SectionTitle
         title="Segurança"
         subtitle="Últimos achados dos scanners de segurança do projeto."
-        icon={<ShieldCheck size={20} />}
       />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
