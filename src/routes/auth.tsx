@@ -100,7 +100,6 @@ function SignupPage() {
         email: safe.email,
         password: safe.password,
         options: {
-          emailRedirectTo: window.location.origin,
           data: { display_name: name.trim(), phone: digits, cpf: cpfDigits, ref },
         },
       });
