@@ -1,21 +1,22 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useLocation } from "@tanstack/react-router";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { FloatingChatButton } from "@/components/admin/FloatingChatButton";
 import { AnimatePresence, motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
+const PUBLIC_AUTH_PATHS = [
+  "/gerente/login",
+  "/gerente/criar-conta",
+  "/gerente/esqueci-senha",
+  "/gerente/redefinir-senha",
+];
+
 export const Route = createFileRoute("/gerente")({
   ssr: false,
   beforeLoad: async ({ location }) => {
     // Rotas públicas do fluxo de autenticação
-    const PUBLIC_PATHS = [
-      "/gerente/login",
-      "/gerente/criar-conta",
-      "/gerente/esqueci-senha",
-      "/gerente/redefinir-senha",
-    ];
-    if (PUBLIC_PATHS.includes(location.pathname)) return;
+    if (PUBLIC_AUTH_PATHS.includes(location.pathname)) return;
 
     if (location.pathname === "/gerente" || location.pathname === "/gerente/") {
       throw redirect({ to: "/gerente/painel" });
@@ -48,6 +49,8 @@ const AdminUIContext = createContext<AdminUICtx>({ openMobileMenu: () => {} });
 export const useAdminUI = () => useContext(AdminUIContext);
 
 function AdminLayout() {
+  const location = useLocation();
+  const isPublicAuthPath = PUBLIC_AUTH_PATHS.includes(location.pathname);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
@@ -56,6 +59,10 @@ function AdminLayout() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [mobileOpen]);
+
+  if (isPublicAuthPath) {
+    return <Outlet />;
+  }
 
   return (
     <AdminUIContext.Provider value={{ openMobileMenu: () => setMobileOpen(true) }}>

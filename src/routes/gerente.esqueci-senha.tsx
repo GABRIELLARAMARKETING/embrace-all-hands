@@ -71,7 +71,7 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <div className="admin-theme admin-scroll relative flex min-h-screen w-full items-center justify-center bg-[color:var(--admin-bg)] px-4 py-10">
+    <div className="admin-theme admin-scroll relative flex min-h-screen w-full items-start justify-center bg-[color:var(--admin-bg)] px-4 py-10 lg:items-center">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-32 -left-24 h-96 w-96 rounded-full bg-[color:var(--admin-green)]/15 blur-[120px]" />
         <div className="absolute -bottom-32 -right-24 h-96 w-96 rounded-full bg-[color:var(--admin-neon)]/10 blur-[120px]" />

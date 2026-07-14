@@ -192,8 +192,11 @@
 .admin-scroll {
   height: 100vh;
   height: 100dvh; /* iOS: exclude dynamic toolbars so content isn't clipped */
+  min-height: 100dvh;
   overflow-y: auto;
+  overflow-x: hidden;
   overscroll-behavior: contain;
+  padding-bottom: max(2.5rem, env(safe-area-inset-bottom));
   touch-action: pan-y; /* iOS Safari respects pan-y over inherited `none` */
   -webkit-overflow-scrolling: touch; /* momentum scroll on iPhone/iPad */
 }
@@ -207,7 +210,27 @@
 .admin-scroll textarea,
 .admin-scroll select,
 .admin-scroll button {
-  touch-action: manipulation;
+  touch-action: pan-y;
+}
+
+/* Public login/signup routes also live under the game shell, where the
+ * document is locked. They need a dedicated iOS-friendly scroll container. */
+.auth-scroll {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.auth-scroll *,
+.auth-scroll input,
+.auth-scroll button {
+  touch-action: pan-y;
 }
 
 /* Player app (mobile-first prototype) needs its own scroll container. */
