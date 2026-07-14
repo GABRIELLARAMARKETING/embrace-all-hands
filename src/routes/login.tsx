@@ -89,8 +89,8 @@ function LoginPage() {
       let msg = "Não foi possível entrar. Tente novamente.";
       if (lower.includes("invalid") || lower.includes("credentials"))
         msg = "Email/telefone ou senha incorretos.";
-      else if (lower.includes("not confirmed") || lower.includes("email not"))
-        msg = "Confirme seu email antes de entrar.";
+      else if (lower.includes("invalid login") || lower.includes("invalid credentials"))
+        msg = "Email ou senha incorretos.";
       else if (lower.includes("rate") || lower.includes("too many"))
         msg = "Muitas tentativas. Aguarde alguns minutos.";
       else if (lower.includes("network") || lower.includes("fetch"))
